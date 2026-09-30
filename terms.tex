@@ -51,7 +51,7 @@
 \DeclareLectureTerm{block-diagonal}{分块对角矩阵}{Block Diagonal Matrix}{除主对角块之外各块均为零的矩阵；本书讨论的可逆性结论要求对角块为方阵。}
 \DeclareLectureTerm{block-matrix}{分块矩阵}{Block Matrix}{按若干固定行、列边界分成子矩阵的矩阵，用于记录分组输入与分组输出之间的作用。}
 \DeclareLectureTerm{block-upper-triangular}{分块上三角矩阵}{Block Upper Triangular Matrix}{主对角块下方各块全为零的分块矩阵，可按组从后向前求解对应方程。}
-\DeclareLectureTerm{column-space}{列空间}{Column Space}{矩阵各列向量张成的空间；$m\times n$ 矩阵的列空间是 $\mathbb R^m$ 的子空间。第3.9节选读引入。}
+\DeclareLectureTerm{column-space}{列空间}{Column Space}{矩阵各列向量张成的空间，即全部可能输出组成的集合；$m\times n$ 矩阵的列空间是 $\mathbb R^m$ 的子空间。第3.5节从转置引入。}
 \DeclareLectureTerm{composition}{复合}{Composition}{把一个映射的输出作为另一个映射的输入；$(S\circ T)(\boldsymbol x)=S(T(\boldsymbol x))$，先作右侧映射。}
 \DeclareLectureTerm{diagonal-matrix}{对角矩阵}{Diagonal Matrix}{主对角线以外的元素全为零的方阵，对应各坐标分量分别缩放。}
 \DeclareLectureTerm{elementary-column}{初等列变换}{Elementary Column Operations}{交换两列、非零倍乘一列、把一列的倍数加到另一列，分别对应右乘合适的初等矩阵。}
@@ -77,7 +77,9 @@
 \DeclareLectureTerm{permutation-matrix}{置换矩阵}{Permutation Matrix}{单位矩阵的行重新排列所得矩阵，每行每列恰有一个1；左乘它可重排行，且 $P^{-1}=P^{\mathrm T}$。}
 \DeclareLectureTerm{plu-factorization}{PLU分解}{PLU Factorization}{把换行记录到置换矩阵中的LU分解，本书约定写成 $PA=LU$；第3.8节为选读。}
 \DeclareLectureTerm{cr-factorization}{列秩分解}{Rank Factorization}{也称CR分解，将秩为 $r$ 的矩阵写成 $A=CR$；$C$ 有 $r$ 个独立列，$R$ 有 $r$ 个独立行，分别记录核心列与组合系数。}
-\DeclareLectureTerm{row-space}{行空间}{Row Space}{矩阵各行向量张成的空间；$m\times n$ 矩阵的行空间是 $\mathbb R^n$ 的子空间。第3.9节选读引入。}
+\DeclareLectureTerm{row-space}{行空间}{Row Space}{矩阵各行竖排后张成的空间，等于转置矩阵的列空间；$m\times n$ 矩阵的行空间是 $\mathbb R^n$ 的子空间。第3.5节从转置引入。}
+\DeclareLectureTerm{left-null-space}{左零空间}{Left Null Space}{转置矩阵的零空间，即满足 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$ 的全部向量；等价地有 $\boldsymbol y^{\mathrm T}A=\boldsymbol0^{\mathrm T}$。若 $A$ 为 $m\times n$，它是 $\mathbb R^m$ 的子空间。}
+\DeclareLectureTerm{fundamental-subspaces}{四个基本子空间}{Four Fundamental Subspaces}{矩阵的列空间、行空间、零空间与左零空间；行空间和零空间位于输入空间，列空间和左零空间位于输出空间。第3.5节铺垫，后续研究维数与正交关系。}
 \DeclareLectureTerm{map-scalar-mult}{映射的数乘}{Scalar Multiplication of a Map}{把映射的每个输出同乘标量，$(\lambda T)(\boldsymbol x)=\lambda T(\boldsymbol x)$。}
 \DeclareLectureTerm{singular-matrix}{奇异矩阵}{Singular Matrix}{不存在双侧逆的方阵。}
 \DeclareLectureTerm{skew-symmetric-matrix}{反对称矩阵}{Skew-Symmetric Matrix}{满足 $A^{\mathrm T}=-A$ 的实方阵，主对角线元素全为0。}

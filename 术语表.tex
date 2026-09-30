@@ -35,7 +35,7 @@
 \GlossaryEntry{系数矩阵}{Coefficient Matrix}{按固定未知数次序逐行收集线性方程组系数形成的数表。}
 \GlossaryEntry{共线}{Collinear}{向量起点统一后位于同一直线上；两个非零向量共线当且仅当一个是另一个的数倍。}
 \GlossaryEntry{列秩}{Column Rank}{矩阵列向量张成空间的维数；等于矩阵的秩，也等于行秩。}
-\GlossaryEntry{列空间}{Column Space}{矩阵各列向量张成的空间；$m\times n$ 矩阵的列空间是 $\mathbb R^m$ 的子空间。第3.9节选读引入。}
+\GlossaryEntry{列空间}{Column Space}{矩阵各列向量张成的空间，即全部可能输出组成的集合；$m\times n$ 矩阵的列空间是 $\mathbb R^m$ 的子空间。第3.5节从转置引入。}
 \GlossaryEntry{列向量}{Column Vector}{将分量按固定次序竖排得到的向量形式。}
 \GlossaryEntry{交换图}{Commutative Diagram}{用箭头表示映射，且任意两条起终点相同的相配路径具有相同的合成作用；本书用它说明换基与矩阵表示的关系。}
 \GlossaryEntry{交换律}{Commutative Law}{交换运算对象的次序不改变结果；如 $\boldsymbol u+\boldsymbol v=\boldsymbol v+\boldsymbol u$。}
@@ -93,6 +93,7 @@
 \GlossaryEntry{有限维空间}{Finite-Dimensional Space}{具有有限基的向量空间，零空间也属于有限维空间。}
 \GlossaryEntry{向前消元}{Forward Elimination}{逐列选择主元并消去其下方元素，将方程组或增广矩阵化成阶梯形的过程。}
 \GlossaryEntry{前代}{Forward Substitution}{从下三角方程组的第1行开始，自上而下依次求出未知量的方法。}
+\GlossaryEntry{四个基本子空间}{Four Fundamental Subspaces}{矩阵的列空间、行空间、零空间与左零空间；行空间和零空间位于输入空间，列空间和左零空间位于输出空间。第3.5节铺垫，后续研究维数与正交关系。}
 \GlossaryEntry{自由变量}{Free Variable}{系数矩阵非主元列对应的未知数；有解时可独立指定其值，再求主元变量。}
 \GlossaryEntry{自由向量}{Free Vector}{只由大小和方向确定、允许平移而不改变自身的几何向量。}
 \GlossaryEntry{列满秩}{Full Column Rank}{矩阵的列向量全部线性无关，即其列向量组的秩等于列数。}
@@ -131,6 +132,7 @@
 \GlossaryEntry{隐因子}{Latent Factor}{模型用于表示潜在联系的向量分量；本章以少量隐因子展示用户与内容的匹配。}
 \GlossaryEntry{余弦定理}{Law of Cosines}{三角形一边的平方等于另两边的平方和减去这两边与其夹角余弦乘积的两倍；将勾股定理推广到任意三角形。}
 \GlossaryEntry{最小二乘法}{Least Squares}{通过使误差平方和尽可能小来确定参数的方法；第3章先应用其线性方程形式，后续再研究其原理。}
+\GlossaryEntry{左零空间}{Left Null Space}{转置矩阵的零空间，即满足 $A^{\mathrm T}\boldsymbol y=\boldsymbol 0$ 的全部向量；等价地有 $\boldsymbol y^{\mathrm T}A=\boldsymbol 0^{\mathrm T}$。若 $A$ 为 $m\times n$，它是 $\mathbb R^m$ 的子空间。}
 \GlossaryEntry{线性代数}{Linear Algebra}{研究向量的线性关系、向量空间与线性映射及其代数表示的数学分支。}
 \GlossaryEntry{线性组合}{Linear Combination}{对给定向量分别作数乘后相加得到的向量。}
 \GlossaryEntry{线性方程}{Linear Equation}{形如 $a_1x_1+\cdots +a_nx_n=b$ 的方程，未知数只以一次项出现。}
@@ -220,7 +222,7 @@
 \GlossaryEntry{行阶梯形方程组}{Row Echelon System}{方程按固定未知数次序排列，全零方程置底，其余方程的首个非零项逐行右移的形式。}
 \GlossaryEntry{行等价}{Row Equivalence}{两个矩阵可通过有限次初等行变换互相得到的关系。}
 \GlossaryEntry{行秩}{Row Rank}{矩阵行向量张成空间的维数；等于列秩。}
-\GlossaryEntry{行空间}{Row Space}{矩阵各行向量张成的空间；$m\times n$ 矩阵的行空间是 $\mathbb R^n$ 的子空间。第3.9节选读引入。}
+\GlossaryEntry{行空间}{Row Space}{矩阵各行竖排后张成的空间，等于转置矩阵的列空间；$m\times n$ 矩阵的行空间是 $\mathbb R^n$ 的子空间。第3.5节从转置引入。}
 \GlossaryEntry{行向量}{Row Vector}{将分量按固定次序横排得到的向量形式，是相应列向量的转置。}
 \GlossaryLetter{S}
 \GlossaryEntry{标量}{Scalar}{来自所选域、用于数乘向量的数。}

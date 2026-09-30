@@ -6643,8 +6643,35 @@ $S(\boldsymbol\varepsilon_\ell)$ 是 $A$ 的第 $\ell$ 列，其第 $j$ 个分�
  \node[font=\footnotesize,text=ThreeGray] at (10.1,-.1) {$2\times3$};
 \end{tikzpicture}}{若把输出分量按 $\boldsymbol c$ 加权汇总，合并后输入分量的系数就是 $A^{\mathrm T}\boldsymbol c$。这种“把汇总系数往前传”的解释只使用线性组合。}
 
+\par\medskip\noindent\textbf{同一张数表，两种线性组合。}
+把 $m\times n$ 矩阵 $A$ 的列记为 $\boldsymbol a_1,\ldots,\boldsymbol a_n\in\mathbb R^m$，把它的第 $i$ 行写成 $\boldsymbol r_i^{\mathrm T}$，其中 $\boldsymbol r_i\in\mathbb R^n$。这里把一行的分量竖排成 $\boldsymbol r_i$，是为了继续使用本书的列向量记法。于是
+\[
+ A\boldsymbol x=x_1\boldsymbol a_1+\cdots+x_n\boldsymbol a_n,
+ \qquad
+ A^{\mathrm T}\boldsymbol y=y_1\boldsymbol r_1+\cdots+y_m\boldsymbol r_m.
+\]
+前一个乘积用 $n$ 个系数组合 $A$ 的列；后一个乘积用 $m$ 个系数组合 $A$ 的行（竖排后）。因此，$A$ 与 $A^{\mathrm T}$ 分别给出
+\[
+ \mathbb R^n\xrightarrow{\ A\ }\mathbb R^m,
+ \qquad
+ \mathbb R^m\xrightarrow{\ A^{\mathrm T}\ }\mathbb R^n.
+\]
+箭头方向相反，只说明输入、输出的维数交换了，并不说明两次作用能够互相撤销。
+
+对刚才的矩阵，取 $\boldsymbol x=(1,0)^{\mathrm T}$、$\boldsymbol y=(1,-1,0)^{\mathrm T}$，就有
+\[
+ A\boldsymbol x=\OpCol{1\\2\\5},\qquad
+ A^{\mathrm T}\boldsymbol y
+ =\OpCol{1\\3}-\OpCol{2\\4}=\OpCol{-1\\-1}.
+\]
+第二个结果正是第一行减第二行之后竖排的结果。若把第一个结果直接送入 $A^{\mathrm T}$，却得到
+\[
+ A^{\mathrm T}(A\boldsymbol x)=\OpCol{30\\41}\ne\OpCol{1\\0}.
+\]
+所以，“回到原来的维数”与“回到原来的向量”是两件事。转置的价值在于把行的组合也写成矩阵乘法，而不在于代替逆矩阵。
+
 \begin{property}[转置的运算法则]
-对尺寸相容的矩阵与实数 $\lambda$，有
+对使下列运算有意义的矩阵与实数 $\lambda$，有
 \[
  (A^{\mathrm T})^{\mathrm T}=A,\quad
  (A+B)^{\mathrm T}=A^{\mathrm T}+B^{\mathrm T},\quad
@@ -6677,6 +6704,79 @@ $S(\boldsymbol\varepsilon_\ell)$ 是 $A$ 的第 $\ell$ 列，其第 $j$ 个分�
  A=\frac{A+A^{\mathrm T}}2+\frac{A-A^{\mathrm T}}2.
 \]
 对两部分分别取转置，就能核对它们的性质。
+
+\par\medskip\noindent\textbf{从转置看四个相关的子空间。}
+第1章已经讲过向量组的张成空间。现在可以把矩阵的两组向量分别组织起来：$A$ 的各列张成的空间称为\term{column-space}，记作 $\operatorname{Col}(A)$；各行竖排后张成的空间称为\term{row-space}，记作 $\operatorname{Row}(A)$。由刚才的线性组合式，
+\[
+ \operatorname{Col}(A)=\{A\boldsymbol x:\boldsymbol x\in\mathbb R^n\},
+ \qquad
+ \operatorname{Row}(A)=\{A^{\mathrm T}\boldsymbol y:\boldsymbol y\in\mathbb R^m\}.
+\]
+列空间回答“$A$ 能产生哪些输出”，行空间回答“把 $A$ 的各行组合起来，能得到哪些向量”。转置恰好把这两个视角接起来：
+\[
+ \boxed{\operatorname{Row}(A)=\operatorname{Col}(A^{\mathrm T})},\qquad
+ \operatorname{Col}(A)=\operatorname{Row}(A^{\mathrm T}).
+\]
+这不是说 $A$ 自己的行空间与列空间相等。前者位于 $\mathbb R^n$，后者位于 $\mathbb R^m$，连所在空间的维数都可能不同。
+
+另一个自然问题是：哪些输入会被送到零？把齐次方程 $A\boldsymbol x=\boldsymbol0$ 的全部解组成的集合称为 $A$ 的\term{null-space}，记作 $\operatorname{null}A$。同样可以考察 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$。它的解空间称为 $A$ 的\term{left-null-space}，记作 $\operatorname{null}(A^{\mathrm T})$；名称中的“左”来自等价的写法 $\boldsymbol y^{\mathrm T}A=\boldsymbol0^{\mathrm T}$。如果两个向量都被同一矩阵送到零，那么它们的任意线性组合也被送到零，所以这两组解确实都是子空间。第4章会系统研究零空间与值域；这里先认清它们与转置的联系。
+
+这四个对象合称矩阵的\term{fundamental-subspaces}，也常称“四大子空间”。先按所在空间分成两组，后面的关系就不容易混淆：
+\ThreeFigure{转置把矩阵的行组合写成列组合，并引出两组齐次方程。四个子空间分别位于输入空间与输出空间中。}{fig:three-four-subspaces}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \node[threecard,fill=ThreeBlue!4,minimum width=5.55cm,minimum height=2.6cm] at (2.8,0) {};
+ \node[threecard,fill=ThreeGreen!4,minimum width=5.55cm,minimum height=2.6cm] at (11.3,0) {};
+ \node[font=\bfseries] at (2.8,.95) {输入所在的空间 $\mathbb R^n$};
+ \node[font=\bfseries] at (11.3,.95) {输出所在的空间 $\mathbb R^m$};
+ \node[align=center] at (2.8,.15) {$\operatorname{Row}(A)=\operatorname{Col}(A^{\mathrm T})$\\[4pt]组合 $A$ 的行};
+ \node[align=center] at (2.8,-.85) {$\operatorname{null}A$：解 $A\boldsymbol x=\boldsymbol0$};
+ \node[align=center] at (11.3,.15) {$\operatorname{Col}(A)$\\[4pt]组合 $A$ 的列};
+ \node[align=center] at (11.3,-.85) {$\operatorname{null}(A^{\mathrm T})$：解 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$};
+ \draw[threearrow,ThreeBlue] (5.7,.45)--node[above] {$A$}(8.4,.45);
+ \draw[threearrow,ThreeRose] (8.4,-.45)--node[below] {$A^{\mathrm T}$}(5.7,-.45);
+\end{tikzpicture}}{两条箭头表示 $A$ 与 $A^{\mathrm T}$ 在两个空间之间的作用，不表示互为逆映射。图中先列出四个子空间的位置和求法，它们之间的几何关系将在后文展开。}
+
+\par\medskip\noindent\textbf{用一个小矩阵把四组向量算出来。}
+取
+\[
+ A=\OpMat{rrr}{1&2&3\\2&4&6},\qquad
+ A^{\mathrm T}=\OpMat{rr}{1&2\\2&4\\3&6}.
+\]
+由于第二、三列分别是第一列的2倍、3倍，第二行是第一行的2倍，所以
+\[
+ \operatorname{Col}(A)=\operatorname{Span}\left\{\OpCol{1\\2}\right\}\subseteq\mathbb R^2,
+ \qquad
+ \operatorname{Row}(A)=\operatorname{Span}\left\{\OpCol{1\\2\\3}\right\}\subseteq\mathbb R^3.
+\]
+两边各由一个非零向量张成，却不是同一个空间。再看两组齐次方程：
+\[
+\begin{aligned}
+ A\boldsymbol x=\boldsymbol0
+ &\iff x_1+2x_2+3x_3=0
+ \iff \boldsymbol x=s\OpCol{-2\\1\\0}+t\OpCol{-3\\0\\1},\quad s,t\in\mathbb R,\\[5pt]
+ A^{\mathrm T}\boldsymbol y=\boldsymbol0
+ &\iff y_1+2y_2=0
+ \iff \boldsymbol y=u\OpCol{-2\\1},\quad u\in\mathbb R.
+\end{aligned}
+\]
+因此 $\operatorname{null}A$ 是三维输入空间中的一个过原点平面，$\operatorname{null}(A^{\mathrm T})$ 是二维输出空间中的一条过原点直线。前者描述不同输入怎样相互抵消；后者描述不同输出分量之间有哪些恒成立的线性关系。例如 $\boldsymbol y=(-2,1)^{\mathrm T}$ 给出 $-2$ 倍第一行加第二行等于零，也就说明任意输出的第二分量都是第一分量的2倍。
+
+\par\medskip\noindent\textbf{“相乘为零”留下了怎样的几何线索？}
+如果 $\boldsymbol x\in\operatorname{null}A$，那么 $A$ 的每一行与 $\boldsymbol x$ 的对应分量乘积之和都为0。这对各行的任意线性组合也成立。若 $\boldsymbol r=A^{\mathrm T}\boldsymbol c\in\operatorname{Row}(A)$，则由乘积转置法则与结合律，
+\[
+ \boldsymbol r^{\mathrm T}\boldsymbol x
+ =(A^{\mathrm T}\boldsymbol c)^{\mathrm T}\boldsymbol x
+ =\boldsymbol c^{\mathrm T}A\boldsymbol x=0.
+\]
+同理，若 $\boldsymbol y\in\operatorname{null}(A^{\mathrm T})$，则它与每个可能输出 $\boldsymbol b=A\boldsymbol z\in\operatorname{Col}(A)$ 都满足
+\[
+ \boldsymbol y^{\mathrm T}\boldsymbol b
+ =\boldsymbol y^{\mathrm T}A\boldsymbol z
+ =(A^{\mathrm T}\boldsymbol y)^{\mathrm T}\boldsymbol z=0.
+\]
+这里每个结果都是一个数，只需按“对应分量相乘再相加”来核对。在上述算例中，若 $A\boldsymbol x=\boldsymbol b$ 有解，就必须有 $-2b_1+b_2=0$；例如 $(1,2)^{\mathrm T}$ 可以得到，而 $(1,3)^{\mathrm T}$ 不可能得到。转置因此也能帮助我们找出输出必须满足的条件。
+
+到第7章，这种“对应分量乘积之和为0”会用\term{orthogonality}统一描述：行空间与零空间是一对，列空间与左零空间是另一对。它们是否已经包含了彼此所有正交的向量、维数如何配合，需要后面的理论继续回答。本节先掌握这条线索：\textbf{转置使“列的组合”与“行的关系”能够使用同一套矩阵语言。}
 
 \subsection{分块矩阵}
 
@@ -6748,12 +6848,74 @@ $S(\boldsymbol\varepsilon_\ell)$ 是 $A$ 的第 $\ell$ 列，其第 $j$ 个分�
  \OpMat{cc}{D_1&0\\0&D_2}^{-1}
  =\OpMat{cc}{D_1^{-1}&0\\0&D_2^{-1}}.
 \]
-这是因为两组输入分别独立恢复。对上三角分块矩阵，先恢复最后一组输入，再恢复前一组：
+这是因为两组输入分别独立恢复。对上三角分块矩阵，右上角还存在跨组作用，逆矩阵中的这一块应当怎样求？直接从逆矩阵的定义出发即可。
+
+\par\medskip\noindent\textbf{用四个待定分块推导逆矩阵。}
+设 $D_1$ 是 $p\times p$ 可逆矩阵，$D_2$ 是 $q\times q$ 可逆矩阵，$C$ 是 $p\times q$ 矩阵。记
 \[
  K=\OpMat{cc}{D_1&C\\0&D_2},\qquad
- K^{-1}=\OpMat{cc}{D_1^{-1}&-D_1^{-1}CD_2^{-1}\\0&D_2^{-1}},
+ B=\OpMat{cc}{B_1&B_2\\B_3&B_4}.
 \]
-且 $K$ 可逆当且仅当 $D_1,D_2$ 都可逆。充分性可直接乘回核对；必要性可以从方程解释：若 $D_1$ 不能唯一恢复第一组输入，$K$ 也不能；而任意第二组输出必须由 $D_2$ 得到，所以 $D_2$ 必须可逆。
+我们要寻找满足 $KB=BK=E_{p+q}$ 的 $B$。其中 $B_1,B_2,B_3,B_4$ 的大小依次为 $p\times p,p\times q,q\times p,q\times q$。\textbf{此时不预先假定 $B_3=0$，而让方程把它确定出来。}
+
+先按定义要求 $KB=E_{p+q}$，利用分块乘法得到
+\[
+ \begin{aligned}
+ KB&=\OpMat{cc}{D_1&C\\0&D_2}\OpMat{cc}{B_1&B_2\\B_3&B_4}\\[4pt]
+ &=\OpMat{cc}{D_1B_1+CB_3&D_1B_2+CB_4\\D_2B_3&D_2B_4}
+ =\OpMat{cc}{E_p&0\\0&E_q}.
+ \end{aligned}
+\]
+对应块相等，便得到四个矩阵方程：
+\[
+ \begin{cases}
+ D_1B_1+CB_3=E_p, &\text{左上块},\\
+ D_1B_2+CB_4=0,   &\text{右上块},\\
+ D_2B_3=0,        &\text{左下块},\\
+ D_2B_4=E_q,      &\text{右下块}.
+ \end{cases}
+\]
+先解下面两式。左乘 $D_2^{-1}$，得到 $B_3=0$、$B_4=D_2^{-1}$；再代入上面两式，得到
+\[
+ D_1B_1=E_p,\qquad D_1B_2+CD_2^{-1}=0.
+\]
+最后左乘 $D_1^{-1}$，就有
+\[
+ B_1=D_1^{-1},\qquad B_2=-D_1^{-1}CD_2^{-1}.
+\]
+四块都已确定。还可以反向乘回，直接核对逆矩阵定义的另一个等式：
+\[
+ \begin{aligned}
+ BK&=\OpMat{cc}{D_1^{-1}&-D_1^{-1}CD_2^{-1}\\0&D_2^{-1}}
+       \OpMat{cc}{D_1&C\\0&D_2}\\[4pt]
+   &=\OpMat{cc}{E_p&D_1^{-1}C-D_1^{-1}CD_2^{-1}D_2\\0&E_q}
+   =E_{p+q}.
+ \end{aligned}
+\]
+因此
+\[
+ \boxed{K^{-1}=\OpMat{cc}{D_1^{-1}&-D_1^{-1}CD_2^{-1}\\0&D_2^{-1}}.}
+\]
+右上块的负号来自移项；三个因子的顺序来自两次\textbf{左乘}，不能按标量运算随意交换。这个结果也对应逐组恢复输入：先由 $\boldsymbol y_2=D_2\boldsymbol x_2$ 求出 $\boldsymbol x_2$，再从 $\boldsymbol y_1$ 中减去 $C\boldsymbol x_2$，最后用 $D_1^{-1}$ 恢复 $\boldsymbol x_1$。
+
+例如取
+\[
+ D_1=\OpMat{rr}{1&1\\0&1},\qquad C=\OpCol{1\\2},\qquad D_2=[\,2\,].
+\]
+先计算右上块：
+\[
+ -D_1^{-1}CD_2^{-1}
+ =-\OpMat{rr}{1&-1\\0&1}\OpCol{1\\2}\cdot\frac12
+ =\OpCol{\tfrac12\\-1}.
+\]
+于是
+\[
+ K=\OpMat{rr|r}{1&1&1\\0&1&2\\\hline0&0&2},\qquad
+ K^{-1}=\OpMat{rr|r}{1&-1&\tfrac12\\0&1&-1\\\hline0&0&\tfrac12}.
+\]
+例如乘积 $KK^{-1}$ 的右上角元素为 $\tfrac12-1+\tfrac12=0$，正是跨组作用被抵消的结果。
+
+在对角块均为方阵的前提下，$K$ 可逆\textbf{当且仅当} $D_1,D_2$ 都可逆。刚才的构造证明了充分性。反过来，若 $K$ 可逆，则 $D_1\boldsymbol u=0$ 必须只有零解，否则非零向量 $(\boldsymbol u^{\mathrm T},\boldsymbol0^{\mathrm T})^{\mathrm T}$ 会被 $K$ 送到零，与可逆性矛盾；同时，任意第二组输出都必须能由 $D_2\boldsymbol x_2$ 得到。根据前一节对方阵可逆性的判定，前者保证 $D_1$ 可逆，后者保证 $D_2$ 可逆。
 
 分块把一个大映射拆成若干相互连接的小映射，零块和三角结构则把“同时求解”变成“分组依次求解”。第2章的消元法正是在制造这样的简化结构。下一节将把每一步消元本身也写成矩阵，为把整个过程保存下来作准备。
 
@@ -7861,7 +8023,7 @@ LU与PLU保存的是“怎样消元”的信息。下一节选读换一个问题
    $C(s,t)^{\mathrm T}=s\boldsymbol a_1+t\boldsymbol a_3=(s,t,s+t)^{\mathrm T}$};
 \end{tikzpicture}}{四个输入分量先变成两个组合系数，再变成三个输出分量。$C$ 保留核心方向，$R$ 保存各原列如何由核心列组成，二者各自记录不同的信息。}
 
-由矩阵列向量张成的空间称为\term{column-space}；由行向量张成的空间称为\term{row-space}。它们分别是 $\mathbb R^m$ 与 $\mathbb R^n$ 的子空间，不应混在一起。在本节的构造中，$C$ 与 $A$ 的列空间相同：$C$ 的列取自 $A$，而 $A$ 的每列又由 $C$ 的列表示。$R$ 与 $A$ 的行空间也相同：可逆的行变换不改变各行能够张成的范围，去掉零行也不改变它。
+第3.5节已经从转置引入列空间与行空间：它们分别由矩阵的列与行张成，分别位于 $\mathbb R^m$ 与 $\mathbb R^n$，不应混在一起。在本节的构造中，$C$ 与 $A$ 的列空间相同：$C$ 的列取自 $A$，而 $A$ 的每列又由 $C$ 的列表示。$R$ 与 $A$ 的行空间也相同：可逆的行变换不改变各行能够张成的范围，去掉零行也不改变它。
 
 因此，CR分解没有把一个矩阵任意切成两块，而是把“可用的输出方向”与“生成这些输出的系数关系”分开记录。核心列可以有不同的选择，所以分解一般不唯一；按行最简形的主元列来选取，是一种明确且便于计算的办法。
 
