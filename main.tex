@@ -11338,7 +11338,218 @@ n=\dim\FNull A+\FRank(A).
 % --- 第 5 章 ---
 \chapter{线性方程组的再研究：解的结构}
 \label{chap:solution-structure}
-% 在这里编写本章正文。
+% CHAPTER 5 INTRODUCTION BEGIN
+% 章首实例不编号；导入插图使用5.0a--5.0d，正文插图以后从5.1开始。
+\begingroup
+\catcode`。=12 \catcode`，=12 \catcode`：=12 \catcode`；=12
+\catcode`？=12 \catcode`！=12 \catcode`（=12 \catcode`）=12
+\linespread{1}\fontsize{12pt}{20pt}\selectfont
+\setlength{\parindent}{2em}\setlength{\parskip}{4pt}
+\setlength{\abovedisplayskip}{8pt}\setlength{\belowdisplayskip}{8pt}
+\ctexset{subsection={format=\raggedright\large\bfseries,
+ beforeskip=14pt,afterskip=10pt}}
+\definecolor{FiveBlue}{HTML}{397AA1}
+\definecolor{FiveRose}{HTML}{AC4963}
+\definecolor{FiveGreen}{HTML}{448678}
+\definecolor{FiveGray}{HTML}{68747D}
+\definecolor{FiveInk}{HTML}{35312D}
+\captionsetup[figure]{font=small,labelfont=bf,skip=6pt}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{\thechapter.0\alph{figure}}
+\renewcommand{\theHfigure}{\thechapter.gridintro.\arabic{figure}}
+\newcommand{\FiveIntroFigure}[4]{%
+ \par\addvspace{7pt}\noindent\begin{minipage}{\linewidth}
+ \centering #3\par\captionof{figure}{#1}\label{#2}
+ \par\vspace{4pt}\begingroup\raggedright
+ \linespread{1}\fontsize{9.5pt}{14pt}\selectfont\color{FiveGray}
+ \noindent #4\par\endgroup
+ \end{minipage}\par\addvspace{7pt}}
+\tikzset{
+ fiveflow/.style={-{Stealth[length=2.2mm]},FiveBlue,line width=1.05pt},
+ fivecycle/.style={-{Stealth[length=2.2mm]},FiveRose,line width=1.3pt},
+ fiveguide/.style={FiveGray!60,densely dashed,line width=.6pt},
+ fivenode/.style={circle,draw=FiveBlue,fill=white,minimum size=6mm,
+   inner sep=0pt,font=\small},
+ fivecard/.style={draw=FiveGray!35,rounded corners=2pt,fill=FiveGray!3}}
+
+\subsection*{介绍性实例\quad 当一张电网牵动千万人的生活\\[4pt]——从北美大停电看方程、网络与状态}
+
+1882年9月4日，爱迪生的珍珠街电站在纽约开始供电。发电机、地下导线与街区里的电灯被接成一个系统，人们开始把持续的光亮交给一张看不见的网络。\cite{edison-pearl-street-1882}此后一百多年，发电站越建越远，输电线路跨过河流与山地，原本分散的地方电网逐渐互联。城市得到的，不仅是来自远方的电能，还有在不同地区之间相互支援的能力；与之同时增长的，则是各部分之间的依赖。
+
+2003年8月14日下午，这份依赖以另一种方式显现出来。美国东北部、中西部部分地区及加拿大安大略省发生大面积停电，影响约五千万人，涉及约6180万千瓦的用电负荷。图\ref{fig:five-blackout-history}中的灰色区域，记录了这次事故波及的范围。\cite{blackout-final-2004}对于使用电灯的人，停电发生在家里的一个开关之后；对于调度员，问题却横跨许多电厂、变电站与输电线路。一处连接退出运行，其他连接上的电力分布就会改变，原本局部的扰动因而可能成为整个网络必须共同面对的问题。
+
+\FiveIntroFigure{从街区供电到区域互联：电网的规模，也意味着联系的规模。}
+ {fig:five-blackout-history}{%
+ \begin{minipage}[c]{.43\linewidth}
+  \centering
+  \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+   \draw[FiveGray!35,line width=1pt] (.25,.2)--(.25,4.2);
+   \fill[FiveBlue] (.25,3.65) circle (2.5pt);
+   \node[anchor=west,font=\Large\bfseries,text=FiveBlue] at (.65,3.65) {1882};
+   \node[anchor=north west,align=left,text width=4.8cm] at (.65,3.2)
+     {珍珠街电站开始供电\\从一片街区组织起电力系统};
+   \fill[FiveRose] (.25,1.65) circle (2.5pt);
+   \node[anchor=west,font=\Large\bfseries,text=FiveRose] at (.65,1.65) {2003};
+   \node[anchor=north west,align=left,text width=4.8cm] at (.65,1.2)
+     {北美大停电\\约五千万人受到影响};
+  \end{tikzpicture}
+ \end{minipage}\hfill
+ \begin{minipage}[c]{.54\linewidth}
+  \centering
+  % 原PDF的图像变换含纵向翻转；此处恢复原报告的显示方向。
+  \rotatebox[origin=c]{180}{\reflectbox{%
+   \includegraphics[width=\linewidth]{figures/chapter05/fig5_0a_blackout_area.jpg}}}
+ \end{minipage}}
+ {右图摘自美加联合调查报告第100页图6.29\cite{blackout-final-2004}，保留原图。灰色表示事故影响区域，其中仍有部分地区保持供电；它不是逐条线路的故障传播图。}
+
+\clearpage
+事后的联合调查涉及系统认识、运行态势感知、树木清障和可靠性协调等多方面问题。\cite{blackout-release-2004}工程师需要知道的，既包括哪台设备出了问题，也包括这些设备怎样相连、哪些运行条件必须共同满足，以及连接改变之后整个系统会怎样响应。要进入这些问题，首先需要一种能够把“局部的连接”写成“整体的关系”的语言。我们在第二章学过的线性方程组，正是其中最基础的一层。
+
+为了看清这一层结构，先把庞大的电网缩成图\ref{fig:five-grid-balance}中的四个节点、五条线路，并用理想直流电路的节点电流平衡作教学模型。这里不复原事故电网，也暂不处理交流电网的完整运行条件。每条线路先规定一个参考方向，电流按这个方向记正，反向记负；在不积累电荷的连接点，\textbf{外部注入的电流加上线路流入，必须等于线路流出}。把各节点的这条关系分别写出来，就得到一组线性方程。
+
+\FiveIntroFigure{从网络连接到节点方程：每一条线路同时联系两个节点。}
+ {fig:five-grid-balance}{%
+ \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+  \node[fivenode] (n1) at (1.0,2.2) {1};
+  \node[fivenode] (n2) at (3.6,3.9) {2};
+  \node[fivenode] (n3) at (3.6,.5) {3};
+  \node[fivenode] (n4) at (6.2,2.2) {4};
+  \draw[fiveflow] (n1)--node[above left] {$f_1$} (n2);
+  \draw[fiveflow] (n1)--node[below left] {$f_2$} (n3);
+  \draw[fiveflow] (n2)--node[left] {$f_3$} (n3);
+  \draw[fiveflow] (n2)--node[above right] {$f_4$} (n4);
+  \draw[fiveflow] (n3)--node[below right] {$f_5$} (n4);
+  \draw[-{Stealth[length=2mm]},FiveGreen,line width=1pt] (-.1,2.2)--(n1);
+  \node[align=center,text=FiveGreen] at (.45,1.25) {外部\mbox{注入}};
+  \draw[-{Stealth[length=2mm]},FiveGreen,line width=1pt] (n4)--(7.3,2.2);
+  \node[align=center,text=FiveGreen] at (6.8,1.25) {外部\mbox{取出}};
+  \draw[fiveguide] (7.75,.1)--(7.75,4.6);
+  \node[text=FiveInk,font=\bfseries] at (11.0,4.55) {把节点2单独取出来};
+  \node[fivenode,draw=FiveRose] (zoom) at (11.0,2.4) {2};
+  \draw[fiveflow] (8.8,2.4)--node[above] {$f_1$} (zoom);
+  \draw[fiveflow] (zoom)--node[above] {$f_4$} (13.2,2.4);
+  \draw[fiveflow] (zoom)--node[right] {$f_3$} (11.0,.6);
+  \draw[-{Stealth[length=2mm]},FiveGreen,line width=1pt]
+   (11.0,3.9)--node[right] {$b_2$} (zoom);
+  \node[align=center,text=FiveRose] at (11.0,-.1)
+   {$b_2+f_1=f_3+f_4$};
+ \end{tikzpicture}}
+ {图中方向只是符号约定，不预先限制电流的实际方向。放大图取 $b_2$ 为外部净注入；它为负时表示该节点向外取出电流。所有连接均为自拟教学示意。}
+
+例如节点2的关系是 $-f_1+f_3+f_4=b_2$。设 $\boldsymbol f$ 收集五条线路的电流，$\boldsymbol b$ 收集四个节点的外部净注入，把全网的节点方程合在一起，就写成
+\begin{equation}
+ A\boldsymbol f=\boldsymbol b.
+ \label{eq:five-grid-balance}
+\end{equation}
+这里的 $A$ 是一个 $4\times5$ 的\term{incidence-matrix}：每列对应一条线路，在流出节点所在行记 $+1$，在流入节点所在行记 $-1$，其余位置记 $0$。它只记录谁与谁相连，以及我们怎样约定方向。设备的名称与地理位置暂时隐去，网络的连接关系却完整地留在了数表中。电网络的这种组织方式，也是用线性代数研究网络结构的经典入口。\cite{strang-networks-2011}
+
+但是，写出方程还不是问题的终点。给定一组外部供需，每条线路的电流都能算出来吗？如果能，是否只有一种满足节点平衡的分配？把所有节点方程相加，会不会发现有些条件早已包含在其余条件之中？第二章的消元法可以帮助我们作出判断；本章则要继续解释：\textbf{这些判断为什么成立，它们究竟反映了网络中的什么结构？}
+
+\clearpage
+先看供需。并不是任意写下一组节点净注入，都能由内部线路实现；在这个连通的教学网络中，全网注入与取出必须平衡。能够实现的 $\boldsymbol b$ 组成 $A$ 的\term{column-space}。再看线路：沿一个闭合回路同时增加一股循环电流，各节点都多流入一份、也多流出一份，外部收支因而不变。这类满足 $A\boldsymbol z=\boldsymbol0$ 的变化，属于 $A$ 的\term{null-space}。\textbf{一个空间回答“什么目标能够达到”，另一个空间回答“达到同一目标还留下什么自由度”。}
+
+\FiveIntroFigure{同一张网络引出的四个问题：四个基本子空间各有工程含义。}
+ {fig:five-grid-four-questions}{%
+ \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+  \foreach \xx/\yy in {0/4.65,7.65/4.65,0/0,7.65/0}{
+   \draw[fivecard] (\xx,\yy) rectangle ++(7.1,4.3);
+  }
+  % 列空间：外部收支由内部线路实现。
+  \begin{scope}[shift={(0,4.65)}]
+   \node[font=\bfseries,text=FiveBlue] at (3.55,3.85) {列空间：哪些供需能够实现？};
+   \foreach \name/\x/\y in {a/1.4/1.9,b/3.4/2.85,c/3.4/.95,d/5.4/1.9}
+    \coordinate (\name) at (\x,\y);
+   \foreach \s/\t in {a/b,a/c,b/c,b/d,c/d}
+    \draw[fiveflow] (\s)--(\t);
+   \foreach \name in {a,b,c,d}\fill[FiveBlue] (\name) circle (2.5pt);
+   \draw[-{Stealth[length=2mm]},FiveGreen,line width=1.1pt] (.3,1.9)--(a);
+   \draw[-{Stealth[length=2mm]},FiveGreen,line width=1.1pt] (d)--(6.5,1.9);
+   \node[text=FiveGreen] at (.7,1.25) {注入};
+   \node[text=FiveGreen] at (6.1,1.25) {取出};
+   \node at (3.55,.38) {寻找满足节点平衡的线路电流};
+  \end{scope}
+  % 零空间：有符号回路向量，逆着f2增加电流。
+  \begin{scope}[shift={(7.65,4.65)}]
+   \node[font=\bfseries,text=FiveRose] at (3.55,3.85) {零空间：哪些循环不改变收支？};
+   \coordinate (a) at (1.4,1.9);\coordinate (b) at (3.4,2.85);
+   \coordinate (c) at (3.4,.95);\coordinate (d) at (5.4,1.9);
+   \draw[fiveguide] (b)--(d)--(c);
+   \draw[fivecycle] (a)--node[above left] {$t$} (b);
+   \draw[fivecycle] (b)--node[right] {$t$} (c);
+   \draw[fivecycle] (c)--node[below left] {$t$} (a);
+   \foreach \name in {a,b,c,d}\fill[FiveInk] (\name) circle (2.5pt);
+   \node[align=center,text=FiveRose,font=\footnotesize] at (5.6,2.95) {每个节点\\一进一出};
+   \node at (3.55,.38) {线路记录变了，节点净收支未变};
+  \end{scope}
+  % 行空间：电势差为A^T v；使用同一网络。
+  \begin{scope}[shift={(0,0)}]
+   \node[font=\bfseries,text=FiveBlue] at (3.55,3.85) {行空间：电势差从哪里来？};
+   \node[fivenode] (a) at (1.4,1.9) {$v_1$};
+   \node[fivenode] (b) at (3.4,2.85) {$v_2$};
+   \node[fivenode] (c) at (3.4,.95) {$v_3$};
+   \node[fivenode] (d) at (5.4,1.9) {$v_4$};
+   \foreach \s/\t in {a/c,b/c,b/d,c/d}\draw[fiveguide] (\s)--(\t);
+   \draw[fiveflow] (a)--node[above left,font=\footnotesize] {$v_1-v_2$} (b);
+   \node at (3.55,.38) {节点电势决定线路两端的电势差};
+  \end{scope}
+  % 左零空间：内部流动抵消，留下整体约束。
+  \begin{scope}[shift={(7.65,0)}]
+   \node[font=\bfseries,text=FiveGreen] at (3.55,3.85) {左零空间：全网受什么约束？};
+   \draw[fiveguide,rounded corners=10pt] (1.05,.72) rectangle (6.0,3.15);
+   \coordinate (a) at (1.7,1.95);\coordinate (b) at (3.5,2.75);
+   \coordinate (c) at (3.5,1.15);\coordinate (d) at (5.3,1.95);
+   \foreach \s/\t in {a/b,a/c,b/c,b/d,c/d}\draw[fiveflow,FiveGray!60] (\s)--(\t);
+   \foreach \name in {a,b,c,d}\fill[FiveGray] (\name) circle (2.5pt);
+   \draw[-{Stealth[length=2mm]},FiveGreen,line width=1.1pt] (.2,1.95)--(a);
+   \draw[-{Stealth[length=2mm]},FiveGreen,line width=1.1pt] (d)--(6.8,1.95);
+   \node[fill=white,inner sep=2pt,font=\footnotesize] at (3.5,1.95) {内部一进一出相抵消};
+   \node at (3.55,.38) {把各节点合起来，外部收支必须平衡};
+  \end{scope}
+ \end{tikzpicture}}
+ {四幅图使用同一连接结构。上右图画的是相对于某个已有平衡方案的电流增量，$t>0$ 时沿红色箭头循环；它不表示无电源的电阻回路会自行维持电流。此处只预览结构，严格定义与相互关系将在本章正文中展开。}
+
+还有另一种观察方式：把各节点的电势排成向量 $\boldsymbol v$，每条线路两端的电势差便组成 $A^{\mathrm T}\boldsymbol v$。这些能够由节点电势产生的线路记录，组成 $A$ 的\term{row-space}。而把全部节点方程相加，内部线路一进一出全部抵消，只留下 $b_1+b_2+b_3+b_4=0$；这条整体约束来自 $A$ 的\term{left-null-space}。甚至把所有节点电势同时加上一个相同的数，线路电势差也完全不变，这同样体现了转置矩阵的零空间。\cite{strang-networks-2011}
+
+第三章从转置中引出的\term{fundamental-subspaces}，现在各有了具体的工程问题。列空间与左零空间联系节点端的“能够实现”与“必须满足”，行空间与零空间联系线路端的“电势差”与“循环自由度”。四个名称背后，是同一个工程系统的四种关系。节点守恒只给出了其中一层条件；线路实际怎样分配电流，还要结合元件关系。\textbf{本章的目标，正是把“方程有没有解、解是否唯一、所有解如何组成”组织成对这些关系的整体认识。}
+
+\clearpage
+真实电网也不会停在同一时刻。用电需求随时间变化，设备会接入或退出；在今天的电力系统中，储能装置还会把某个时段充入的能量留到另一个时段使用，以帮助调节供需。\cite{doe-storage-grid}一张满足节点平衡的记录，只说明此刻的关系。工程师还需要连续地记录状态，追问下一时刻会怎样，以及一次变化会怎样影响之后的运行。
+
+\FiveIntroFigure{从一张快照到连续记录：平衡关系描述此刻，更新规则联系前后。}
+ {fig:five-grid-state-sequence}{%
+ \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+  \foreach \xx/\kk in {0/k,5.15/{k+1},10.3/{k+2}}{
+   \begin{scope}[shift={(\xx,0)}]
+    \draw[fivecard] (0,0) rectangle (4.1,3.15);
+    \node[font=\bfseries,text=FiveBlue] at (2.05,2.73) {时刻 $\kk$};
+    \coordinate (a) at (.75,1.62);\coordinate (b) at (2.0,2.13);
+    \coordinate (c) at (2.0,1.11);\coordinate (d) at (3.25,1.62);
+    \foreach \s/\t in {a/b,a/c,b/c,b/d,c/d}\draw[FiveGray!55,line width=.6pt] (\s)--(\t);
+    \foreach \name in {a,b,c,d}\fill[FiveBlue] (\name) circle (2.2pt);
+    \node[text=FiveRose] at (2.05,.55) {状态记录 $\boldsymbol x_{\kk}$};
+   \end{scope}}
+  \draw[fivecycle] (4.15,1.6)--node[above,font=\footnotesize] {更新} (5.1,1.6);
+  \draw[fivecycle] (9.3,1.6)--node[above,font=\footnotesize] {更新} (10.25,1.6);
+  \draw[fiveguide] (.25,-.42)--(14.15,-.42);
+  \node[fill=white,text=FiveGray] at (7.2,-.42)
+   {连续记录同一个系统，才能讨论它随时间怎样变化};
+ \end{tikzpicture}}
+ {这里仅示意状态记录的先后次序，没有指定真实电网的参数或演化曲线。连接固定时，状态仍可能变化；连接改变时，模型也需要随之更新。}
+
+例如，储能装置下一时段的电量，等于当前电量加上本时段的净充入量。把需要记住的量有序排成一列，就得到\term{state-vector}。若某个教学模型在所考察范围内可用固定的线性更新规则描述，并暂不考虑外部输入，状态之间便可以写成
+\begin{equation}
+ \boldsymbol x_{k+1}=F\boldsymbol x_k.
+ \label{eq:five-state-preview}
+\end{equation}
+这里 $F$ 是\term{state-transition-matrix}，它记录从当前状态到下一状态的作用；前面的 $A$ 则记录节点与线路的连接。两种矩阵承担不同任务。真实系统的完整动态模型通常更复杂，式\eqref{eq:five-state-preview}只为后面的离散递推选读打开入口：\textbf{同一个矩阵反复作用，怎样把一个初始状态带向之后的一串状态？}
+
+于是，从电网中提出的问题便有了次序：先辨认哪些平衡可以实现，再说明达到同一平衡可以保留哪些自由度，进而把行与列、矩阵与转置联系起来；在此基础上，再观察状态怎样随时间更新。我们不会在本章用一个小矩阵重演北美大停电，但可以开始读懂大型系统背后的基本关系。百余年来，从街区里的电灯到跨地区的互联网络，人类建造的不只是更多设备，也是一套越来越复杂的相互联系。\textbf{本章就从方程的全部解出发，学习看清这份联系的结构。}
+
+\par\clearpage
+\endgroup
+\setcounter{figure}{0}
+% CHAPTER 5 INTRODUCTION END
+% 后续5.1及各节正文待编写；保留章首介绍性实例。
 
 % --- 第 6 章 ---
 \chapter{行列式：从体积到可逆性}
@@ -12012,6 +12223,28 @@ Wallace G K. The JPEG Still Picture Compression Standard[J]. \textit{Communicati
 \newblock 本节核对采用作者1992年发表于 \textit{IEEE Transactions on Consumer Electronics} 的同题修订版；首页注明其源于1991年原文，公开全文由Stanford课程网站托管。
 \newblock \url{https://web.stanford.edu/class/ee398a/handouts/papers/Wallace%20-%20JPEG%20-%201992.pdf}.
 % DCT CASE REFERENCES END
+
+% CHAPTER 5 INTRODUCTION REFERENCES BEGIN
+\bibitem{edison-pearl-street-1882}
+Thomas A. Edison Papers, Rutgers University. \textit{Chronology Details: 1882}[EB/OL]. 记载1882年9月4日珍珠街电站开始运营 [2026-09-30].
+\newblock \url{https://edison.rutgers.edu/edit-chronology/chronology-details/1881---1890/1882}.
+
+\bibitem{blackout-final-2004}
+U.S.--Canada Power System Outage Task Force. \textit{Final Report on the August 14, 2003 Blackout in the United States and Canada: Causes and Recommendations}[R/OL]. 2004-04. 第1页（影响规模）、第2章（互联电网背景）、第100页图6.29（影响区域）[2026-09-30].
+\newblock \url{https://www.energy.gov/sites/default/files/oeprod/DocumentsandMedia/BlackoutFinal-Web.pdf}.
+
+\bibitem{blackout-release-2004}
+Natural Resources Canada. \textit{Canada--U.S. Task Force Presents Final Report on Blackout of August 2003}[EB/OL]. 2004-04-05 [2026-09-30].
+\newblock \url{https://www.canada.ca/en/news/archive/2004/04/canada-task-force-presents-final-report-blackout-august-2003.html}.
+
+\bibitem{strang-networks-2011}
+Strang G. \textit{Graphs, Networks, Incidence Matrices}[EB/OL]. MIT OpenCourseWare, 18.06SC Linear Algebra, Fall 2011 [2026-09-30]. 本讲义自拟网络取“节点为行、线路为列”，与该讲中矩阵的排列方向互为转置。
+\newblock \url{https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/ax-b-and-the-four-subspaces/graphs-networks-incidence-matrices/}.
+
+\bibitem{doe-storage-grid}
+U.S. Department of Energy, Electricity Advisory Committee. \textit{National Distributed Energy Storage in the Electric Grid}[R/OL]. 2016. 第2部分“Current State of Distributed Energy Storage” [2026-09-30].
+\newblock \url{https://www.energy.gov/oe/articles/eac-recommendations-national-distributed-energy-storage-electric-grid}.
+% CHAPTER 5 INTRODUCTION REFERENCES END
 
 \end{thebibliography}
 \par\clearpage
