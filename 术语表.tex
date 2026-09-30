@@ -2,6 +2,7 @@
 \GlossaryLetter{A}
 \GlossaryEntry{绝对收敛}{Absolute Convergence}{无穷和中各项绝对值（复数项取模）的和有限；附录用它说明复指数展开可以按奇偶次幂分组。}
 \GlossaryEntry{抽象向量空间}{Abstract Vector Space}{不限定元素具体形式，只要求加法与数乘满足向量空间公理的集合。}
+\GlossaryEntry{主动旋转}{Active Rotation}{固定坐标基，对向量或物体施加旋转作用，用同一组基记录作用前后的坐标；转轴上的向量可以保持不变。}
 \GlossaryEntry{加减消元法}{Addition Method of Elimination}{把一个方程的倍数加到另一个方程，以消去某个未知数的方法。}
 \GlossaryEntry{映射的加法}{Addition of Maps}{对同定义域、同目标空间的映射逐点相加，$(S+T)(\boldsymbol x)=S(\boldsymbol x)+T(\boldsymbol x)$。}
 \GlossaryEntry{相反向量}{Additive Inverse}{与原向量相加得到零向量的向量，记为 $-\boldsymbol v$。}
@@ -12,7 +13,7 @@
 \GlossaryEntry{辐角}{Argument}{从正实轴转向非零复数所对应向量的有向角，相差 $2k\pi $ 的角表示同一方向。}
 \GlossaryEntry{结合律}{Associative Law}{改变相邻运算的分组方式不改变结果；如 $(\boldsymbol u+\boldsymbol v)+\boldsymbol w=\boldsymbol u+(\boldsymbol v+\boldsymbol w)$。}
 \GlossaryEntry{注意力机制}{Attention Mechanism}{根据查询与键计算权重，再对值向量加权求和的信息汇聚方法；第3章介绍性实例采用单头的简化图示。}
-\GlossaryEntry{姿态矩阵}{Attitude Matrix}{描述飞行器本体轴相对参考系朝向的线性变换矩阵；换参考系时按相似变换 $M_{\mathcal C}=P^{-1}M_{\mathcal B}P$ 改变。}
+\GlossaryEntry{姿态矩阵}{Attitude Matrix}{常指机体系相对参考系的方向余弦矩阵；只改变参考基时按坐标转换链左乘。若记录同一个旋转作用并同时更换输入与输出的基，其表示矩阵才按相似关系改变。}
 \GlossaryEntry{增广矩阵}{Augmented Matrix}{在系数矩阵右侧附上常数项列得到的矩阵，记为 $[A\mid \boldsymbol b]$。}
 \GlossaryLetter{B}
 \GlossaryEntry{回代}{Back Substitution}{从阶梯形的最后一个有效方程开始，逐行向上求出主元变量的方法。}
@@ -61,7 +62,7 @@
 \GlossaryEntry{维数公式}{Dimension Formula}{有限维子空间满足 $\dim (U+V)=\dim U+\dim V-\dim (U\cap V)$。}
 \GlossaryEntry{直和}{Direct Sum}{当 $U\cap V=\{\boldsymbol 0\}$ 时的子空间和，记作 $U\oplus V$；等价地，每个和向量的分解唯一。}
 \GlossaryEntry{有向角}{Directed Angle}{同时记录转动大小与方向的角；本附录约定逆时针为正、顺时针为负。}
-\GlossaryEntry{方向余弦矩阵}{Direction Cosine Matrix}{飞行力学中把一组基的坐标换算到另一组基的可逆矩阵，即过渡矩阵；第 $j$ 列是新基第 $j$ 个向量在旧基下的坐标。}
+\GlossaryEntry{方向余弦矩阵}{Direction Cosine Matrix}{两组单位且两两垂直的基之间的坐标过渡矩阵；第 $(i,j)$ 个元素为旧基第 $i$ 个向量与新基第 $j$ 个向量的夹角余弦，须注明换算方向。}
 \GlossaryEntry{离散余弦变换}{Discrete Cosine Transform}{把有限个采样值改写为不同余弦模式的系数；本书使用规范化的二型DCT，完整保留系数时可以逆变换恢复输入。}
 \GlossaryEntry{分配律}{Distributive Law}{数乘对向量加法与标量加法分别满足分配规则。}
 \GlossaryEntry{定义域}{Domain}{映射允许的全部输入组成的集合；对 $T:\mathbb R^n\to \mathbb R^m$，定义域为 $\mathbb R^n$。}
@@ -79,7 +80,7 @@
 \GlossaryEntry{同解方程组}{Equivalent Linear Systems}{解集相同的两个线性方程组。}
 \GlossaryEntry{等价向量组}{Equivalent Sets of Vectors}{能够相互线性表示的向量组；其张成空间相同，但向量个数可以不同。}
 \GlossaryEntry{模长}{Euclidean Length}{实向量各分量平方和的平方根，等于向量与自身点积的平方根；也称向量的长度。}
-\GlossaryEntry{欧拉角}{Euler Angles}{依次绕坐标轴旋转的三个角度，用于确定一个坐标系相对另一个坐标系的姿态；转轴顺序不同，复合得到的矩阵一般不同。}
+\GlossaryEntry{欧拉角}{Euler Angles}{以约定轴序的三次旋转描述姿态的角度参数；须说明转轴固定还是随动。某些姿态可由不同角度组表示，本书也以此广义称呼三个不同轴的角度参数。}
 \GlossaryEntry{欧拉公式}{Euler's Formula}{对实数 $\theta $，$e^{i\theta }=\cos \theta +i\sin \theta $，将单位圆上的旋转与复指数联系起来。}
 \GlossaryEntry{指数形式}{Exponential Form}{用 $z=re^{i\theta }$ 表示非零复数的形式，其中 $r=|z|$，$\theta $ 是其一个辐角。}
 \GlossaryLetter{F}
@@ -102,6 +103,7 @@
 \GlossaryLetter{G}
 \GlossaryEntry{高斯--若尔当消元法}{Gauss-Jordan Elimination}{继续把主元化为1并消去主元列其余元素，得到行最简形的方法。}
 \GlossaryEntry{高斯消元法}{Gaussian Elimination}{通过同解初等变换化为行阶梯形，再指定自由变量并回代求解的方法。}
+\GlossaryEntry{万向节锁}{Gimbal Lock}{用三个角度描述三维姿态时的特殊退化现象；在本节例子中矩阵只依赖两个外侧角的差，两个角不能被分别唯一确定，但旋转矩阵仍可逆。}
 \GlossaryLetter{H}
 \GlossaryEntry{齐次性}{Homogeneity}{映射保持数乘的性质，即对所有实数 $c$ 和允许的向量 $\boldsymbol x$ 有 $T(c\boldsymbol x)=cT(\boldsymbol x)$。}
 \GlossaryEntry{齐次坐标}{Homogeneous Coordinates}{用增加一个分量的方式表示几何点；本章把二维点记为 $(x,y,1)^{\mathrm T}$，以三阶矩阵统一表示平移与线性作用。}
@@ -169,6 +171,7 @@
 \GlossaryEntry{斜投影}{Oblique Projection}{沿与目标子空间不垂直的互补方向投到该子空间、并保持其上的向量不动的线性映射；本章以沿 $(1,1,1)^{\mathrm T}$ 投到 $xy$ 平面为例。}
 \GlossaryEntry{一一对应}{One-to-One Correspondence}{两类对象之间互相唯一确定、没有遗漏的配对关系；固定标准基后，$\mathbb R^n$ 到 $\mathbb R^m$ 的线性映射与 $m\times n$ 矩阵一一对应。}
 \GlossaryEntry{有序基}{Ordered Basis}{指定了基向量先后次序的一组基，坐标必须按该次序排列。}
+\GlossaryEntry{正交矩阵}{Orthogonal Matrix}{满足 $Q^{\mathrm T}Q=E$ 的实方阵；列向量单位且两两垂直，逆矩阵等于转置，保持标准点积；不一定表示旋转，也可能包含反射。}
 \GlossaryEntry{正交投影}{Orthogonal Projection}{沿垂直于目标直线或平面的方向得到投影的对应规则；向 $xy$ 平面投影得到 $(x,y,0)^{\mathrm T}$，用平面坐标记录则为 $(x,y)^{\mathrm T}$。}
 \GlossaryEntry{正交性}{Orthogonality}{内积为0所刻画的关系，是几何垂直的推广；第7章展开。}
 \GlossaryEntry{外积}{Outer Product}{列向量与行向量的矩阵乘积 $\boldsymbol u\boldsymbol v^{\mathrm T}$；第 $(i,j)$ 个元素为 $u_iv_j$，两向量均非零时秩为1。}
@@ -176,6 +179,7 @@
 \GlossaryEntry{平行四边形定则}{Parallelogram Rule}{以同一起点的两个向量为邻边作平行四边形，其从共同起点出发的对角线表示向量和。}
 \GlossaryEntry{部分选主元}{Partial Pivoting}{每一步在当前列尚未处理的行中选绝对值最大的元素，交换到主元行后再消元。}
 \GlossaryEntry{特解}{Particular Solution}{一个确实满足给定方程组的具体解；一个特解未必代表全部解。}
+\GlossaryEntry{被动旋转}{Passive Rotation}{向量不动，转动描述它的坐标架；新坐标由对应主动旋转矩阵的逆矩阵换算。}
 \GlossaryEntry{置换矩阵}{Permutation Matrix}{单位矩阵的行重新排列所得矩阵，每行每列恰有一个1；左乘它可重排行，且 $P^{-1}=P^{\mathrm T}$。}
 \GlossaryEntry{主元}{Pivot}{阶梯形非零行的首个非零元素，用于组织消元与确定主元变量。}
 \GlossaryEntry{主元列}{Pivot Column}{阶梯形中含主元的列；原矩阵对应列号的列可用于选取极大无关组。}
@@ -208,6 +212,7 @@
 \GlossaryEntry{反身性}{Reflexivity}{某种关系对每个对象与其自身都成立；如向量组与自身等价。}
 \GlossaryEntry{正则化}{Regularization}{在拟合目标中加入对参数等对象的约束或惩罚，以改善模型的稳定性与泛化；本章示例采用参数平方和惩罚。}
 \GlossaryEntry{余项}{Remainder}{原函数与截断多项式之间的差，如 $R_n(t)=f(t)-T_n(t)$。}
+\GlossaryEntry{右手法则}{Right-Hand Rule}{右手拇指指向转轴正向，四指弯曲方向规定为正向旋转；用于统一三维旋转的正负约定。}
 \GlossaryEntry{单位根}{Roots of Unity}{方程 $w^n=1$ 的解，均在单位圆上，辐角相邻间隔为 $2\pi /n$。}
 \GlossaryEntry{旋转}{Rotation}{绕原点转过固定有向角的变换；复平面上乘 $e^{i\theta }$ 表示旋转 $\theta $。}
 \GlossaryEntry{旋转矩阵}{Rotation Matrix}{表示绕原点旋转的矩阵；平面逆时针旋转 $\theta $ 时，两列依次为 $(\cos \theta ,\sin \theta )^{\mathrm T}$ 与 $(-\sin \theta ,\cos \theta )^{\mathrm T}$。}
@@ -249,6 +254,7 @@
 \GlossaryEntry{对称矩阵}{Symmetric Matrix}{满足 $A^{\mathrm T}=A$ 的实方阵，对称位置的元素相等。}
 \GlossaryEntry{对称性}{Symmetry}{某种关系成立时交换两个对象，关系仍成立；如向量组等价关系。}
 \GlossaryLetter{T}
+\GlossaryEntry{泰特--布赖恩角}{Tait-Bryan Angles}{按约定依次绕三个不同坐标轴旋转的三个角；必须同时说明轴序、固定轴或随动轴以及正向约定。}
 \GlossaryEntry{泰勒多项式}{Taylor Polynomial}{用函数在某一点的有限阶导数作系数构造的多项式，本书用于选读的函数近似例子。}
 \GlossaryEntry{词元}{Token}{分词器按规则将文本切分得到的基本处理单元，可为完整的词、词的一部分或标点等，不必与汉字或自然语言中的词一一对应。模型先将其映射为初始向量，再通过后续计算融入上下文信息。}
 \GlossaryEntry{传递性}{Transitivity}{若对象一与二、二与三具有某种关系，则对象一与三也具有该关系。}

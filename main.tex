@@ -10317,247 +10317,490 @@ $B$ 的两列线性无关，秩为2，故由 $2-2=0$ 可知它是单射。输出
 \label{sec:four-qian-trajectory}
 \textbf{本小节为拓展内容，不做考核要求。}
 
-% 本小节的七幅插图统一占用 4.17 这个整数图号，用字母后缀编号，不推进后续 DCT 案例的图号。
+在第 4.4 节，我们已经证明：同一个向量可以有不同的坐标，同一个线性变换可以有不同的矩阵。真正进入工程问题时，困难常常不是不会乘矩阵，而是不知道眼前这张矩阵究竟在做什么：它把向量转动了，还是只把坐标换了一套？为什么有的公式左乘一个矩阵，有的却要左右各乘一个？本节从钱学森弹道的公开背景出发，把这些问题追到三维旋转矩阵的来源。所需几何只有高中三角函数和第 0 章的点积、长度与垂直关系；所有数值与轨迹均为教学自拟示意。
+
+% 4.5 节采用固定字母后缀，不推进后续整数图号。
 \setcounter{figure}{17}
 \definecolor{FourOrange}{HTML}{C8822A}
 
-\FHead{历史背景：两条滑翔弹道的分野}
-1948年秋，钱学森在美国火箭学会年会上报告了一种可以完成洲际飞行的“助推—再入”高速火箭飞机方案，其弹道后来被称为“助推—滑翔”弹道。1949年，他又研究了一种以火箭助推、再入滑翔完成洲际运输的系统，采用近似平衡滑翔的轨迹。\cite{qian-interplanetary-flight, guan-qian-trajectory, nuaa-boost-glide-thesis}钱学森弹道与德国科学家桑格尔（Sänger）在1933年提出的“跳跃滑翔”弹道有明显区别：桑格尔弹道具有跳跃波动，飞行器在大气层中多次“打水漂”式弹跳；钱学森弹道则为平衡滑翔，飞行器在滑翔段始终保持重力方向上的受力平衡。这条弹道融合了弹道导弹的高速再入特性与巡航导弹的灵活机动能力，利用乘波体外形在 20–100 公里的临近空间进行滑翔增程飞行。
+\subsection{轨迹之外，计算机还需要知道什么}
+公开文献把与钱学森研究相关的助推后持续滑翔构想称为“钱学森弹道”，其主要几何特征是再入后的较平滑滑翔；它与桑格尔方案中反复起伏的跳跃滑翔形成对照。关世义的论文以此为背景讨论了助推与滑翔的结合。\cite{guan-qian-trajectory}这里关注的不是射程或飞行性能，而是随之出现的一个数学问题：\textbf{同一次运动，为什么需要同时使用多套坐标？}
 
-\FHead{五种弹道，一张图看清差别}
-把五种弹道放在同一个高度—距离坐标系中对比，钱学森弹道的独特之处便一目了然。传统弹道导弹的弹道是一条高抛的抛物线，飞出大气层后沿惯性飞行，再入段几乎是自由落体。巡航导弹在大气层内低空飞行，机动灵活但速度慢、射程有限。桑格尔弹道是“跳跃滑翔”，飞行器在大气层边缘反复弹跳，像打水漂一样起伏前进。钱学森弹道是“平衡滑翔”，飞行器再入后不再飞出大气层，而是贴在大气层边缘做平滑的滑翔飞行。此外还有一种半弹道跳跃式再入，介于传统弹道和跳跃弹道之间。图~\ref{fig:four-qian-trajectories}把这五种弹道画在一起；五种弹道共享同一个起点和终点，区别在于再入段之后的飞行方式。\cite{nuaa-boost-glide-thesis, qian-trajectory-outreach}
+图\ref{fig:four-qian-trajectories}把常见的五种轨迹形态放在一起。常规弹道画成较高的弧线，巡航形态画成低空延伸，跳跃滑翔与半弹道跳跃式用不同起伏程度示意，钱学森弹道则强调再入后较平滑的滑翔段。这不是统一飞行条件下的性能比较：同一起终点只是便于读图的安排，实际轨迹也不必是抛物线。约 $100\,\mathrm{km}$ 的虚线只作常见的空间边界参照，\textbf{大气没有一堵到此突然结束的墙}；滑翔依赖空气作用，也不等于沿这条虚线飞行。
 
-% FIGURE 4.17a BEGIN
-\FourNamedSupplement{4.17a}{五种弹道共享同一个起点和终点，区别在于再入段之后的飞行方式。钱学森弹道的独特之处在于：再入后不再飞出大气层，而是贴着大气层边缘做平滑滑翔。}{fig:four-qian-trajectories}{%
-\resizebox{.98\linewidth}{!}{\begin{tikzpicture}[every node/.style={font=\footnotesize,inner sep=2pt}]
- \draw[fouraxis] (0,0)--(13.6,0) node[below] {距离（射程，示意）};
- \draw[fouraxis] (0,0)--(0,6.9) node[left] {高度（示意）};
- \draw[FourGray,densely dashed,line width=.8pt] (0,2.6)--(13.6,2.6);
- \node[text=FourGray,above right] at (9.9,2.72) {大气层边界（20–100 km，示意）};
- \draw[FourGray,line width=1pt] (0.2,0) .. controls (3.6,6.4) and (6.4,6.0) .. (13.2,0);
- \node[text=FourGray,above] at (4.5,6.2) {传统弹道};
- \draw[FourGreen,line width=1pt] (0.2,0.25) .. controls (4,0.55) and (9,0.45) .. (13.2,0.25);
- \node[text=FourGreen,below] at (6.5,0.28) {巡航导弹};
- \draw[FourRose,line width=1pt] (0.2,0) .. controls (2,4.2) and (3.2,2.4) .. (4.4,3.4) .. controls (5.6,4.2) and (6.8,2.4) .. (8,3.4) .. controls (9.2,4.2) and (10.4,2.4) .. (11.6,3.2) .. controls (12.4,3.7) and (12.8,1.6) .. (13.2,0);
- \node[text=FourRose,above] at (6.6,4.4) {桑格尔（跳跃滑翔）};
- \draw[FourBlue,line width=1.5pt] (0.2,0) .. controls (3,5.0) and (5,2.7) .. (7,2.75) .. controls (9.5,2.8) and (11,2.7) .. (13.2,0);
- \node[text=FourBlue,above] at (7.6,3.15) {钱学森（平衡滑翔）};
- \draw[FourOrange,line width=1pt] (0.2,0) .. controls (2.6,4.8) and (4,2.2) .. (5.4,3.6) .. controls (7,5.0) and (9,2.4) .. (13.2,0);
- \node[text=FourOrange,above] at (4.5,5.2) {半弹道跳跃式};
- \fill[FourGray] (0.2,0) circle (1.6pt) node[below left] {起点};
- \fill[FourGray] (13.2,0) circle (1.6pt) node[below right] {终点};
-\end{tikzpicture}}
-}{五种轨迹均为教学示意，不代表真实射程、高度或飞行数据；曲线相对位置只表达五种飞行方式的差别。}
-% FIGURE 4.17a END
-
-\FHead{为什么要同时用多组坐标}
-同一枚飞行器在不同阶段面对不同的描述任务。助推段，地面人员关心它相对发射点的位置，发射坐标系便于组织这类记录；再入段要辨认弹体姿态，弹体坐标系便于描述朝向；滑翔段要沿速度方向组织气动量，速度坐标系便于分解气动力。这不是“一阶段只用一组坐标”的固定规程——实际计算在同一时刻也并用多组坐标。NASA 的公开资料同样把地面参考系、机体系和与飞行方向有关的坐标系分别列出，说明它们承担不同的描述任务。\cite{nasa-flight-frames, nasa-flight-axis-survey}
-
-发射坐标系的原点与发射点固联，$ox$ 轴在发射点水平面内指向瞄准方向，$oy$ 轴垂直向上，$oz$ 轴与二者构成右手坐标系。弹体坐标系的原点在导弹质心，$ox$ 轴与弹体纵轴重合指向头部，$oy$ 轴在弹体纵向对称面内指向上方。速度坐标系的原点在飞行器质心，$ox$ 轴与速度矢量重合，$oy$ 轴在主对称面内指向上方；气动力通常在速度坐标系下分解为阻力、升力和侧力。图~\ref{fig:four-qian-stages-frames}标出助推、再入、滑翔三个阶段与三组坐标架。
-
-% FIGURE 4.17b BEGIN
-\FourNamedSupplement{4.17b}{钱学森弹道的助推、再入、滑翔三个阶段，以及发射系（蓝）、弹体系（红）、速度系（绿）三组坐标架。}{fig:four-qian-stages-frames}{%
-\begin{tikzpicture}[every node/.style={font=\footnotesize,inner sep=2pt}]
- \fill[FourBlue!4] (0,0) rectangle (14,6.3);
- \draw[FourGray,densely dashed,line width=.7pt] (0,2.2)--(14,2.2);
- \node[text=FourGray,right] at (14.02,2.5) {大气层边界};
- \draw[FourGray,line width=1.1pt] (0.4,0.3) .. controls (2.6,5.6) and (4.6,5.9) .. (6.2,4.0) .. controls (8,2.6) and (11,2.6) .. (13.6,1.4);
- \node[text=FourGray] at (2.1,5.55) {助推};
- \node[text=FourGray] at (6.4,4.9) {再入};
- \node[text=FourGray] at (11.4,3.25) {滑翔};
- \draw[fourblue] (3.0,1.5)--(4.7,1.5); \node[right,text=FourBlue] at (4.75,1.5) {$x_L$：瞄准方向};
- \draw[fourblue] (3.0,1.5)--(3.0,2.9); \node[above,text=FourBlue] at (3.0,2.95) {$y_L$：铅垂向上};
- \draw[fourblue] (3.0,1.5)--(2.2,0.9); \node[below left,text=FourBlue] at (2.2,0.9) {$z_L$};
- \node[below right,text=FourBlue] at (3.0,1.5) {$O_L$};
- \begin{scope}[shift={(8.2,3.1)},rotate=22]
-  \filldraw[FourGray,fill=white,line width=.8pt] (-1.0,-.13)--(.85,-.13)--(1.25,0)--(.85,.13)--(-1.0,.13)--cycle;
-  \draw[FourGray] (-.2,0)--(-.7,.5)--(.2,0)--(-.7,-.5)--cycle;
- \end{scope}
- \draw[fourrose] (8.2,3.1)--(10.35,4.0); \node[above right,text=FourRose] at (10.4,4.05) {$x_B$：弹体纵轴};
- \draw[fourrose] (8.2,3.1)--(8.78,1.9); \node[below right,text=FourRose] at (8.8,1.85) {$z_B$};
- \node[below left,text=FourRose] at (7.95,2.9) {$y_B$};
- \draw[fourgreen] (8.2,3.1)--(11.5,3.2); \node[right,text=FourGreen] at (11.5,3.2) {$x_V$：沿速度};
- \draw[fourgreen] (8.2,3.1)--(8.3,0.9); \node[below,text=FourGreen] at (8.3,0.9) {$z_V$};
- \node[above left,text=FourGreen] at (7.7,3.35) {$y_V$};
- \node[text=FourGray,fill=white,inner sep=.1pt] at (8.2,3.1) {$\odot$};
- \node[align=center,font=\footnotesize] at (10.2,-0.45) {弹体系看朝向，速度系看运动方向};
- \node[text=FourGray,font=\footnotesize] at (7.0,-1.05) {$\odot$ 表示两根重合的横向轴指向纸外；图为纵向截面示意。};
+\FourNamedSupplement{4.17a}{五种轨迹形态的教学对照。五条曲线共享示意起终点；钱学森弹道突出再入后的持续平滑滑翔，桑格尔弹道突出反复起伏。}{fig:four-qian-trajectories}{%
+\begin{tikzpicture}[x=1cm,y=.82cm,every node/.style={font=\footnotesize}]
+ \fill[FourBlue!4] (0,0) rectangle (11.5,2.45);
+ \draw[fouraxis] (0,0)--(11.9,0);
+ \node[below] at (5.8,-.12) {水平距离（示意）};
+ \draw[fouraxis] (0,0)--(0,5.4) node[above right] {高度（示意）};
+ \draw[fourguide] (0,2.45)--(11.5,2.45);
+ \node[text=FourGray] at (6,5.6) {水平虚线：约 $100\,\mathrm{km}$ 边界参照，并非大气终止面};
+ \draw[FourGray,dashed,line width=1pt] (0,0) .. controls (3.3,6.9) and (7.5,6.2) .. (11.5,0);
+ \draw[FourGreen,densely dotted,line width=1.2pt] (0,0) .. controls (.8,.36) and (10.5,.36) .. (11.5,0);
+ \draw[FourRose,line width=1.1pt] (0,0) .. controls (1.2,3.5) and (2,4.1) .. (3.1,1.75)
+  .. controls (3.85,4.1) and (4.65,4.1) .. (5.35,1.6)
+  .. controls (6.1,3.55) and (6.85,3.55) .. (7.55,1.35)
+  .. controls (8.3,2.8) and (9,2.8) .. (9.65,1.0)
+  .. controls (10.3,1.8) and (11.0,.7) .. (11.5,0);
+ \draw[FourOrange,dash dot,line width=1pt] (0,0) .. controls (1.6,3.1) and (3.4,3.3) .. (5.4,1.25)
+  .. controls (6.5,2.05) and (7.3,2.1) .. (8.1,1.15)
+  .. controls (9.25,.75) and (10.4,.35) .. (11.5,0);
+ \draw[FourBlue,line width=1.9pt] (0,0) .. controls (1.1,4.5) and (2.0,4.2) .. (2.7,2.8)
+  .. controls (3.1,2.0) and (3.5,2.0) .. (4.2,1.9)
+  .. controls (6.2,1.6) and (8.5,1.5) .. (9.6,1.0)
+  .. controls (10.5,.65) and (11.0,.25) .. (11.5,0);
+ \fill[FourGray] (0,0) circle(1.8pt) node[below left] {起点};
+ \fill[FourGray] (11.5,0) circle(1.8pt) node[below right] {终点};
+ \draw[FourGray,dashed] (.1,-1.3)--(.8,-1.3);\node[right] at (.9,-1.3) {常规弹道};
+ \draw[FourGreen,densely dotted,line width=1.2pt] (4.1,-1.3)--(4.8,-1.3);\node[right] at (4.9,-1.3) {低空巡航};
+ \draw[FourRose,line width=1.1pt] (7.9,-1.3)--(8.6,-1.3);\node[right] at (8.7,-1.3) {桑格尔：跳跃滑翔};
+ \draw[FourOrange,dash dot] (.1,-1.9)--(.8,-1.9);\node[right] at (.9,-1.9) {半弹道跳跃式};
+ \draw[FourBlue,line width=1.9pt] (4.1,-1.9)--(4.8,-1.9);\node[right] at (4.9,-1.9) {钱学森：平滑滑翔};
 \end{tikzpicture}
-}{三组坐标架用蓝、红、绿区分，原点分别位于发射点与飞行器质心。弹体轴沿机体，速度轴沿运动方向，两者不必重合；轨迹与角度均为教学示意。}
-% FIGURE 4.17b END
+}{图为原创形态示意，不提供高度、速度、射程或气动计算模型；浅色区域只帮助辨认边界参照下方，曲线不可作为实际飞行数据读取。}
 
-\FHead{同一个向量，两份坐标}
-承接第 4.4 节的坐标转换关系 $[\boldsymbol x]_{\mathcal B}=P_{\mathcal B\leftarrow\mathcal C}[\boldsymbol x]_{\mathcal C}$，用导弹的位置向量 $\boldsymbol r$ 作具体例子。设发射坐标系为 $\mathcal B$，弹体坐标系为 $\mathcal C$。弹上传感器测得的位置在弹体系下是 $[\boldsymbol r]_{\mathcal C}$，地面站需要知道它在发射系下的坐标 $[\boldsymbol r]_{\mathcal B}$，两者满足
-\[
- [\boldsymbol r]_{\mathcal B}=P_{\mathcal B\leftarrow\mathcal C}[\boldsymbol r]_{\mathcal C}.
-\]
-过渡矩阵 $P_{\mathcal B\leftarrow\mathcal C}$ 的每一列是弹体系基向量在发射系下的坐标，在飞行力学文献中称为\term{direction-cosine-matrix}。图~\ref{fig:four-qian-vector-bases}把这个换算画清楚。
+地面记录常以地面参考系为准；固定在机体上的设备沿自身轴向记录分量；讨论运动方向时，又会用到沿速度方向安排的坐标架。因此，发射系便于表达相对发射点的位置，机体系便于表达机体朝向，速度系便于表达与运动方向有关的量。这些坐标系可以在同一时刻并用，并不是每个阶段只准选一套。不同领域对轴向的命名也可能不同，读公式前必须先看坐标约定。NASA 的飞行坐标资料和 SPICE 参考系文档都明确区分参考系及其转换方向。\cite{nasa-flight-axis-survey,naif-reference-frames}
 
-% FIGURE 4.17c BEGIN
-\FourNamedSupplement{4.17c}{同一个位置向量 $\boldsymbol r$，在发射系 $\mathcal B$ 与弹体系 $\mathcal C$ 下的坐标不同，中间由过渡矩阵 $P_{\mathcal B\leftarrow\mathcal C}$ 换算。}{fig:four-qian-vector-bases}{%
-\begin{tikzpicture}[x=1cm,y=1cm,every node/.style={font=\footnotesize,inner sep=2pt}]
- \begin{scope}
-  \draw[fouraxis] (-.5,0)--(3.8,0) node[right] {$\boldsymbol b_1$};
-  \draw[fouraxis] (0,-.6)--(0,2.9) node[above] {$\boldsymbol b_2$};
-  \draw[fourguide] (0,0)--(3,0)--(3,1.2);
-  \draw[fourrose] (0,0)--(3,1.2);
-  \fill[FourRose] (3,1.2) circle (1.8pt);
-  \node[above right,text=FourRose] at (3,1.2) {$\boldsymbol r$};
-  \node[below left] at (0,0) {$O$};
-  \node[font=\small\bfseries] at (1.4,3.5) {发射系 $\mathcal B$};
-  \node at (1.4,-1.3) {$[\boldsymbol r]_{\mathcal B}$};
+\FourNamedSupplement{4.17b}{一条轨迹，多组坐标。上方示意助推、再入与滑翔，下方分别画出地面参考架、机体参考架与速度参考架。}{fig:four-qian-stages-frames}{%
+\begin{tikzpicture}[every node/.style={font=\footnotesize}]
+ \draw[FourGray!60] (0,2.6)--(11.8,2.6);
+ \draw[FourGray,line width=1pt] (.2,2.6) .. controls (1.7,5.65) and (3.1,5.8) .. (4.8,4.0)
+  .. controls (6.7,3.6) and (9.3,3.45) .. (11.5,2.8);
+ \node at (1.4,5.0) {助推};\node at (4.9,4.65) {再入};\node at (9.3,3.95) {滑翔};
+ \begin{scope}[shift={(1.65,0)}]
+  \draw[fourblue] (0,0)--(1.5,0) node[right] {$x_L$};
+  \draw[fourblue] (0,0)--(0,1.35) node[above] {$y_L$};
+  \draw[fourblue] (0,0)--(-.65,-.45) node[left] {$z_L$};
+  \node[align=center,text=FourBlue] at (.1,-1.05) {发射系\\固定在发射点附近};
  \end{scope}
- \draw[fouraxis,-{Stealth[length=2.2mm]},line width=1pt] (4.6,1.3)--(6.1,1.3);
- \node[align=center] at (5.35,1.85) {$P_{\mathcal B\leftarrow\mathcal C}$\\[2pt]换基};
- \begin{scope}[shift={(7.3,0)}]
-  \draw[fouraxis,FourGreen] (-.7,-.7)--(2.3,2.3) node[above right] {$\boldsymbol c_1$};
-  \draw[fouraxis,FourGreen] (.75,-.75)--(-1.7,1.7) node[above left] {$\boldsymbol c_2$};
-  \draw[fourguide] (0,0)--(2.12,2.12)--(3,1.2);
-  \draw[FourGreen,-{Stealth[length=1.4mm]}] (.75,0) arc[start angle=0,end angle=45,radius=.75];
-  \node[font=\footnotesize] at (1.2,.4) {$45^\circ$};
-  \draw[fourrose] (0,0)--(3,1.2);
-  \fill[FourRose] (3,1.2) circle (1.8pt);
-  \node[above right,text=FourRose] at (3,1.2) {$\boldsymbol r$};
-  \node[below left] at (0,0) {$O$};
-  \node[font=\small\bfseries] at (1.4,3.5) {弹体系 $\mathcal C$};
-  \node at (1.4,-1.3) {$[\boldsymbol r]_{\mathcal C}$};
+ \begin{scope}[shift={(5.7,0)}]
+  \draw[fourrose] (0,0)--(1.3,.5) node[right] {$x_C$};
+  \draw[fourrose] (0,0)--(-.45,1.2) node[above] {$y_C$};
+  \draw[fourrose] (0,0)--(-.6,-.5) node[left] {$z_C$};
+  \node[align=center,text=FourRose] at (.1,-1.05) {机体系\\随物体朝向改变};
+ \end{scope}
+ \begin{scope}[shift={(9.85,0)}]
+  \draw[fourgreen] (0,0)--(1.45,-.18) node[right] {$x_V$};
+  \draw[fourgreen] (0,0)--(.16,1.25) node[above] {$y_V$};
+  \draw[fourgreen] (0,0)--(-.6,-.5) node[left] {$z_V$};
+  \node[align=center,text=FourGreen] at (.1,-1.05) {速度系\\首轴沿运动方向};
  \end{scope}
 \end{tikzpicture}
-}{两幅图中的红色箭头指向同一位置，长度比例相同；右图坐标轴相对左图转过 $45^\circ$，虚线标出两组轴之间的夹角，粗箭头标出 $P_{\mathcal B\leftarrow\mathcal C}$ 的换算方向。坐标仅作三维示意。}
-% FIGURE 4.17c END
+}{下方坐标架已移到空白处单独展示，图上位置不代表它们的实际原点。三维坐标架在纸上以斜视图表示；后续推导先把原点对齐，只研究方向与坐标分量的变化。}
 
-\FHead{坐标转换链：不是一步，而是一串}
-真实导航系统不会从发射系直接一步换到弹体系。弹体系相对发射系的姿态由三个\term{euler-angles}依次确定，每一次绕一个坐标轴旋转对应一个基本旋转矩阵。绕三个坐标轴的基本旋转矩阵分别为
-\[
-\begin{aligned}
- R_x(\alpha)&=\FMat{ccc}{1&0&0\\0&\cos\alpha&-\sin\alpha\\0&\sin\alpha&\cos\alpha},\\
- R_y(\beta)&=\FMat{ccc}{\cos\beta&0&\sin\beta\\0&1&0\\-\sin\beta&0&\cos\beta},\\
- R_z(\gamma)&=\FMat{ccc}{\cos\gamma&-\sin\gamma&0\\\sin\gamma&\cos\gamma&0\\0&0&1}.
-\end{aligned}
-\]
-按 Y、Z、X 轴的顺序依次旋转，完整的过渡矩阵就是三个基本旋转矩阵的连乘（最右边的矩阵最先作用）：
-\[
- P_{\mathcal B\leftarrow\mathcal C}=R_x(\alpha)\,R_z(\gamma)\,R_y(\beta).
-\]
-这里的基本旋转矩阵不是第三章消元法中的初等矩阵，而是绕坐标轴的旋转。这一连乘形式在飞行力学文献中有明确推导；陈阳泉指出，“坐标系之间的转换，实质上是由一系列的基本转换构成的”。\cite{chen-coordinate-matrix-1989}这里强调每一步的顺序不能交换：先俯仰再滚转，与先滚转再俯仰，得到的姿态不同。这正是矩阵乘法不满足交换律在飞行力学中的直接体现。图~\ref{fig:four-qian-euler-chain}把三次旋转串起来。
+不妨暂时把飞行器换成手中的一本书：书页朝向可以改变，桌面上的坐标轴却不必跟着转。只要把这件小事讲清楚，三维旋转矩阵的大半疑惑就会消失。
 
-% FIGURE 4.17d BEGIN
-\FourNamedSupplement{4.17d}{三次绕坐标轴的基本旋转依次复合，得到完整过渡矩阵 $P_{\mathcal B\leftarrow\mathcal C}=R_x(\alpha)R_z(\gamma)R_y(\beta)$。}{fig:four-qian-euler-chain}{%
-\begin{tikzpicture}[every node/.style={font=\footnotesize,inner sep=2pt},
- box/.style={draw=FourGray!60,fill=white,rounded corners=2pt,align=center,inner sep=4pt,font=\footnotesize}]
- \begin{scope}[shift={(0,0)}]
-  \node[align=center] at (0,1.5) {先绕 $y$ 轴\\转过 $\beta$（俯仰）};
-  \draw[fouraxis] (-1.1,0)--(1.1,0) node[right] {$x$};
-  \draw[fouraxis] (0,-.95)--(0,.95) node[above] {$y$};
-  \draw[fourrose] (0,0)--(0.75,0.55);
-  \draw[FourRose,-{Stealth[length=1.2mm]}] (0.55,0) arc[start angle=0,end angle=36,radius=.55];
-  \node[box] at (0,-2.35) {$R_y(\beta)=\FMat{ccc}{\cos\beta&0&\sin\beta\\0&1&0\\-\sin\beta&0&\cos\beta}$};
- \end{scope}
- \draw[fouraxis,-{Stealth[length=2mm]},line width=1pt] (2.35,0)--(3.25,0);
- \begin{scope}[shift={(4.6,0)}]
-  \node[align=center] at (0,1.5) {再绕 $z$ 轴\\转过 $\gamma$（偏航）};
-  \draw[fouraxis] (-1.1,0)--(1.1,0) node[right] {$x$};
-  \draw[fouraxis] (0,-.95)--(0,.95) node[above] {$y$};
-  \draw[fourrose] (0,0)--(0.5,0.75);
-  \draw[FourRose,-{Stealth[length=1.2mm]}] (0.6,0) arc[start angle=0,end angle=56,radius=.6];
-  \node[box] at (0,-2.35) {$R_z(\gamma)=\FMat{ccc}{\cos\gamma&-\sin\gamma&0\\\sin\gamma&\cos\gamma&0\\0&0&1}$};
- \end{scope}
- \draw[fouraxis,-{Stealth[length=2mm]},line width=1pt] (6.95,0)--(7.85,0);
- \begin{scope}[shift={(9.2,0)}]
-  \node[align=center] at (0,1.5) {最后绕 $x$ 轴\\转过 $\alpha$（滚转）};
-  \draw[fouraxis] (-1.1,0)--(1.1,0) node[right] {$x$};
-  \draw[fouraxis] (0,-.95)--(0,.95) node[above] {$y$};
-  \draw[fourrose] (0,0)--(0.75,0.6);
-  \draw[FourRose,-{Stealth[length=1.2mm]}] (0.5,0) arc[start angle=0,end angle=39,radius=.5];
-  \node[box] at (0,-2.35) {$R_x(\alpha)=\FMat{ccc}{1&0&0\\0&\cos\alpha&-\sin\alpha\\0&\sin\alpha&\cos\alpha}$};
- \end{scope}
- \node[align=center,text=FourBlue] at (4.6,-3.7) {复合 $=$ 矩阵连乘：$P_{\mathcal B\leftarrow\mathcal C}=R_x(\alpha)R_z(\gamma)R_y(\beta)$};
+\subsection{从高中三角公式推导平面旋转}
+本节采用列向量、右手直角坐标系；正角按\term{right-hand-rule}规定：右手拇指指向转轴正向，四指弯曲的方向为正。从转轴正半轴看向原点，正向旋转在面向我们的平面上表现为逆时针。先固定坐标系，真正转动向量；这称为\term{active-rotation}。另一种“向量不动、坐标轴转动”的解释稍后再讨论。\cite{zanetti-rotations-2019}
+
+设平面非零向量 $\boldsymbol u$ 的长度为 $\rho$，它与 $x$ 轴正向的有向角为 $\varphi$。旋转 $\theta$ 后得到 $\boldsymbol u'$，于是
+\begin{align}
+ x&=\rho\cos\varphi,\qquad y=\rho\sin\varphi,\\
+ x'&=\rho\cos(\varphi+\theta)=x\cos\theta-y\sin\theta,\\
+ y'&=\rho\sin(\varphi+\theta)=x\sin\theta+y\cos\theta.
+ \label{eq:four-planar-rotation-derive}
+\end{align}
+这里只用了高中学过的两角和公式。零向量旋转后仍是零，上式也成立。把系数整理成矩阵，就是
+\begin{equation}
+ \begin{pmatrix}x'\\y'\end{pmatrix}
+ =\underbrace{\begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}}_{R(\theta)}
+ \begin{pmatrix}x\\y\end{pmatrix}.
+ \label{eq:four-planar-rotation}
+\end{equation}
+
+\FourNamedSupplement{4.17c}{平面旋转的推导：长度 $\rho$ 不变，有向角从 $\varphi$ 变成 $\varphi+\theta$，再用两角和公式展开坐标。}{fig:four-qian-planar-derive}{%
+\begin{tikzpicture}[every node/.style={font=\small}]
+ \draw[fouraxis] (-.4,0)--(3.1,0) node[right] {$x$};
+ \draw[fouraxis] (0,-.35)--(0,2.7) node[above] {$y$};
+ \coordinate (p) at (20:2.5);\coordinate (q) at (55:2.5);
+ \draw[fourguide] (p)--(2.349,0);\draw[fourguide] (q)--(1.434,0);
+ \draw[fourblue] (0,0)--(p) node[right] {$\boldsymbol u$};
+ \draw[fourrose] (0,0)--(q) node[above right] {$\boldsymbol u'$};
+ \draw[FourGray] (.5,0) arc(0:20:.5);\node at (.78,.12) {$\varphi$};
+ \draw[FourRose,-{Stealth[length=1.5mm]}] (20:1) arc(20:55:1);
+ \node[text=FourRose] at (39:1.32) {$\theta$};
+ \node[below left] at (0,0) {$O$};
+ \node[draw=FourGray!40,rounded corners,align=left,inner sep=10pt] at (7.25,1.2)
+  {$\boldsymbol u=\rho(\cos\varphi,\sin\varphi)^{\mathrm T}$\\[10pt]
+   $\boldsymbol u'=\rho(\cos(\varphi+\theta),$\\[3pt]
+   $\hphantom{\boldsymbol u'=\rho(}\sin(\varphi+\theta))^{\mathrm T}$};
 \end{tikzpicture}
-}{三个分步骤各自显示一个方向向量绕一根轴转过一个小角度，下方给出对应的基本旋转矩阵；箭头串联表示依次复合，旋转顺序不能交换。角度仅为示意。}
-% FIGURE 4.17d END
+}{蓝色是原向量，红色是旋转后的向量，灰色虚线为坐标辅助线。图中取锐角便于观察，推导对任意实数角成立。}
 
-\FHead{姿态矩阵按相似变换改变}
-导弹的\term{attitude-matrix} $M$ 描述弹体轴相对参考系的姿态。同一个姿态，在发射坐标系下记为 $M_{\mathcal B}$，在弹体坐标系下记为 $M_{\mathcal C}$，两者之间满足相似关系
-\[
- M_{\mathcal C}=P^{-1}M_{\mathcal B}P.
-\]
-这不是人为规定的规则，而是第 4.4 节已经证明的结论：同一个线性变换在两组基下的矩阵相似。姿态矩阵是“旋转”这个线性变换的矩阵表示，换参考系就是换基，姿态矩阵随之按相似变换改变。Chen 等人推导了发射惯性系与当地水平系之间方向余弦矩阵的关系，说明这类换算在实际导航中按同样的相似结构展开。\cite{chen-strapdown-2017}图~\ref{fig:four-qian-similarity-loop}把相似变换画成一个环。
+还可以按第 3.1 节的办法读出同一个矩阵：$\mathbf e_1$ 变为 $(\cos\theta,\sin\theta)^{\mathrm T}$，$\mathbf e_2$ 变为 $(-\sin\theta,\cos\theta)^{\mathrm T}$。把这两个像按列放好，恰是 $R(\theta)$。\textbf{三角公式给出分量，基的像解释列的含义；两条思路在这里相遇。}
 
-% FIGURE 4.17e BEGIN
-\FourNamedSupplement{4.17e}{姿态矩阵的相似变换环：$M_{\mathcal C}=P^{-1}M_{\mathcal B}P$。}{fig:four-qian-similarity-loop}{%
-\begin{tikzpicture}[every node/.style={font=\footnotesize},
- cb/.style={draw=FourBlue,fill=FourBlue!5,rounded corners,text width=3.3cm,minimum height=1.3cm,align=center,text=FourBlue},
- bb/.style={draw=FourRose,fill=FourRose!5,rounded corners,text width=3.3cm,minimum height=1.3cm,align=center,text=FourRose}]
- \node[cb] (ci) at (0,4) {弹体系下的方向\\$[\boldsymbol d]_{\mathcal C}$};
- \node[bb] (bi) at (6,3) {发射系下的方向\\$[\boldsymbol d]_{\mathcal B}$};
- \node[bb] (bo) at (6,0) {旋转后的方向\\（发射系坐标）};
- \node[cb] (co) at (0,-1) {旋转后的方向\\（弹体系坐标）};
- \draw[fourrose] (ci.east) to[bend left=12] node[above] {$P$：换基} (bi.north);
- \draw[fourrose] (bi)--node[right] {$M_{\mathcal B}$：旋转} (bo);
- \draw[fourblue] (bo.south) to[bend left=12] node[below] {$P^{-1}$：换回来} (co.east);
- \draw[fouraxis,densely dashed] (ci.south)--node[left,align=right] {直接用 $M_{\mathcal C}$} (co.north);
- \node[align=center] at (3,1.4) {沿外侧三步合成\\[5pt]$M_{\mathcal C}=P^{-1}M_{\mathcal B}P$};
+\subsection{三维只多一根不动的轴：推导与助记}
+绕坐标轴旋转时，该轴方向的分量不变，垂直于它的坐标平面内发生二维旋转。因而三个基本矩阵不需要分别死记；只要认清“不动哪一轴、转动哪一个有序平面”。NASA 的 Henderson 报告也以单轴旋转建立三维坐标转换公式。\cite{henderson-euler-1977}
+
+\FHead{绕 $z$ 轴：把平面公式直接放进三维}
+此时 $z'=z$，$(x,y)$ 按式\eqref{eq:four-planar-rotation}变化。基向量的像依次为
+\begin{equation}
+ \mathbf e_1\mapsto(\cos\theta,\sin\theta,0)^{\mathrm T},\quad
+ \mathbf e_2\mapsto(-\sin\theta,\cos\theta,0)^{\mathrm T},\quad
+ \mathbf e_3\mapsto\mathbf e_3.
+\end{equation}
+按列排列，得到
+\begin{equation}
+ R_z(\theta)=\begin{pmatrix}\cos\theta&-\sin\theta&0\\\sin\theta&\cos\theta&0\\0&0&1\end{pmatrix}.
+ \label{eq:four-rz-derived}
+\end{equation}
+
+\FHead{绕 $x$ 轴：在有序平面 $(y,z)$ 中旋转}
+右手正向把 $+y$ 转向 $+z$。保持 $x'=x$，将平面公式中的 $x,y$ 换为 $y,z$，得到
+\begin{align}
+ y'&=y\cos\theta-z\sin\theta,&z'&=y\sin\theta+z\cos\theta,\\
+ R_x(\theta)&=\begin{pmatrix}1&0&0\\0&\cos\theta&-\sin\theta\\0&\sin\theta&\cos\theta\end{pmatrix}.
+ \label{eq:four-rx-derived}
+\end{align}
+三列分别表示 $\mathbf e_1$ 不动、$\mathbf e_2$ 转为 $(0,\cos\theta,\sin\theta)^{\mathrm T}$、$\mathbf e_3$ 转为 $(0,-\sin\theta,\cos\theta)^{\mathrm T}$。
+
+\FHead{绕 $y$ 轴：为什么负号换了位置}
+绕 $+y$ 轴的右手正向是从 $+z$ 转向 $+x$，所以与前面相同的二维模板应放在\textbf{有序平面 $(z,x)$}中，而不是直接放在 $(x,z)$ 中。先写
+\begin{equation}
+ \begin{pmatrix}z'\\x'\end{pmatrix}
+ =\begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}
+ \begin{pmatrix}z\\x\end{pmatrix},\qquad y'=y.
+\end{equation}
+再按全书统一的 $(x,y,z)$ 顺序排回去：
+\begin{align}
+ x'&=x\cos\theta+z\sin\theta,&z'&=-x\sin\theta+z\cos\theta,\\
+ R_y(\theta)&=\begin{pmatrix}\cos\theta&0&\sin\theta\\0&1&0\\-\sin\theta&0&\cos\theta\end{pmatrix}.
+ \label{eq:four-ry-derived}
+\end{align}
+因此 $\mathbf e_1\mapsto(\cos\theta,0,-\sin\theta)^{\mathrm T}$，$\mathbf e_2$ 不动，$\mathbf e_3\mapsto(\sin\theta,0,\cos\theta)^{\mathrm T}$。\textbf{$y$ 轴没有另一套旋转法则；看起来不同的符号，来自把 $(z,x)$ 的顺序重新写成 $(x,z)$。}
+
+\FourNamedSupplement{4.17d}{三维旋转的三个二维截面。绕 $x,y,z$ 轴时，分别在 $(y,z)$、$(z,x)$、$(x,y)$ 有序平面中使用同一个二维旋转模板。}{fig:four-qian-axis-planes}{%
+\begin{tikzpicture}[every node/.style={font=\footnotesize}]
+ \foreach \a/\h/\v/\dx in {x/y/z/0,y/z/x/4.4,z/x/y/8.8}{
+  \begin{scope}[shift={(\dx,0)}]
+   \fill[FourBlue!4] (-.3,-.3) rectangle (2.45,2.15);
+   \draw[fouraxis] (-.3,0)--(2.3,0) node[right] {$\h$};
+   \draw[fouraxis] (0,-.3)--(0,2.15) node[above] {$\v$};
+   \draw[fourguide] (0,0)--(1.8,0);
+   \draw[fourrose] (0,0)--(35:1.8);
+   \draw[FourRose,-{Stealth[length=1.4mm]}] (.85,0) arc(0:35:.85);
+   \node[text=FourRose] at (22:1.1) {$\theta$};
+   \node[below left] at (0,0) {$\odot$};
+   \node[align=center] at (1,3.25) {绕 $\a$ 轴\\正轴朝向读者};
+   \node at (1,-.85) {不动的分量：$\a'=\a$};
+  \end{scope}}
 \end{tikzpicture}
-}{四个节点围成环形：实线沿外侧先 $P$ 换基、再 $M_{\mathcal B}$ 旋转、最后 $P^{-1}$ 换回；灰色虚线直接使用 $M_{\mathcal C}$，两条路线都从弹体系方向走向旋转后的弹体系方向。与 4.4 节的环形图保持一致的视觉结构。}
-% FIGURE 4.17e END
+}{每幅图的横、纵轴顺序已经写明，三幅不是同一个 $xy$ 平面。红色箭头均由横轴正向逆时针转过同一示意角；$\odot$ 表示垂直纸面朝向读者的转轴。}
 
-\FHead{参考系切换：状态量同步换基}
-在助推段，导航系统在发射坐标系下解算位置和速度。切换到滑翔段时，需要把位置、速度、姿态一起换到当地水平系或速度坐标系。这一步等价于对状态向量作一次换基运算：
-\[
- [\boldsymbol r]_{\mathrm{LL}}=P_{\mathrm{LL}\leftarrow\mathrm{LCI}}[\boldsymbol r]_{\mathrm{LCI}},\qquad
- [\boldsymbol v]_{\mathrm{LL}}=P_{\mathrm{LL}\leftarrow\mathrm{LCI}}[\boldsymbol v]_{\mathrm{LCI}},
-\]
-姿态矩阵则按相似变换同步更新。因此状态切换是一个完整的换基过程，不是简单地把一部分数据换掉。\cite{chen-strapdown-2017, naif-reference-frames}图~\ref{fig:four-qian-state-sync}把这一同步画出来。
+\FHead{助记不是背九个数，而是按几何重建}
+从 $E_3$ 出发，绕哪根轴，就保留相应的行与列；其余四个位置填入正弦、余弦。要决定正弦的正负，记住右手循环
+\begin{equation}
+ x\longrightarrow y\longrightarrow z\longrightarrow x:
+ \quad\text{绕 }z:\ x\to y;\quad
+ \text{绕 }x:\ y\to z;\quad
+ \text{绕 }y:\ z\to x.
+\end{equation}
+最后用 $90^\circ$ 自检：$R_z\mathbf e_1=\mathbf e_2$，$R_x\mathbf e_2=\mathbf e_3$，$R_y\mathbf e_3=\mathbf e_1$；反过来的那个平面方向应带负号，例如 $R_y(90^\circ)\mathbf e_1=-\mathbf e_3$。这比只记“$y$ 轴符号特殊”更可靠。
 
-% FIGURE 4.17f BEGIN
-\FourNamedSupplement{4.17f}{参考系切换时，位置、速度、姿态同步换基：中间的大箭头是同一个过渡矩阵 $P_{\mathrm{LL}\leftarrow\mathrm{LCI}}$。}{fig:four-qian-state-sync}{%
-\begin{tikzpicture}[every node/.style={font=\footnotesize,inner sep=2pt},
- cell/.style={draw=FourGray!60,fill=white,rounded corners=2pt,minimum width=3.6cm,minimum height=.85cm,align=center}]
- \node[font=\small\bfseries] at (0,2.0) {发射惯性系 LCI};
- \node[font=\small\bfseries] at (7.6,2.0) {当地水平系 LL};
- \node[cell] at (0,1.0) {$[\boldsymbol r]_{\mathrm{LCI}}$};
- \node[cell] at (0,0) {$[\boldsymbol v]_{\mathrm{LCI}}$};
- \node[cell] at (0,-1.0) {$M_{\mathrm{LCI}}$（姿态）};
- \node[cell] at (7.6,1.0) {$[\boldsymbol r]_{\mathrm{LL}}$};
- \node[cell] at (7.6,0) {$[\boldsymbol v]_{\mathrm{LL}}$};
- \node[cell] at (7.6,-1.0) {$M_{\mathrm{LL}}$（姿态）};
- \draw[fouraxis,-{Stealth[length=2.4mm]},line width=1.1pt] (1.9,0)--(5.7,0);
- \node[align=center,text=FourBlue] at (3.8,.85) {$P_{\mathrm{LL}\leftarrow\mathrm{LCI}}$};
- \node[align=center,text=FourGray,font=\footnotesize] at (3.8,-1.75) {位置、速度左乘同一过渡矩阵；\\姿态矩阵按相似变换同步更新};
-\end{tikzpicture}
-}{左栏是发射惯性系下的三个状态量，右栏是当地水平系下的同一组量，中间的大箭头标注同一过渡矩阵 $P_{\mathrm{LL}\leftarrow\mathrm{LCI}}$。状态切换是完整的换基，不是只换其中一部分。}
-% FIGURE 4.17f END
+\textbf{读公式时还要检查书写习惯。}本书用列向量左乘；若某资料用行向量，则 $\boldsymbol u'=R\boldsymbol u$ 转置后成为 $(\boldsymbol u')^{\mathrm T}=\boldsymbol u^{\mathrm T}R^{\mathrm T}$。矩阵出现在右边，而且要转置。比较不同资料时，先统一列向量约定，再比较正负号。
 
-\FHead{从滑翔到落地：叙事收束}
-滑翔段结束后，飞行器再入大气层，进入末段。末段的姿态调整同样需要在几组坐标之间反复换算：制导系统要把期望的飞行方向、弹体当前姿态和执行机构的动作统一到同一套坐标里。这些换算的力学细节属于飞行力学的内容，本节不再展开。我们只需记住一件事：从发射到落地，飞行器全程都在换基——位置、速度、姿态，每一组量都可能在多个坐标系下被记录和转换。图~\ref{fig:four-qian-reentry}只画到这一层。
+\subsection{向量转了，还是坐标轴转了}
+同样画一条弧形箭头，可能在说两件不同的事。固定基 $\mathcal B$、把向量真的转过 $\theta$，输出是新向量 $T(\boldsymbol u)$，其旧基坐标为 $R(\theta)[\boldsymbol u]_{\mathcal B}$。如果保持向量不动，只把基旋转为 $\mathcal C$，则新基向量在旧基下排成的过渡矩阵是 $P=R(\theta)$，第 4.4 节告诉我们
+\begin{equation}
+ [\boldsymbol u]_{\mathcal B}=R(\theta)[\boldsymbol u]_{\mathcal C},\qquad
+ [\boldsymbol u]_{\mathcal C}=R(\theta)^{-1}[\boldsymbol u]_{\mathcal B}
+ =R(-\theta)[\boldsymbol u]_{\mathcal B}.
+ \label{eq:four-active-passive}
+\end{equation}
+后一种解释叫\term{passive-rotation}。\textbf{坐标轴正转，固定向量的新坐标要按反向矩阵计算。}Zanetti 的论文专门讨论两种解释及其约定差异；这里的区分也是阅读不同工程资料的起点。\cite{zanetti-rotations-2019}
 
-% FIGURE 4.17g BEGIN
-\FourNamedSupplement{4.17g}{本节的故事在此收束：换基贯穿飞行全程，末段也不例外。}{fig:four-qian-reentry}{%
-\begin{tikzpicture}[every node/.style={font=\footnotesize,inner sep=2pt}]
- \draw[FourGray,line width=1.2pt] (0,0)--(11,0);
- \node[below left,text=FourGray] at (0,0) {地面};
- \draw[FourBlue,line width=1.2pt] (1.5,2.4) .. controls (4.5,3.0) and (7.5,2.4) .. (9.8,0);
- \node[text=FourBlue,above] at (5.2,2.75) {再入段};
- \fill[FourBlue] (1.5,2.4) circle (1.8pt) node[left] {滑翔末端};
- \begin{scope}[shift={(6.2,1.5)}]
-  \draw[fourrose] (0,0)--(0.55,0.2);
-  \draw[fourrose] (0,0)--(-0.1,0.5);
+\FourNamedSupplement{4.17e}{主动旋转与被动旋转。左图改变物理向量，右图保持向量不动、改变描述它的基。}{fig:four-qian-active-passive}{%
+\begin{tikzpicture}[every node/.style={font=\footnotesize}]
+ \draw[fouraxis] (-.4,0)--(2.6,0) node[right] {$\mathbf e_1$};
+ \draw[fouraxis] (0,-.3)--(0,2.7) node[above] {$\mathbf e_2$};
+ \draw[fourblue] (0,0)--(2,0) node[below] {$\boldsymbol u$};
+ \draw[fourrose] (0,0)--(1,1.732) node[above right] {$T(\boldsymbol u)$};
+ \draw[FourRose,-{Stealth[length=1.4mm]}] (.7,0) arc(0:60:.7);
+ \node at (1.0,3.35) {主动：基不动，向量动};
+ \node[align=center] at (1.0,-1.05) {$(2,0)^{\mathrm T}\mapsto(1,\sqrt3)^{\mathrm T}$\\矩阵 $R(60^\circ)$};
+ \begin{scope}[shift={(7,0)}]
+  \draw[fourguide] (-.4,0)--(2.6,0);\draw[fourguide] (0,-.3)--(0,2.7);
+  \draw[fourblue] (0,0)--(60:2.3) node[above] {$\boldsymbol c_1$};
+  \draw[fourblue] (0,0)--(150:1.8) node[above left] {$\boldsymbol c_2$};
+  \draw[fourrose] (0,0)--(2,0) node[right] {$\boldsymbol u$};
+  \draw[FourBlue,-{Stealth[length=1.4mm]}] (.7,0) arc(0:60:.7);
+  \node at (.8,3.35) {被动：向量不动，基转动};
+  \node[align=center] at (.8,-1.05) {$[\boldsymbol u]_{\mathcal C}=(1,-\sqrt3)^{\mathrm T}$\\矩阵 $R(-60^\circ)$};
  \end{scope}
- \begin{scope}[shift={(8.3,0.55)}]
-  \draw[fourgreen] (0,0)--(0.5,0.15);
-  \draw[fourgreen] (0,0)--(-0.08,0.45);
- \end{scope}
- \node[text=FourGray,align=center] at (7.0,-0.95) {两个小小的坐标架：姿态换算仍在继续};
 \end{tikzpicture}
-}{只画一条从滑翔末端到地面的弧线，标注“再入段”和两个小坐标架；不画舵面、不画拦截、不画黑障。}
-% FIGURE 4.17g END
+}{两边均从 $\boldsymbol u=(2,0)^{\mathrm T}$ 出发。右图红色箭头仍在原处；负的第二个新坐标表示沿 $\boldsymbol c_2$ 的反方向分解，不表示向量已经向下旋转。}
 
-\FHead{选择参考系的工程目的}
-回到第四章的核心问题：换基不改变物理对象，但改变描述方式。同一段飞行轨迹，在弹体坐标系下的运动方程可能包含大量交叉项，在速度坐标系下可能只保留少数几项。气动力在速度坐标系下分解为阻力、升力和侧力，不仅符合气动力产生的原理，而且便于直接测量。工程中之所以在不同阶段选用不同参考系，就是为了让描述变简单、让数值计算更稳定。
+\subsection{方向余弦矩阵：九个数怎样记录一副坐标架}
+现在把两组三维基 $\mathcal B=(\boldsymbol b_1,\boldsymbol b_2,\boldsymbol b_3)$、$\mathcal C=(\boldsymbol c_1,\boldsymbol c_2,\boldsymbol c_3)$ 的原点对齐，规定每根基向量的长度都是 $1$，同组内两两垂直。这只是两副普通直角坐标架。先把 $\boldsymbol c_j$ 展开为 $\sum_i p_{ij}\boldsymbol b_i$，再与 $\boldsymbol b_i$ 点乘：其他垂直项消失，留下
+\begin{equation}
+ p_{ij}=\boldsymbol b_i\cdot\boldsymbol c_j
+ =\cos\angle(\boldsymbol b_i,\boldsymbol c_j),\qquad
+ P_{\mathcal B\leftarrow\mathcal C}
+ =\bigl([\boldsymbol c_1]_{\mathcal B}\ [\boldsymbol c_2]_{\mathcal B}\ [\boldsymbol c_3]_{\mathcal B}\bigr).
+ \label{eq:four-dcm-dot}
+\end{equation}
+所以它叫\term{direction-cosine-matrix}：第 $i$ 行、第 $j$ 列记录旧轴 $\boldsymbol b_i$ 与新轴 $\boldsymbol c_j$ 的夹角余弦。不是任意过渡矩阵都能叫方向余弦矩阵；这里“单位长度、两两垂直”的前提不可少。第 4.4 节长度为 $\sqrt2$ 的那组新基，就不能直接这样套用。
 
-换基让描述变简单，但还没有回答“哪一组基最好”。第 8 章会用特征值寻找最自然的坐标系，第 9 章会用相似对角化找出最简表示。
+\FourNamedSupplement{4.17f}{从一根新轴到矩阵的一列。三个方向余弦给出新轴在旧基下的三个分量，三根新轴并列便得到 $P$。}{fig:four-qian-dcm-columns}{%
+\begin{tikzpicture}[x={(1cm,0cm)},y={(-.6cm,-.38cm)},z={(0cm,1cm)},every node/.style={font=\footnotesize}]
+ \draw[fouraxis] (0,0,0)--(2.6,0,0) node[right] {$\boldsymbol b_1$};
+ \draw[fouraxis] (0,0,0)--(0,2.15,0) node[left] {$\boldsymbol b_2$};
+ \draw[fouraxis] (0,0,0)--(0,0,2.3) node[above] {$\boldsymbol b_3$};
+ \draw[fourguide] (1.4,.8,1.8)--(1.4,.8,0)--(1.4,0,0);
+ \draw[fourrose] (0,0,0)--(1.4,.8,1.8) node[above right] {$\boldsymbol c_j$};
+ \node[align=center] at (1,0,-1.1) {只画一根新轴\\实际长度取 $1$};
+ \node[draw=FourGray!40,rounded corners,inner sep=9pt,align=center] (col) at (5.6,0,1)
+  {$[\boldsymbol c_j]_{\mathcal B}=\begin{pmatrix}\boldsymbol b_1\cdot\boldsymbol c_j\\\boldsymbol b_2\cdot\boldsymbol c_j\\\boldsymbol b_3\cdot\boldsymbol c_j\end{pmatrix}$};
+ \node[align=center] at (5.6,0,-1.1) {这一列对应第 $j$ 根新轴};
+ \draw[fourrose] (2.7,0,1)--(3.5,0,1);
+\end{tikzpicture}
+}{左图为三维斜视图，纸上的长度与夹角不用于量取数值；右侧的点积公式给出准确含义。矩阵按“旧轴编号为行、新轴编号为列”排列。}
 
-从发射坐标系到弹体坐标系，从姿态矩阵的相似变换到状态量的同步切换，一条完整的导弹飞行轨迹把第四章和此前所有章节的知识串在一起。矩阵乘法对应复合，逆矩阵对应反向换算，过渡矩阵对应换基，相似矩阵对应“同一个变换的不同坐标描述”。这些工具不只是一组代数规则，它们是真实飞行器在临空高速飞行时赖以导航与控制的底层语言。\cite{qian-engineering-cybernetics}
+\FHead{为什么逆矩阵只需转置}
+设 $\boldsymbol p_j=[\boldsymbol c_j]_{\mathcal B}$ 是 $P$ 的第 $j$ 列。单位且垂直意味着 $\boldsymbol p_j\cdot\boldsymbol p_k$ 在 $j=k$ 时为 $1$，在 $j\ne k$ 时为 $0$。而矩阵乘法的行乘列恰好给出这些点积，因此
+\begin{equation}
+ (P^{\mathrm T}P)_{j,k}=\boldsymbol p_j\cdot\boldsymbol p_k
+ =\begin{cases}1,&j=k,\\0,&j\ne k,\end{cases}
+ \qquad P^{\mathrm T}P=E_3.
+\end{equation}
+过渡矩阵已经知道可逆，右乘 $P^{-1}$ 即得
+\begin{equation}
+ \boxed{P^{-1}=P^{\mathrm T}},\qquad
+ [\boldsymbol u]_{\mathcal C}=P^{\mathrm T}[\boldsymbol u]_{\mathcal B}.
+ \label{eq:four-dcm-inverse}
+\end{equation}
+满足 $Q^{\mathrm T}Q=E$ 的实方阵称为\term{orthogonal-matrix}。这里不展开一般理论，只把它读作“矩阵各列长度为 $1$、两两垂直”。对三个基本旋转矩阵，反转角度就是撤销作用，故
+\begin{equation}
+ R_x(\theta)^{-1}=R_x(-\theta)=R_x(\theta)^{\mathrm T},
+ \qquad R_y,R_z\text{ 同理}.
+\end{equation}
+进一步，令坐标列 $\boldsymbol u'=Q\boldsymbol u$、$\boldsymbol v'=Q\boldsymbol v$，用点积的坐标公式可直接验证
+\begin{equation}
+ \boldsymbol u'\cdot\boldsymbol v'
+ =(Q\boldsymbol u)^{\mathrm T}(Q\boldsymbol v)
+ =\boldsymbol u^{\mathrm T}Q^{\mathrm T}Q\boldsymbol v
+ =\boldsymbol u\cdot\boldsymbol v.
+\end{equation}
+取 $\boldsymbol v=\boldsymbol u$ 得长度不变；对非零向量再除以长度之积，得夹角不变。\textbf{九个矩阵元素并非九个任意数字，它们共同维护坐标架的几何关系。}但保持长度和夹角还不够保证是旋转，例如 $\operatorname{diag}(-1,1,1)$ 也满足上述条件，却把空间作了镜像。判断旋转还须保留坐标架的左右手取向；本节的三个基本矩阵由右手旋转构造，已经满足这一点。
+
+\FHead{同一个箭头，跟着数字换一次基}
+取标准基为 $\mathcal B$，让新基绕 $z$ 轴正转 $90^\circ$，则
+\begin{equation}
+ P=\begin{pmatrix}0&-1&0\\1&0&0\\0&0&1\end{pmatrix},\qquad
+ P^{\mathrm T}=\begin{pmatrix}0&1&0\\-1&0&0\\0&0&1\end{pmatrix}.
+\end{equation}
+同一个向量在旧基下记为 $[\boldsymbol u]_{\mathcal B}=(2,1,1)^{\mathrm T}$，新坐标为
+\begin{equation}
+ [\boldsymbol u]_{\mathcal C}=P^{\mathrm T}\begin{pmatrix}2\\1\\1\end{pmatrix}
+ =\begin{pmatrix}1\\-2\\1\end{pmatrix},\qquad
+ P\begin{pmatrix}1\\-2\\1\end{pmatrix}=\begin{pmatrix}2\\1\\1\end{pmatrix}.
+\end{equation}
+因为 $\boldsymbol c_1=\mathbf e_2$、$\boldsymbol c_2=-\mathbf e_1$、$\boldsymbol c_3=\mathbf e_3$，所以 $\boldsymbol c_1-2\boldsymbol c_2+\boldsymbol c_3=2\mathbf e_1+\mathbf e_2+\mathbf e_3$。数表中的负号变了，箭头没有变。
+
+\subsection{连续旋转：为什么顺序也是数据的一部分}
+一根轴上的旋转已经清楚，多次旋转只需接上第三章的映射复合。先规定\textbf{每一步都绕原来固定的坐标轴}：先绕 $y$ 轴转 $\beta$，再绕 $z$ 轴转 $\gamma$，最后绕 $x$ 轴转 $\alpha$。对同一固定坐标系中的列向量，逐步写为
+\begin{align}
+ \boldsymbol u_1&=R_y(\beta)\boldsymbol u_0,\\
+ \boldsymbol u_2&=R_z(\gamma)\boldsymbol u_1,\\
+ \boldsymbol u_3&=R_x(\alpha)\boldsymbol u_2
+ =\underbrace{R_x(\alpha)R_z(\gamma)R_y(\beta)}_{Q}\boldsymbol u_0.
+ \label{eq:four-fixed-yzx}
+\end{align}
+因此，动作按 $y,z,x$ 发生，矩阵却按 $R_xR_zR_y$ 书写：\textbf{最先作用的写在最右边。}这三个依次使用的角是一种\term{euler-angles}约定；本节采用三个不同轴的情形，也常称为\term{tait-bryan-angles}。换一组轴序，或者换成随物体转动的轴，乘积就要相应改变。Henderson 的报告列出不同轴序，正说明“三个角”必须与“怎样使用这三个角”一起给出。\cite{henderson-euler-1977}
+
+\FourNamedSupplement{4.17g}{绕固定轴依次旋转，与从右向左作用的矩阵乘积对应。图中三个角均取 $90^\circ$，只为跟踪坐标变化。}{fig:four-qian-euler-chain}{%
+\begin{tikzpicture}[every node/.style={font=\footnotesize},x={(.8cm,0cm)},y={(-.32cm,-.3cm)},z={(0cm,.8cm)}]
+ \foreach \k/\a/\b/\c/\d in {0/1/1/1/0,1/1/1/-1/4,2/-1/1/-1/8,3/-1/1/1/12}{
+  \begin{scope}[shift={(\d,0,0)}]
+   \draw[fouraxis] (0,0,0)--(1.45,0,0) node[right] {$x$};
+   \draw[fouraxis] (0,0,0)--(0,1.45,0) node[left] {$y$};
+   \draw[fouraxis] (0,0,0)--(0,0,1.5) node[above] {$z$};
+   \draw[fourguide] (0,0,-1.3)--(0,0,0);
+   \draw[fourrose] (0,0,0)--(\a,\b,\c);
+   \node at (.1,0,2.25) {$\boldsymbol u_{\k}$};
+   \node at (.1,0,-2.1) {$(\a,\b,\c)^{\mathrm T}$};
+  \end{scope}}
+ \draw[fourblue] (1.8,0,2.75)--node[above] {$R_y(90^\circ)$} (2.6,0,2.75);
+ \draw[fourblue] (5.8,0,2.75)--node[above] {$R_z(90^\circ)$} (6.6,0,2.75);
+ \draw[fourblue] (9.8,0,2.75)--node[above] {$R_x(90^\circ)$} (10.6,0,2.75);
+\end{tikzpicture}
+}{各格使用同一固定坐标架，红色向量按三维公式更新。上方蓝色箭头表示计算的先后；把三个矩阵连写时，最先执行的 $R_y(90^\circ)$ 位于乘积最右端。}
+
+\FHead{把顺序换一下，结果真的不同}
+取 $\mathbf e_1=(1,0,0)^{\mathrm T}$，只做两个 $90^\circ$ 旋转。先绕 $z$ 再绕 $x$，与先绕 $x$ 再绕 $z$，得到
+\begin{align}
+ R_x(90^\circ)R_z(90^\circ)\mathbf e_1
+ &=R_x(90^\circ)\mathbf e_2=\mathbf e_3,\\
+ R_z(90^\circ)R_x(90^\circ)\mathbf e_1
+ &=R_z(90^\circ)\mathbf e_1=\mathbf e_2.
+\end{align}
+连一个输入向量的输出都不同，两种复合映射当然不同。这比展开九个元素更直接地说明矩阵乘法一般不满足交换律。
+
+\FourNamedSupplement{4.17h}{同样两个旋转，次序不同，终点不同。上、下两条路线都从 $\mathbf e_1$ 出发，分别到达 $\mathbf e_3$ 与 $\mathbf e_2$。}{fig:four-qian-noncommuting}{%
+\begin{tikzpicture}[every node/.style={font=\small},
+ v/.style={draw=FourGray!45,rounded corners,minimum width=1.4cm,minimum height=.75cm}]
+ \node[v] (s) at (0,0) {$\mathbf e_1$};
+ \node[v] (u) at (4,1.35) {$\mathbf e_2$};
+ \node[v,text=FourRose] (a) at (8,1.35) {$\mathbf e_3$};
+ \node[v] (v) at (4,-1.35) {$\mathbf e_1$};
+ \node[v,text=FourBlue] (b) at (8,-1.35) {$\mathbf e_2$};
+ \draw[fourrose] (s)--node[above,sloped] {$R_z(90^\circ)$} (u);
+ \draw[fourrose] (u)--node[above] {$R_x(90^\circ)$} (a);
+ \draw[fourblue] (s)--node[below,sloped] {$R_x(90^\circ)$} (v);
+ \draw[fourblue] (v)--node[below] {$R_z(90^\circ)$} (b);
+ \node at (8,0) {$\ne$};
+\end{tikzpicture}
+}{可拿一本书或画一副坐标架亲自核对。下方第一步没有改变 $\mathbf e_1$，因为它就在 $x$ 轴上；这不是漏画了一次旋转。}
+
+\FHead{固定轴与随动轴：左乘、右乘为什么都会出现}
+设 $Q$ 的列记录当前物体三根单位轴在固定基下的坐标。在固定基中追加一个旋转 $S$，三根轴都受 $S$ 作用，因此新矩阵为 $SQ$。若追加动作是\textbf{绕当前物体自己的轴}，同一个局部旋转在固定基中的矩阵应先通过换基写成 $Q R_i(\theta)Q^{-1}$，于是
+\begin{equation}
+ Q_{\mathrm{new}}=
+ \bigl(QR_i(\theta)Q^{-1}\bigr)Q=Q R_i(\theta).
+ \label{eq:four-local-axis-update}
+\end{equation}
+这就解释了：在这里的约定下，固定轴追加动作左乘，当前物体轴追加动作右乘。\textbf{左右乘不是两种互相矛盾的记忆法，而是在回答两个不同的问题。}Zanetti 对连续旋转作了这种区分。\cite{zanetti-rotations-2019}本式也提前把我们带回相似变换：局部动作要放进全局坐标描述，必须先换过去、做动作、再换回来。
+
+撤销一串动作时，还必须倒序。由第三章乘积求逆法则，式\eqref{eq:four-fixed-yzx}的逆为
+\begin{equation}
+ Q^{-1}=R_y(-\beta)R_z(-\gamma)R_x(-\alpha).
+\end{equation}
+从右往左读，先撤销最后的 $x$ 轴旋转，再撤销 $z$ 轴，最后撤销 $y$ 轴。只把三个角变号、却保留原乘积次序，一般不能回到起点。
+
+\subsection{再深一层：姿态唯一，三个角却可能不唯一}
+矩阵能描述一个确定的旋转，是否意味着从矩阵一定能唯一找回三个角？未必。先不求任何反三角函数，就用一个特殊角看出问题。仍用式\eqref{eq:four-fixed-yzx}的固定轴顺序，取中间角 $\gamma=90^\circ$。将三个基本矩阵相乘，再用两角差公式整理，得到
+\begin{align}
+ Q&=R_x(\alpha)R_z(90^\circ)R_y(\beta)\\
+ &=\begin{pmatrix}
+ 0&-1&0\\
+ \cos(\alpha-\beta)&0&-\sin(\alpha-\beta)\\
+ \sin(\alpha-\beta)&0&\cos(\alpha-\beta)
+ \end{pmatrix}.
+ \label{eq:four-euler-nonunique}
+\end{align}
+矩阵只记得 $\alpha-\beta$，不再分别记得 $\alpha$ 与 $\beta$。例如 $(\alpha,\gamma,\beta)=(30^\circ,90^\circ,10^\circ)$ 与 $(50^\circ,90^\circ,30^\circ)$ 描述完全相同的旋转，因为两者的差角都是 $20^\circ$。
+
+\FourNamedSupplement{4.17i}{不同角度记录可以给出同一个旋转矩阵。当中间角为 $90^\circ$ 时，本例中的矩阵只依赖差角 $\alpha-\beta$。}{fig:four-qian-euler-nonunique}{%
+\begin{tikzpicture}[every node/.style={font=\small},
+ box/.style={draw=FourGray!50,rounded corners,minimum width=4.6cm,minimum height=1cm,align=center}]
+ \node[box,text=FourBlue] (a) at (0,1.25) {$\alpha=30^\circ,\ \gamma=90^\circ,\ \beta=10^\circ$};
+ \node[box,text=FourRose] (b) at (0,-1.25) {$\alpha=50^\circ,\ \gamma=90^\circ,\ \beta=30^\circ$};
+ \node[box,minimum width=3.2cm,minimum height=1.6cm] (q) at (6.1,0) {同一个 $Q$\\[5pt]只取决于 $20^\circ$};
+ \draw[fourblue] (a.east)--(q.north west);
+ \draw[fourrose] (b.east)--(q.south west);
+ \node[font=\footnotesize,text=FourGray] at (2.4,-2.25) {角度参数的区分消失，旋转矩阵仍然可逆};
+\end{tikzpicture}
+}{这张图比较的是两份角度记录，不是两个不同的物体。把同一个增量同时加到 $\alpha$ 与 $\beta$ 上，式\eqref{eq:four-euler-nonunique}保持不变。}
+
+这种角度表示的退化常被称为\term{gimbal-lock}。对本例，最重要的事实是：\textbf{失去的是三个角分别记录姿态的唯一性，不是旋转矩阵的可逆性，更不是物体不能转动。}三个基本矩阵都可逆，它们的乘积仍可逆。Shuster 与 Markley 关于欧拉角提取的论文讨论了角度表示的非唯一与特殊情形；我们的两角差例子只展示其中最容易直接计算的现象。\cite{shuster-markley-euler-2006}
+
+这与前面“线性映射在固定基下的矩阵唯一”并不冲突：基固定、映射固定，矩阵仍唯一；不唯一的是用三次旋转去描述这个矩阵的角度记录。\textbf{对象、坐标、描述参数，是三个层次。}分清层次，才不会把表示方法的局限误认为对象本身的故障。
+
+\subsection{两个核心公式：换一个向量，换一个变换}
+现在回到本节最初的问题。把某一瞬间的两组基固定下来，记 $P=P_{\mathcal B\leftarrow\mathcal C}$。同一个向量换基时，改变的只是它的坐标列：
+\begin{equation}
+ \boxed{[\boldsymbol u]_{\mathcal B}=P[\boldsymbol u]_{\mathcal C}}.
+\end{equation}
+如果有一个已经确定的线性变换 $T$，旧坐标下的矩阵为 $M_{\mathcal B}$，新坐标下的矩阵为 $M_{\mathcal C}$，则要同时处理\textbf{输入和输出}的坐标：
+\begin{align}
+ [T(\boldsymbol u)]_{\mathcal C}
+ &=P^{-1}[T(\boldsymbol u)]_{\mathcal B}\\
+ &=P^{-1}M_{\mathcal B}[\boldsymbol u]_{\mathcal B}
+ =P^{-1}M_{\mathcal B}P[\boldsymbol u]_{\mathcal C}.
+\end{align}
+因此
+\begin{equation}
+ \boxed{M_{\mathcal C}=P^{-1}M_{\mathcal B}P}.
+ \label{eq:four-engineering-similarity}
+\end{equation}
+这才是相似变换适用的准确情形：\textbf{同一个作用，输入和输出都改用同一套新基。}如果 $T$ 是一次确定的旋转，换基后仍描述那次旋转；这里的两套基用于记账，并没有随着 $T$ 又被重新定义。
+
+\FourNamedSupplement{4.17j}{同一旋转的两条计算路线：先换基、应用旋转、换回来，等价于直接使用新基下的矩阵。}{fig:four-qian-similarity-loop}{%
+\begin{tikzpicture}[every node/.style={font=\small},
+ cb/.style={draw=FourBlue,fill=FourBlue!4,rounded corners,text width=3cm,minimum height=1.05cm,align=center},
+ bb/.style={draw=FourRose,fill=FourRose!4,rounded corners,text width=3cm,minimum height=1.05cm,align=center}]
+ \node[cb] (ci) at (0,3.5) {$[\boldsymbol u]_{\mathcal C}$\\新基下的输入};
+ \node[bb] (bi) at (6,3.5) {$[\boldsymbol u]_{\mathcal B}$\\旧基下的输入};
+ \node[bb] (bo) at (6,0) {$[T(\boldsymbol u)]_{\mathcal B}$\\旧基下的输出};
+ \node[cb] (co) at (0,0) {$[T(\boldsymbol u)]_{\mathcal C}$\\新基下的输出};
+ \draw[fourrose] (ci)--node[above] {$P$：换过去} (bi);
+ \draw[fourrose] (bi)--node[right] {$M_{\mathcal B}$：应用 $T$} (bo);
+ \draw[fourblue] (bo)--node[below] {$P^{-1}$：换回来} (co);
+ \draw[fouraxis,densely dashed] (ci)--node[left] {$M_{\mathcal C}$} (co);
+ \node[align=center,font=\footnotesize] at (3,1.75) {同一输入、同一输出\\[4pt]$M_{\mathcal C}=P^{-1}M_{\mathcal B}P$};
+\end{tikzpicture}
+}{环形布局中的三条实线与一条虚线是两条同起点、同终点的路线。它不是把输出再送回输入；返回的是坐标体系，输出向量本身通常已经改变。}
+
+\FHead{用同一组数字，把两条路线核对到底}
+沿用前面绕 $z$ 轴 $90^\circ$ 得到的基 $\mathcal C$，以及 $[\boldsymbol u]_{\mathcal B}=(2,1,1)^{\mathrm T}$、$[\boldsymbol u]_{\mathcal C}=(1,-2,1)^{\mathrm T}$。现在让 $T$ 真正把向量绕\emph{固定的旧 $x$ 轴}转过 $90^\circ$，则
+\begin{align}
+ M_{\mathcal B}&=R_x(90^\circ)=\begin{pmatrix}1&0&0\\0&0&-1\\0&1&0\end{pmatrix},\\
+ M_{\mathcal C}&=P^{\mathrm T}M_{\mathcal B}P
+ =\begin{pmatrix}0&0&-1\\0&1&0\\1&0&0\end{pmatrix}.
+\end{align}
+沿旧坐标绕行与直接使用新矩阵，分别给出
+\begin{align}
+ \begin{pmatrix}1\\-2\\1\end{pmatrix}
+ &\xrightarrow{P}\begin{pmatrix}2\\1\\1\end{pmatrix}
+ \xrightarrow{M_{\mathcal B}}\begin{pmatrix}2\\-1\\1\end{pmatrix}
+ \xrightarrow{P^{\mathrm T}}\begin{pmatrix}-1\\-2\\1\end{pmatrix},\\
+ M_{\mathcal C}\begin{pmatrix}1\\-2\\1\end{pmatrix}
+ &=\begin{pmatrix}-1\\-2\\1\end{pmatrix}.
+\end{align}
+新矩阵看起来像 $R_y(-90^\circ)$，这是有原因的：旧 $x$ 轴正向在新基中是 $-\boldsymbol c_2$，所以绕旧 $+x$ 的正向旋转，写在新坐标里正是绕新 $+y$ 的负向旋转。\textbf{矩阵变了，实际转轴没有变。}
+
+\FHead{为什么“姿态矩阵”不能一概套用相似公式}
+工程资料里的\term{attitude-matrix}常指机体系相对于参考系的方向余弦矩阵。若记
+\begin{equation}
+ D_{\mathcal B\leftarrow\mathcal C}
+ =\bigl([\boldsymbol c_1]_{\mathcal B}\ [\boldsymbol c_2]_{\mathcal B}\ [\boldsymbol c_3]_{\mathcal B}\bigr),
+\end{equation}
+它已经把\emph{两套不同基}写在输入、输出两端。只把参考基 $\mathcal B$ 改为 $\mathcal D$，机体基 $\mathcal C$ 不变，按坐标换算链应有
+\begin{equation}
+ D_{\mathcal D\leftarrow\mathcal C}
+ =P_{\mathcal D\leftarrow\mathcal B}\,D_{\mathcal B\leftarrow\mathcal C}.
+ \label{eq:four-attitude-left-change}
+\end{equation}
+这里是左乘，因为只换了输出端的基；它不是式\eqref{eq:four-engineering-similarity}。若输入端也从 $\mathcal C$ 改为 $\mathcal E$，则再右乘 $P_{\mathcal C\leftarrow\mathcal E}$。只有输入、输出原来使用同一组基、现在又一起换成另一组基来描述\emph{同一个变换}，才得到 $P^{-1}MP$。把箭头下标写全，比看到“姿态”二字就选择某个公式可靠得多。\cite{zanetti-rotations-2019,naif-reference-frames}
+
+\subsection{回到工程：先问清对象，再选择坐标}
+真实的发射系与机体系往往不共原点。若 $\boldsymbol r$ 指同一条已确定的自由向量，只改分量记录，当然可以使用 $[\boldsymbol r]_{\mathcal B}=P[\boldsymbol r]_{\mathcal C}$；但若它指某一点相对于各自原点的位置，就要先辨认两条箭头是不是同一个向量。设旧原点为 $O$，新原点为 $O'$，同一点为 $X$，令
+\begin{equation}
+ \boldsymbol r_{\mathcal B}=[\overrightarrow{OX}]_{\mathcal B},\quad
+ \boldsymbol r_{\mathcal C}=[\overrightarrow{O'X}]_{\mathcal C},\quad
+ \boldsymbol t=[\overrightarrow{OO'}]_{\mathcal B}.
+\end{equation}
+由向量加法 $\overrightarrow{OX}=\overrightarrow{OO'}+\overrightarrow{O'X}$ 得
+\begin{equation}
+ \boxed{\boldsymbol r_{\mathcal B}=\boldsymbol t+P\boldsymbol r_{\mathcal C}},\qquad
+ \boldsymbol r_{\mathcal C}=P^{-1}(\boldsymbol r_{\mathcal B}-\boldsymbol t).
+\end{equation}
+
+\FourNamedSupplement{4.17k}{原点不同，位置向量也不同。先把 $O'X$ 的分量换到旧基，再加上旧原点指向新原点的位移。}{fig:four-qian-origin-shift}{%
+\begin{tikzpicture}[every node/.style={font=\small}]
+ \coordinate (o) at (0,0);\coordinate (n) at (3.1,.55);\coordinate (p) at (6.4,2.8);
+ \draw[fourblue] (o)--(n) node[midway,below] {$\overrightarrow{OO'}$};
+ \draw[fourgreen] (n)--(p) node[midway,below right] {$\overrightarrow{O'X}$};
+ \draw[fourrose] (o)--(p) node[midway,above left] {$\overrightarrow{OX}$};
+ \draw[fourguide] (o)--(1.25,0);\draw[fourguide] (o)--(0,1.25);
+ \draw[fourguide] (n)--++(1.05,.42);\draw[fourguide] (n)--++(-.42,1.05);
+ \fill[FourGray] (o) circle(1.6pt) node[below left] {$O$};
+ \fill[FourGray] (n) circle(1.6pt) node[below] {$O'$};
+ \fill[FourGray] (p) circle(1.6pt) node[above] {$X$};
+ \node[font=\footnotesize] at (3.3,-1.0) {两条位置箭头的起点不同，必须同时计入原点位移};
+\end{tikzpicture}
+}{这就是第 4.1 节已出现的“线性作用加平移”。把物体质心作为机体系原点时，质心在机体系中的位置为零，却并不在地面原点；这一极端例子足以检查是否遗漏了平移。}
+
+同样，某个\emph{已经确定的速度向量}在同一时刻改用另一组基，只是分量换算；若改为“相对另一运动参考系的速度”，物理量的定义也变了，不能只左乘一个 $3\times3$ 矩阵。NASA/JPL 的工具文档分别处理向量分量变换和随时间变化的状态变换。\cite{naif-reference-frames}本节不展开运动学，只保留这个判断：\textbf{先确认是否仍在描述同一个对象，再决定是否只需换基。}
+
+\FHead{把一张公式读成一条路线}
+回看本节，工程兴趣最终落在清楚的数学问题上：$R\boldsymbol u$ 改变向量；$P[\boldsymbol u]_{\mathcal C}$ 改变同一向量的坐标；$P^{-1}MP$ 改变同一作用的矩阵表示。它们可以使用外形相同的数表，但回答的不是同一个问题。陈阳泉在 1989 年的论文中讨论用程序辅助推导坐标转换矩阵，这也提示计算机专业的读者：公式可以由程序生成，\emph{对象、约定和方向却必须由人先说清楚}。\cite{chen-coordinate-matrix-1989}
+
+读到这里，再看一架飞行器的姿态示意、一台相机的朝向或一件三维模型的转动，矩阵便不只是九个排好的数。每一列记录一根轴去了哪里，每一次连乘连接一段明确的作用，每一次转置在合适的条件下把路线倒过来。从纸上的三角函数到工程中的坐标记录，真正贯穿其中的不是某个专门名词，而是\textbf{同一对象可以换一种语言描述，而描述之间必须保持一致}。接下来的第 4.6 节将回到线性映射本身的结构；以后再讨论选哪一组基能让结构显得更清楚。
+
+\FHead{带着问题读文献}
+若想继续阅读，可先看 Henderson 报告第 2.1 节的单轴矩阵与复合约定，再读 Zanetti 论文前几节关于主动、被动解释的区分；对“三个角为何不唯一”感兴趣，再看 Shuster 与 Markley 的论文。本节只使用其中与初等旋转、坐标表示有关的部分，不要求学习文献中的其他工具。\cite{henderson-euler-1977,zanetti-rotations-2019,shuster-markley-euler-2006}知乎文章《3维旋转矩阵推导与助记》可作图解辅助阅读；本文采用自己的推导与绘图，并始终按本节的右手系、列向量和主动旋转约定核对符号。\cite{zhihu-rotation-mnemonic}
 
 \section{【选读】秩与零度定理的证明及行秩性质}
 \label{sec:four-proof}
@@ -11718,25 +11961,31 @@ Talay T. A. \textit{Introduction to the Aerodynamics of Flight}, NASA SP-367, Ap
 \newblock \url{https://ntrs.nasa.gov/api/citations/19760003955/downloads/19760003955.pdf}.
 
 % 4.5 节选读：钱学森弹道工程背景参考文献。
-\bibitem{qian-interplanetary-flight}
-钱学森. 星际航行概论[M]. 北京: 科学出版社, 1963.
-
-\bibitem{qian-engineering-cybernetics}
-钱学森. 工程控制论[M]. 北京: 科学出版社, 1958.
-
 \bibitem{guan-qian-trajectory}
-关世义. 基于钱学森弹道的新概念飞航导弹[J]. 飞航导弹, 2003(01): 1-4.
+关世义. 基于钱学森弹道的新概念飞航导弹[J]. 飞航导弹, 2003(01): 1--4.
+\newblock \url{https://doi.org/10.16338/j.issn.1009-1319.2003.01.001}.
 
 \bibitem{chen-coordinate-matrix-1989}
 陈阳泉. 坐标系转换矩阵与几何关系方程式的推导程序[J]. 西安工业学院学报, 1989, 9(3).
-\newblock \url{http://mechatronics.ucmerced.edu/sites/mechatronics.ucmerced.edu/files/documents/papers-in-chinese/222.zuo_biao_xi_zhuan_huan_ju_zhen_yu_ji_he_guan_xi_fang_cheng_shi_de_tui_dao_cheng_xu_chen_yang_quan_.pdf}.
+\newblock \url{https://mechatronics.ucmerced.edu/sites/mechatronics.ucmerced.edu/files/documents/papers-in-chinese/222.zuo_biao_xi_zhuan_huan_ju_zhen_yu_ji_he_guan_xi_fang_cheng_shi_de_tui_dao_cheng_xu_chen_yang_quan_.pdf}.
 
-\bibitem{chen-strapdown-2017}
-Chen Kai, Zhang Linyuan, et al. Strapdown Inertial Navigation Algorithm for Hypersonic Boost-Glide Vehicle[C]//21st AIAA International Space Planes and Hypersonics Technologies Conference. Xiamen, China: AIAA, 2017. AIAA 2017-2174.
-\newblock \url{https://doi.org/10.2514/6.2017-2174}.
+\bibitem{henderson-euler-1977}
+Henderson D M. \textit{Euler Angles, Quaternions, and Transformation Matrices: Working Relationships}[R/OL]. NASA-TM-74839, JSC-12960, 1977. 本节使用第2.1节的单轴矩阵、旋转顺序与反向转换。
+\newblock \url{https://ntrs.nasa.gov/citations/19770024290}.
 
-\bibitem{nuaa-boost-glide-thesis}
-南京航空航天大学. 含常规弹道、Sänger 弹道与「钱学森弹道」轨迹对比图的硕士学位论文[D]. 南京: 南京航空航天大学.
+\bibitem{zanetti-rotations-2019}
+Zanetti R. Rotations, Transformations, Left Quaternions, Right Quaternions?[J]. \textit{The Journal of the Astronautical Sciences}, 2019, 66(3): 361--381. 本节仅使用主动旋转、坐标转换与复合约定的讨论。
+\newblock \url{https://doi.org/10.1007/s40295-018-00151-2}.
+\newblock 作者公开稿：\url{https://sites.utexas.edu/near/files/2022/07/Rotations.pdf}.
+
+\bibitem{shuster-markley-euler-2006}
+Shuster M D, Markley F L. General Formula for Extracting the Euler Angles[J]. \textit{Journal of Guidance, Control, and Dynamics}, 2006, 29(1): 215--217. 本节引用角度表示非唯一的讨论，不展开角度提取算法。
+\newblock \url{https://doi.org/10.2514/1.16622}.
+\newblock 作者公开稿：\url{https://malcolmdshuster.com/Pub_2006a_J_eulerx_AIAA.pdf}.
+
+\bibitem{zhihu-rotation-mnemonic}
+码农爱学习. 3维旋转矩阵推导与助记[EB/OL]. 知乎, 2023-04-03更新 [2026-09-30]. 图解辅助阅读；讲义公式按自身约定独立推导。
+\newblock \url{https://zhuanlan.zhihu.com/p/183973440}.
 
 % CHAPTER 4 REFERENCES END
 
