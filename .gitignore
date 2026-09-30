@@ -1,0 +1,43 @@
+# Local builds, previews, and recovery copies
+/tmp/
+/backups/
+/build/
+/build-check.txt
+
+# LaTeX intermediate files
+*.aux
+*.log
+*.toc
+*.out
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex*
+*.xdv
+*.nav
+*.snm
+*.vrb
+*.bcf
+*.run.xml
+*.blg
+
+# Generated build PDF; the named published PDF remains available to track
+/main.pdf
+
+# Editor and operating-system temporary files
+*~
+*.bak
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local credentials must not enter version history
+.env
+.env.*
+!.env.example
+/.ssh/
+id_ed25519*
+id_rsa*

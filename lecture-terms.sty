@@ -1,0 +1,92 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{lecture-terms}[2026/09/25 Bilingual lecture terminology]
+\RequirePackage{expl3,xparse,needspace}
+\ExplSyntaxOn
+\seq_new:N \g_lecture_terms_seq
+\prop_new:N \g_lecture_cn_prop
+\prop_new:N \g_lecture_en_prop
+\prop_new:N \g_lecture_def_prop
+\prop_new:N \g_lecture_sort_prop
+\iow_new:N \g_lecture_glossary_iow
+\tl_new:N \l_lecture_cn_tl
+\tl_new:N \l_lecture_en_tl
+\tl_new:N \l_lecture_def_tl
+\tl_new:N \l_lecture_initial_tl
+\tl_new:N \l_lecture_previous_initial_tl
+\msg_new:nnn {lecture-terms}{unknown}{Undefined~term~'#1'.~Register~it~in~terms.tex.}
+\msg_new:nnn {lecture-terms}{duplicate}{Duplicate~term~key~'#1'.}
+\msg_new:nnn {lecture-terms}{empty}{Term~'#1'~has~an~empty~name~or~definition.}
+\NewDocumentCommand{\DeclareLectureTerm}{mmmm}
+ {
+  \prop_if_in:NnTF \g_lecture_cn_prop {#1}
+   {\msg_error:nnn {lecture-terms}{duplicate}{#1}}
+   {
+    \tl_if_blank:nT {#2}{\msg_error:nnn {lecture-terms}{empty}{#1}}
+    \tl_if_blank:nT {#3}{\msg_error:nnn {lecture-terms}{empty}{#1}}
+    \tl_if_blank:nT {#4}{\msg_error:nnn {lecture-terms}{empty}{#1}}
+    \seq_gput_right:Nn \g_lecture_terms_seq {#1}
+    \prop_gput:Nnn \g_lecture_cn_prop {#1}{#2}
+    \prop_gput:Nnn \g_lecture_en_prop {#1}{#3}
+    \prop_gput:Nnn \g_lecture_def_prop {#1}{#4}
+    \prop_gput:Nnx \g_lecture_sort_prop {#1}{\str_lowercase:n {#3}}
+   }
+ }
+\NewDocumentCommand{\term}{m}
+ {
+  \prop_if_in:NnTF \g_lecture_cn_prop {#1}
+   {\prop_item:Nn \g_lecture_cn_prop {#1}\nobreakspace
+    (\prop_item:Nn \g_lecture_en_prop {#1})}
+   {\msg_error:nnn {lecture-terms}{unknown}{#1}}
+ }
+% Letter dividers are visual headings only; they never write to the contents.
+\NewDocumentCommand{\GlossaryLetter}{m}
+ {
+  \par\Needspace{7\baselineskip}\addvspace{18pt}
+  \group_begin:
+   \centering\normalfont\bfseries\fontsize{26pt}{32pt}\selectfont
+   \color{LogicColor}#1\par
+  \group_end:
+  \nobreak\vspace{10pt}\nobreak
+ }
+\NewDocumentCommand{\GlossaryEntry}{mmm}
+ {
+  \par\Needspace{3\baselineskip}\noindent
+  \textbf{#1~(#2)}\enspace [#3\unskip\nobreak\mbox{]}\par\addvspace{6pt}
+ }
+\NewDocumentCommand{\PrintLectureGlossary}{}
+ {
+  \seq_gsort:Nn \g_lecture_terms_seq
+   {
+    \str_compare:eNeTF
+     {\prop_item:Nn \g_lecture_sort_prop {##1}} >
+     {\prop_item:Nn \g_lecture_sort_prop {##2}}
+     {\sort_return_swapped:}{\sort_return_same:}
+   }
+  \iow_open:Nn \g_lecture_glossary_iow {术语表.tex}
+  \iow_now:Nn \g_lecture_glossary_iow {\relax}
+  \tl_clear:N \l_lecture_previous_initial_tl
+  \seq_map_inline:Nn \g_lecture_terms_seq
+   {
+    \prop_get:NnN \g_lecture_cn_prop {##1} \l_lecture_cn_tl
+    \prop_get:NnN \g_lecture_en_prop {##1} \l_lecture_en_tl
+    \prop_get:NnN \g_lecture_def_prop {##1} \l_lecture_def_tl
+    \tl_set:Nx \l_lecture_initial_tl
+     {\str_uppercase:f {\tl_head:V \l_lecture_en_tl}}
+    \tl_if_eq:NNF \l_lecture_initial_tl \l_lecture_previous_initial_tl
+     {
+      \iow_now:Nx \g_lecture_glossary_iow
+       {\token_to_str:N \GlossaryLetter {\exp_not:V \l_lecture_initial_tl}}
+      \tl_set_eq:NN \l_lecture_previous_initial_tl \l_lecture_initial_tl
+     }
+    \iow_now:Nx \g_lecture_glossary_iow
+     {
+      \token_to_str:N \GlossaryEntry
+      {\exp_not:V \l_lecture_cn_tl}
+      {\exp_not:V \l_lecture_en_tl}
+      {\exp_not:V \l_lecture_def_tl}
+     }
+   }
+  \iow_close:N \g_lecture_glossary_iow
+  \file_input:n {术语表.tex}
+ }
+\ExplSyntaxOff
