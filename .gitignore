@@ -4,6 +4,12 @@
 /build/
 /build-check.txt
 
+# Local agent instructions and working configuration
+AGENTS.md
+agent.md
+.agents/
+.codex/
+
 # LaTeX intermediate files
 *.aux
 *.log
