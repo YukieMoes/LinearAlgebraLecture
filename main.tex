@@ -7364,7 +7364,59 @@ LU分解正是把这部分工作保存下来。\textbf{它的求解意义，是�
  -\tfrac12U_1+U_2=(-1,2,-1),\quad
  -\tfrac23U_2+U_3=(0,-1,2).
 \]
-它们恰好是 $A$ 的三行。消元把某行减去主元行的相应倍数，$L$ 又把这些倍数加回去，因而 $LU=A$。从第3.6节的初等矩阵看，这就是按逆序撤销消元；这里用三行数的恢复把它具体写了出来。
+它们恰好是 $A$ 的三行。消元把某行减去主元行的相应倍数，$L$ 又把这些倍数加回去，因而 $LU=A$。下面用第3.6节的初等矩阵，把这种“撤销消元”的解释完整写出来。
+
+\par\medskip\noindent\textbf{从初等矩阵看：$L$ 怎样撤销整串消元？}
+每做一次初等行变换，就相当于在左侧乘一个初等矩阵。设我们按顺序执行 $k$ 次消元，对应的初等矩阵依次为 $E_1,E_2,\ldots,E_k$。先做的变换紧挨着 $A$，后做的变换继续乘在左边，因此
+\[
+ A\ \xrightarrow{\ E_1\ }\ E_1A
+ \ \xrightarrow{\ E_2\ }\ E_2E_1A
+ \ \xrightarrow{\ \cdots\ }\
+ \underbrace{E_k\cdots E_2E_1A}_{U}.
+\]
+我们看到，\textbf{$U$ 是对 $A$ 实施整串消元后的结果。要从 $U$ 恢复 $A$，就把这串操作倒着撤销：先撤销最后一步，再撤销倒数第二步，直到撤销第一步。}于是
+\[
+ \begin{aligned}
+ E_k\cdots E_2E_1A&=U,\\[3pt]
+ A&=(E_k\cdots E_2E_1)^{-1}U\\[3pt]
+  &=\underbrace{E_1^{-1}E_2^{-1}\cdots E_k^{-1}}_{L}\,U.
+ \end{aligned}
+\]
+这就是 $A=LU$ 的矩阵代数解释：
+\[
+ \boxed{L=(E_k\cdots E_2E_1)^{-1}
+          =E_1^{-1}E_2^{-1}\cdots E_k^{-1}.}
+\]
+这里同时用到了第3.4节的乘积求逆法则：\textbf{乘积求逆时，因子的书写顺序要反过来。}在 $L$ 作用于 $U$ 时，最右边的 $E_k^{-1}$ 先作用，恰好先撤销最后一次消元；不能任意调换这些因子。
+
+本节消元不交换行，也不将主元行缩放为1，只用主元行消去其下方的元素。因而每个 $E_i$ 都是单位下三角矩阵，它的逆矩阵仍是单位下三角矩阵，这些逆矩阵的乘积 $L$ 也保持这一结构。一次消元是 $r_i\leftarrow r_i-\ell_{ij}r_j$，它的逆操作就是 $r_i\leftarrow r_i+\ell_{ij}r_j$。\textbf{这说明消元矩阵中的相应位置是 $-\ell_{ij}$，撤销它的矩阵中则是 $\ell_{ij}$；按照消元顺序逐列整理，就得到前面记录乘数的 $L$。}
+
+\par\medskip\noindent\textbf{在同一个算例中，把这两个初等矩阵真正乘出来。}
+本例只需执行两次消元：先做 $r_2\leftarrow r_2+\tfrac12r_1$，再做 $r_3\leftarrow r_3+\tfrac23r_2$，所以
+\[
+ E_1=\OpMat{ccc}{1&0&0\\\tfrac12&1&0\\0&0&1},\qquad
+ E_2=\OpMat{ccc}{1&0&0\\0&1&0\\0&\tfrac23&1},\qquad
+ E_2E_1A=U.
+\]
+撤销它们时，相应倍数改号。按照刚才推出的顺序相乘，
+\[
+ \begin{aligned}
+ L=E_1^{-1}E_2^{-1}
+ &=\OpMat{ccc}{1&0&0\\-\tfrac12&1&0\\0&0&1}
+   \OpMat{ccc}{1&0&0\\0&1&0\\0&-\tfrac23&1}\\[5pt]
+ &=\OpMat{ccc}{1&0&0\\-\tfrac12&1&0\\0&-\tfrac23&1}.
+ \end{aligned}
+\]
+这正是图中由乘数 $-\tfrac12$、$-\tfrac23$ 填出的 $L$。读这个乘积时，先由右边的 $E_2^{-1}$ 撤销第2列消元，再由 $E_1^{-1}$ 撤销第1列消元，原来的 $A$ 就恢复了。\textbf{所以，$U$ 是消元的结果，$L$ 是整串消元操作的逆；两者相乘，便还原原矩阵。}
+
+这也解释了前代为什么能替右端项完成消元。将同一串初等变换施加到增广矩阵的两侧，便有
+\[
+ A\boldsymbol x=\boldsymbol b
+ \quad\Longrightarrow\quad
+ U\boldsymbol x=\underbrace{E_k\cdots E_1\boldsymbol b}_{\boldsymbol y},
+ \qquad L\boldsymbol y=\boldsymbol b.
+\]
+因此，先解 $L\boldsymbol y=\boldsymbol b$，就是算出消元后的右端项；再解 $U\boldsymbol x=\boldsymbol y$，就是熟悉的回代。\textbf{初等矩阵解释了分解怎样产生，两次三角求解则说明分解怎样拿来解方程组。}
 
 \par\medskip\noindent\textbf{第一步，前代：先求 $\boldsymbol y$，从上到下。}
 现在正式使用保存好的 $L,U$。先解
