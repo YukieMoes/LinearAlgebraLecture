@@ -7030,20 +7030,443 @@ $F$ 的前两行原样取出 $A$ 的前两行，第3行取 $2r_1+r_3$，所以
 现在，一次消元对应一个初等矩阵，一连串消元对应一连串矩阵乘法。若每遇到一个新的右端项，都从头重做这串操作，就浪费了已经完成的工作。下一节将把它们整理为两个三角矩阵，让一次消元服务于多次求解。
 
 
-\section{LU分解：高斯消元的工程封装}
+\section{LU分解：把一个方程组拆成两次三角求解}
 \label{sec:three-lu}
 
+\subsection{为什么要做LU分解？}
 
-\subsection*{从港珠澳大桥出发：桥不变，荷载在变}
+面对 $A\boldsymbol x=\boldsymbol b$，我们要找的是未知向量 $\boldsymbol x$。一般方程组中，每一行都可能牵涉好几个未知数；消元的作用，是把这些联系整理出先后次序。等最后一行只剩一个未知数，就能先解它，再一行一行向上回代。\textbf{容易求解的关键，是三角结构让下一步的未知数只剩一个。}
 
-港珠澳大桥的工程资料中，计算模型并非抽象的装饰。项目团队关于香港连接路的公开论文展示了桩帽的有限元模型，并讨论施工荷载、水压力等不同作用下的设计检查\cite{hzmb-engineering}。这类工作要求工程师反复回答：同一结构，换一种作用方式，会产生怎样的响应？
+现在把问题再往前推一步：如果 $A$ 不变，$\boldsymbol b$ 却不断改变，还需要每次从头消元吗？桥梁在同一个线性模型下承受不同荷载，就是这样的任务。结构连接与刚度不变，系数矩阵不变；车辆或其他外力改变，右端项随之改变。对同一张系数表反复进行相同的行运算，显然有许多工作可以保存。
 
+LU分解正是把这部分工作保存下来。\textbf{它的求解意义，是把一个复杂的方程组转化为两个容易求解的三角方程组：先从上往下算出一个中间向量，再从下往上算回所求的解。}我们先看这条路线，再用一个三元方程组把每一步走完；最后回到桥梁，看看怎样复用已经算好的结果。
+
+本节先讨论可逆方阵，且按当前行次序进行高斯消元时，每一步所需的主元都非零。需要交换行的情况放在第3.8节选读中讨论。
+
+\subsection{图解LU分解的结构}
+
+主对角线下方全为零的方阵称为\term{upper-triangular}，它适合从最后一行往上求解；主对角线上方全为零的方阵称为\term{lower-triangular}，它适合从第一行往下求解。下三角矩阵的对角线若全为1，就称为\term{unit-lower-triangular}。这里的“单位”只限定对角线，下面仍然可以有非零元素。
+
+消元结束后，上三角矩阵 $U$ 记录整理好的方程系数；另用单位下三角矩阵 $L$ 记录每一步用了主元行的多少倍。两份记录一起保留了原来的系数关系，得到
+\[
+ \boxed{A=LU.}
+\]
+这种写法称为\term{lu-factorization}。先不要急着把它当成一个需要背诵的恒等式：$L$ 从哪里来、为什么乘回去就是 $A$，会在下面的消元实例中直接看见。
+
+\ThreeFigure{一份系数矩阵，分成两份可复用的记录：$L$ 保存乘数，$U$ 保存三角方程。}{fig:three-lu-structure}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (0.200,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (0.650,1.950) {$a_{11}$};
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (1.100,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (1.550,1.950) {$a_{12}$};
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (2.000,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (2.450,1.950) {$a_{13}$};
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (0.200,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (0.650,1.250) {$a_{21}$};
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (1.100,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (1.550,1.250) {$a_{22}$};
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (2.000,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (2.450,1.250) {$a_{23}$};
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (0.200,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (0.650,0.550) {$a_{31}$};
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (1.100,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (1.550,0.550) {$a_{32}$};
+\filldraw[fill=ThreeGray!14,draw=white,line width=.4pt] (2.000,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (2.450,0.550) {$a_{33}$};
+\draw[ThreeGray,line width=.65pt] (0.200,2.300)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (2.900,2.300)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[] at (1.550,2.850) {$A$};
+\node[font=\Large] at (3.450,1.250) {$=$};
+\filldraw[fill=ThreeBlue!28,draw=white,line width=.4pt] (4.050,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (4.500,1.950) {$1$};
+\draw[ThreeBlue,line width=1.1pt] (4.075,2.275) rectangle ++(0.850,-0.650);
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (4.950,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (5.400,1.950) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.850,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,1.950) {$0$};
+\filldraw[fill=ThreeBlue!14,draw=white,line width=.4pt] (4.050,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (4.500,1.250) {$\ell_{21}$};
+\filldraw[fill=ThreeBlue!28,draw=white,line width=.4pt] (4.950,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (5.400,1.250) {$1$};
+\draw[ThreeBlue,line width=1.1pt] (4.975,1.575) rectangle ++(0.850,-0.650);
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.850,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,1.250) {$0$};
+\filldraw[fill=ThreeBlue!14,draw=white,line width=.4pt] (4.050,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (4.500,0.550) {$\ell_{31}$};
+\filldraw[fill=ThreeBlue!14,draw=white,line width=.4pt] (4.950,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (5.400,0.550) {$\ell_{32}$};
+\filldraw[fill=ThreeBlue!28,draw=white,line width=.4pt] (5.850,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,0.550) {$1$};
+\draw[ThreeBlue,line width=1.1pt] (5.875,0.875) rectangle ++(0.850,-0.650);
+\draw[ThreeGray,line width=.65pt] (4.050,2.300)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (6.750,2.300)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[] at (5.400,2.850) {$L$};
+\node[font=\Large] at (7.300,1.250) {$\times$};
+\filldraw[fill=ThreeGreen!20,draw=white,line width=.4pt] (7.950,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (8.400,1.950) {$u_{11}$};
+\draw[ThreeBlue,line width=1.1pt] (7.975,2.275) rectangle ++(0.850,-0.650);
+\filldraw[fill=ThreeGreen!20,draw=white,line width=.4pt] (8.850,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (9.300,1.950) {$u_{12}$};
+\filldraw[fill=ThreeGreen!20,draw=white,line width=.4pt] (9.750,2.300) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (10.200,1.950) {$u_{13}$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (7.950,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (8.400,1.250) {$0$};
+\filldraw[fill=ThreeGreen!20,draw=white,line width=.4pt] (8.850,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (9.300,1.250) {$u_{22}$};
+\draw[ThreeBlue,line width=1.1pt] (8.875,1.575) rectangle ++(0.850,-0.650);
+\filldraw[fill=ThreeGreen!20,draw=white,line width=.4pt] (9.750,1.600) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (10.200,1.250) {$u_{23}$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (7.950,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (8.400,0.550) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (8.850,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (9.300,0.550) {$0$};
+\filldraw[fill=ThreeGreen!20,draw=white,line width=.4pt] (9.750,0.900) rectangle ++(0.900,-0.700);
+\node[inner sep=1pt,font=\small] at (10.200,0.550) {$u_{33}$};
+\draw[ThreeBlue,line width=1.1pt] (9.775,0.875) rectangle ++(0.850,-0.650);
+\draw[ThreeGray,line width=.65pt] (7.950,2.300)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (10.650,2.300)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[] at (9.300,2.850) {$U$};
+\node[font=\footnotesize] at (1.550,-0.300) {原来的系数矩阵};
+\node[font=\footnotesize] at (5.400,-0.300) {单位下三角};
+\node[font=\footnotesize] at (9.300,-0.300) {上三角};
+\node[font=\footnotesize,text=ThreeBlue] at (5.400,-0.850) {对角线为1，记录乘数};
+\node[font=\footnotesize,text=ThreeGreen] at (9.300,-0.850) {消元后的方程系数};
+\end{tikzpicture}
+}{$L$ 主对角线上方、$U$ 主对角线下方的浅色区域固定为零；蓝、绿色区域保留各自的三角结构。本节讨论可逆方阵的无换行消元，因而 $U$ 的各个对角元都非零。}
+
+
+把这个分解代回原方程，利用矩阵乘法的结合律，
+\[
+ A\boldsymbol x=\boldsymbol b
+ \quad\Longleftrightarrow\quad
+ L(U\boldsymbol x)=\boldsymbol b.
+\]
+令 $\boldsymbol y=U\boldsymbol x$。虽然此时还不知道 $\boldsymbol x$，却能先把 $\boldsymbol y$ 当作未知量，因为 $L$ 和 $\boldsymbol b$ 都已知。于是求解变成两步：
+\[
+ \boxed{\text{第一步： }L\boldsymbol y=\boldsymbol b}
+ \qquad\Longrightarrow\qquad
+ \boxed{\text{第二步： }U\boldsymbol x=\boldsymbol y}.
+\]
+第一步称为\term{forward-substitution}：$L$ 的第一行只有 $y_1$，算出后代入第二行求 $y_2$，再往下推进。第二步是\term{back-substitution}：$U$ 的最后一行只有 $x_n$，算出后代入上一行，再向上推进。\textbf{先把中间向量 $\boldsymbol y$ 算完整，第二个方程组的右端项才有了具体数值。}
+
+\ThreeFigure{先解下三角方程，再解上三角方程；箭头同时标出求解顺序与逐行计算方向。}{fig:three-lu-solve-route}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+\node[threecard,fill=ThreeGray!7,minimum width=2.5cm,minimum height=1.2cm] at (0.900,0.000) {$A\boldsymbol x=\boldsymbol b$};
+\node[threecard,fill=ThreeBlue!8,align=center,minimum width=3.8cm,minimum height=1.6cm] at (5.000,0.000) {$L\boldsymbol y=\boldsymbol b$\\[5pt]前代：从上到下 $\downarrow$\\[3pt]$y_1\ \to\ y_2\ \to\ y_3$};
+\node[threecard,fill=ThreeGreen!8,align=center,minimum width=3.8cm,minimum height=1.6cm] at (10.100,0.000) {$U\boldsymbol x=\boldsymbol y$\\[5pt]回代：从下到上 $\uparrow$\\[3pt]$x_3\ \to\ x_2\ \to\ x_1$};
+\node[threecard,fill=ThreeRose!8,minimum width=1.1cm,minimum height=1.2cm] at (14.000,0.000) {$\boldsymbol x$};
+\draw[threearrow] (2.200,0.000)--(3.000,0.000);
+\draw[threearrow] (7.000,0.000)--(8.100,0.000);
+\draw[threearrow] (12.100,0.000)--(13.350,0.000);
+\node[font=\footnotesize] at (2.600,1.200) {已保存 $L,U$};
+\node[font=\footnotesize] at (7.550,1.200) {得到 $\boldsymbol y$};
+\node[font=\footnotesize] at (12.750,1.200) {得到解};
+\node[font=\footnotesize] at (7.400,-1.500) {求解时的已知量依次是：$\boldsymbol b\ \longrightarrow\ \boldsymbol y\ \longrightarrow\ \boldsymbol x$};
+\end{tikzpicture}
+}{把 $\boldsymbol y=U\boldsymbol x$ 看作待求的中间量。先由已知的 $\boldsymbol b$ 求出 $\boldsymbol y$，才能把它放到第二个方程组的右端。}
+
+
+请分清“作用的顺序”和“求解的顺序”：给定 $\boldsymbol x$ 计算 $A\boldsymbol x$，是先乘 $U$、再乘 $L$；已知最终结果 $\boldsymbol b$ 去寻找 $\boldsymbol x$，则先解含 $L$ 的方程，再解含 $U$ 的方程。这里直接逐行求解，不必先计算 $L^{-1}$、$U^{-1}$ 或 $A^{-1}$。
+
+\subsection{具体方程组的演练}
+
+\noindent\textbf{先把要解决的问题写出来。}考虑
+\[
+ \begin{cases}
+ 2x_1-x_2=1,\\
+ -x_1+2x_2-x_3=0,\\
+ -x_2+2x_3=0,
+ \end{cases}
+ \qquad
+ A=\OpMat{rrr}{2&-1&0\\-1&2&-1\\0&-1&2},\qquad
+ \boldsymbol b=\OpCol{1\\0\\0}.
+\]
+这就是本节桥梁教学模型的系数矩阵，稍后记为 $K$。此处统一用 $\boldsymbol x$ 表示未知量，先把注意力放在求解顺序上。\textbf{以下数值均为三节点线性教学模型，不是实桥设计参数或测量数据。}
+
+\par\medskip\noindent\textbf{从 $A$ 到 $U$：消掉一个数，保存一个乘数。}
+用主元所在行消去它下面的元素时，统一写成
+\[
+ r_i\leftarrow r_i-\ell_{ik}r_k,\qquad
+ \ell_{ik}=\frac{\text{本步要消去的元素}}{\text{本步主元}}.
+\]
+这个比值称为\term{elimination-multiplier}，也叫消元倍数。\textbf{$L$ 保存的是 $\ell_{ik}$ 本身，不是行变换中另加的负号。}
+
+第一列的主元是2。要消去下面的 $-1$，所用乘数为 $\ell_{21}=\boxed{-\tfrac12}$；第3行本来就是0，所以 $\ell_{31}=\boxed{0}$。执行 $r_2\leftarrow r_2-(-\tfrac12)r_1$ 后，第2行变为 $(0,\tfrac32,-1)$。我们看到，减去负倍数也就是加上正倍数，但写入 $L$ 的仍是 $-\tfrac12$。
+
+第二列必须看\textbf{更新后的矩阵}。新主元是 $\tfrac32$，下面的元素为 $-1$，所以
+\[
+ \ell_{32}=\frac{-1}{3/2}=\boxed{-\tfrac23},\qquad
+ r_3\leftarrow r_3-(-\tfrac23)r_2.
+\]
+这次第3行变为 $(0,0,\tfrac43)$，上三角矩阵 $U$ 就形成了。图中把当前主元列着色，并将乘数沿箭头记入下方的 $L$；这种“阶梯形演进、逐列记录”的组织方式也见于Lay教材的矩阵分解一节\cite{lay2021}，这里全部使用本讲义的三节点算例重新绘制。
+
+\ThreeFigure{上方阶梯形逐步形成，下方同步记录乘数；同色数字沿箭头“落入” $L$ 的对应列。}{fig:three-lu-multipliers}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (0.000,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (0.400,2.100) {$2$};
+\draw[ThreeBlue,line width=1.1pt] (0.025,2.425) rectangle ++(0.750,-0.650);
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (0.800,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (1.200,2.100) {$-1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (1.600,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (2.000,2.100) {$0$};
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (0.000,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (0.400,1.400) {$-1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (0.800,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (1.200,1.400) {$2$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (1.600,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (2.000,1.400) {$-1$};
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (0.000,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (0.400,0.700) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (0.800,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (1.200,0.700) {$-1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (1.600,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (2.000,0.700) {$2$};
+\draw[ThreeGray,line width=.65pt] (0.000,2.450)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (2.400,2.450)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[] at (1.200,3.000) {$A$};
+\draw[threearrow] (2.600,1.350)--(4.850,1.350);
+\node[font=\footnotesize] at (3.700,1.850) {第1列消元};
+\node[font=\footnotesize] at (3.700,0.800) {$r_2-(-\frac12)r_1$};
+\node[font=\footnotesize,text=ThreeBlue] at (1.200,-0.250) {$\ell_{21}=\boxed{-\tfrac12},\quad\ell_{31}=\boxed{0}$};
+\draw[threearrow,ThreeBlue] (1.200,-0.700)--(0.400,-1.250);
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (0.000,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (0.400,-1.800) {$1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (0.800,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (1.200,-1.800) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (1.600,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (2.000,-1.800) {$0$};
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (0.000,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (0.400,-2.500) {$-\tfrac12$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (0.800,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (1.200,-2.500) {$1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (1.600,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (2.000,-2.500) {$0$};
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (0.000,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (0.400,-3.200) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (0.800,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (1.200,-3.200) {$?$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (1.600,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (2.000,-3.200) {$1$};
+\draw[ThreeGray,line width=.65pt] (0.000,-1.450)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (2.400,-1.450)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[font=\footnotesize] at (1.200,-4.050) {记入 $L$ 的第1列};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.100,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (5.500,2.100) {$2$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.900,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,2.100) {$-1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (6.700,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (7.100,2.100) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.100,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (5.500,1.400) {$0$};
+\filldraw[fill=ThreeRose!22,draw=white,line width=.4pt] (5.900,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,1.400) {$\tfrac32$};
+\draw[ThreeBlue,line width=1.1pt] (5.925,1.725) rectangle ++(0.750,-0.650);
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (6.700,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (7.100,1.400) {$-1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.100,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (5.500,0.700) {$0$};
+\filldraw[fill=ThreeRose!22,draw=white,line width=.4pt] (5.900,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,0.700) {$-1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (6.700,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (7.100,0.700) {$2$};
+\draw[ThreeGray,line width=.65pt] (5.100,2.450)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (7.500,2.450)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[] at (6.300,3.000) {$A^{(1)}$};
+\draw[threearrow] (7.700,1.350)--(9.950,1.350);
+\node[font=\footnotesize] at (8.800,1.850) {第2列消元};
+\node[font=\footnotesize] at (8.800,0.800) {$r_3-(-\frac23)r_2$};
+\node[font=\footnotesize,text=ThreeRose] at (6.300,-0.250) {$\ell_{32}=\boxed{-\tfrac23}$};
+\draw[threearrow,ThreeRose] (6.300,-0.700)--(6.300,-1.250);
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.100,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (5.500,-1.800) {$1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.900,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,-1.800) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (6.700,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (7.100,-1.800) {$0$};
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (5.100,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (5.500,-2.500) {$-\tfrac12$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (5.900,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,-2.500) {$1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (6.700,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (7.100,-2.500) {$0$};
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (5.100,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (5.500,-3.200) {$0$};
+\filldraw[fill=ThreeRose!22,draw=white,line width=.4pt] (5.900,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (6.300,-3.200) {$-\tfrac23$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (6.700,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (7.100,-3.200) {$1$};
+\draw[ThreeGray,line width=.65pt] (5.100,-1.450)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (7.500,-1.450)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[font=\footnotesize] at (6.300,-4.050) {记入 $L$ 的第2列};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (10.200,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (10.600,2.100) {$2$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (11.000,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (11.400,2.100) {$-1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (11.800,2.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (12.200,2.100) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (10.200,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (10.600,1.400) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (11.000,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (11.400,1.400) {$\tfrac32$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (11.800,1.750) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (12.200,1.400) {$-1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (10.200,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (10.600,0.700) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (11.000,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (11.400,0.700) {$0$};
+\filldraw[fill=ThreeGreen!22,draw=white,line width=.4pt] (11.800,1.050) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (12.200,0.700) {$\tfrac43$};
+\draw[ThreeBlue,line width=1.1pt] (11.825,1.025) rectangle ++(0.750,-0.650);
+\draw[ThreeGray,line width=.65pt] (10.200,2.450)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (12.600,2.450)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[] at (11.400,3.000) {$U$};
+\node[font=\footnotesize,text=ThreeGreen] at (11.400,-0.250) {上三角已形成};
+\draw[threearrow,ThreeGreen] (11.400,-0.700)--(12.200,-1.250);
+\filldraw[fill=ThreeGreen!16,draw=white,line width=.4pt] (10.200,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (10.600,-1.800) {$1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (11.000,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (11.400,-1.800) {$0$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (11.800,-1.450) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (12.200,-1.800) {$0$};
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (10.200,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (10.600,-2.500) {$-\tfrac12$};
+\filldraw[fill=ThreeGreen!16,draw=white,line width=.4pt] (11.000,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (11.400,-2.500) {$1$};
+\filldraw[fill=ThreeGray!5,draw=white,line width=.4pt] (11.800,-2.150) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (12.200,-2.500) {$0$};
+\filldraw[fill=ThreeBlue!22,draw=white,line width=.4pt] (10.200,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (10.600,-3.200) {$0$};
+\filldraw[fill=ThreeRose!22,draw=white,line width=.4pt] (11.000,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (11.400,-3.200) {$-\tfrac23$};
+\filldraw[fill=ThreeGreen!16,draw=white,line width=.4pt] (11.800,-2.850) rectangle ++(0.800,-0.700);
+\node[inner sep=1pt,font=\small] at (12.200,-3.200) {$1$};
+\draw[ThreeGray,line width=.65pt] (10.200,-1.450)--++(-.1,0)--++(0,-2.100)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (12.600,-1.450)--++(.1,0)--++(0,-2.100)--++(-.1,0);
+\node[font=\footnotesize] at (11.400,-4.050) {完整的 $L$};
+\end{tikzpicture}
+}{细框标出本步主元。$\ell_{21},\ell_{31},\ell_{32}$ 分别填入 $L$ 的 $(2,1),(3,1),(3,2)$ 位置。问号表示尚未计算，已知的零照常记录；原矩阵的元素与消元乘数不是同一个数。}
+
+
+怎样把“主元列除以主元”读准确？\textbf{每一轮只取当前主元及其下方的列段，除以当前主元；主元上方的位置补零。}本例中三个列段依次来自 $A$、$A^{(1)}$、$U$，因此
+\[
+ L=
+ \OpMat{ccc}{
+ \dfrac{2}{2}&0&0\\[5pt]
+ \dfrac{-1}{2}&\dfrac{3/2}{3/2}&0\\[5pt]
+ \dfrac{0}{2}&\dfrac{-1}{3/2}&\dfrac{4/3}{4/3}}
+ =\OpMat{ccc}{1&0&0\\\textcolor{ThreeBlue}{-\tfrac12}&1&0\\\textcolor{ThreeBlue}{0}&\textcolor{ThreeRose}{-\tfrac23}&1}.
+\]
+这就解释了为什么 $L$ 的对角线是1，以及乘数为什么在对应的主元下方。\textbf{不能把原矩阵的每一列都直接除以原主元；第2轮使用的是已经更新过的系数。}
+
+乘回去也能看见这些记录的作用。设 $U$ 的三行为 $U_1,U_2,U_3$，则 $LU$ 的三行分别为
+\[
+ U_1=(2,-1,0),\quad
+ -\tfrac12U_1+U_2=(-1,2,-1),\quad
+ -\tfrac23U_2+U_3=(0,-1,2).
+\]
+它们恰好是 $A$ 的三行。消元把某行减去主元行的相应倍数，$L$ 又把这些倍数加回去，因而 $LU=A$。从第3.6节的初等矩阵看，这就是按逆序撤销消元；这里用三行数的恢复把它具体写了出来。
+
+\par\medskip\noindent\textbf{第一步，前代：先求 $\boldsymbol y$，从上到下。}
+现在正式使用保存好的 $L,U$。先解
+\[
+ \underbrace{\OpMat{ccc}{1&0&0\\-\tfrac12&1&0\\0&-\tfrac23&1}}_{L}
+ \OpCol{y_1\\y_2\\y_3}=\OpCol{1\\0\\0},
+ \qquad
+ \begin{cases}
+ y_1=1,\\
+ -\tfrac12y_1+y_2=0,\\
+ -\tfrac23y_2+y_3=0.
+ \end{cases}
+\]
+第一行直接给出 $y_1$；把这个数放进第二行，就只剩 $y_2$；再把 $y_2$ 放进第三行：
+\[
+ \begin{aligned}
+ y_1&=1,\\[3pt]
+ y_2&=0+\tfrac12y_1=\tfrac12,\\[3pt]
+ y_3&=0+\tfrac23y_2=\tfrac13.
+ \end{aligned}
+ \qquad
+ \boxed{\boldsymbol y=\OpCol{1\\\tfrac12\\\tfrac13}}.
+\]
+这组 $\boldsymbol y$ 也正是对右端项做相同行消元得到的结果：先把第一行右端的 $\tfrac12$ 倍加到第二行，得到 $\tfrac12$；再把新第二行右端的 $\tfrac23$ 倍加到第三行，得到 $\tfrac13$。\textbf{前代把“右端项跟着消元”这件事重新做了一遍，系数矩阵则不必再消元。}
+
+\par\medskip\noindent\textbf{第二步，回代：再求 $\boldsymbol x$，从下到上。}
+把刚算出的 $\boldsymbol y$ 放到右端，解
+\[
+ \underbrace{\OpMat{ccc}{2&-1&0\\0&\tfrac32&-1\\0&0&\tfrac43}}_{U}
+ \OpCol{x_1\\x_2\\x_3}=\OpCol{1\\\tfrac12\\\tfrac13},
+ \qquad
+ \begin{cases}
+ 2x_1-x_2=1,\\
+ \tfrac32x_2-x_3=\tfrac12,\\
+ \tfrac43x_3=\tfrac13.
+ \end{cases}
+\]
+这一次，请从最后一行开始读。先求 $x_3$，再把它代入上一行求 $x_2$，最后求 $x_1$：
+\[
+ \begin{aligned}
+ x_3&=\frac{1/3}{4/3}=\tfrac14,\\[3pt]
+ x_2&=\frac{\tfrac12+x_3}{3/2}
+     =\frac{\tfrac12+\tfrac14}{3/2}=\tfrac12,\\[3pt]
+ x_1&=\frac{1+x_2}{2}=\tfrac34.
+ \end{aligned}
+ \qquad
+ \boxed{\boldsymbol x=\OpCol{\tfrac34\\\tfrac12\\\tfrac14}}.
+\]
+代回最初的三条方程，左端分别是 $2\cdot\tfrac34-\tfrac12=1$、$-\tfrac34+2\cdot\tfrac12-\tfrac14=0$、$-\tfrac12+2\cdot\tfrac14=0$，与原右端项完全相同。我们没有直接“求出一个逆矩阵”，而是按两条清楚的逐行路线得到了原方程组的解。
+
+\par\medskip\noindent\textbf{回看消元：剩余方程的系数怎样更新？}
+可以把第一轮画成一幅块状图。第一行暂时保留，下面两行各自减去主元行的相应倍数；因此右下角的 $2\times2$ 系数块，从 $B$ 变成“$B$ 减去乘数列与主元行右侧的乘积”。这就是外积消元的局部图景。
+
+\ThreeFigure{一次消元怎样更新右下角：从剩余系数块中，减去“乘数列乘主元行右侧”生成的数表。}{fig:three-lu-peeling}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+\node[font=\small] at (1.600,2.400) {原来的剩余块 $B$};
+\filldraw[fill=ThreeGray!12,draw=white,line width=.4pt] (0.700,1.950) rectangle ++(0.900,-0.800);
+\node[inner sep=1pt,font=\small] at (1.150,1.550) {$2$};
+\filldraw[fill=ThreeGray!12,draw=white,line width=.4pt] (1.600,1.950) rectangle ++(0.900,-0.800);
+\node[inner sep=1pt,font=\small] at (2.050,1.550) {$-1$};
+\filldraw[fill=ThreeGray!12,draw=white,line width=.4pt] (0.700,1.150) rectangle ++(0.900,-0.800);
+\node[inner sep=1pt,font=\small] at (1.150,0.750) {$-1$};
+\filldraw[fill=ThreeGray!12,draw=white,line width=.4pt] (1.600,1.150) rectangle ++(0.900,-0.800);
+\node[inner sep=1pt,font=\small] at (2.050,0.750) {$2$};
+\draw[ThreeGray,line width=.65pt] (0.700,1.950)--++(-.1,0)--++(0,-1.600)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (2.500,1.950)--++(.1,0)--++(0,-1.600)--++(-.1,0);
+\node[font=\Large] at (3.300,1.150) {$-$};
+\node[font=\small] at (6.500,2.400) {乘数列 $\times$ 主元行的右侧};
+\node[] at (6.500,1.050) {$\OpCol{-\tfrac12\\0}[\,-1\quad0\,]=\OpMat{cc}{\tfrac12&0\\0&0}$};
+\node[font=\Large] at (9.800,1.150) {$=$};
+\node[font=\small] at (11.800,2.400) {更新后的剩余块};
+\filldraw[fill=ThreeGreen!18,draw=white,line width=.4pt] (10.900,1.950) rectangle ++(0.900,-0.800);
+\node[inner sep=1pt,font=\small] at (11.350,1.550) {$\tfrac32$};
+\filldraw[fill=ThreeGreen!18,draw=white,line width=.4pt] (11.800,1.950) rectangle ++(0.900,-0.800);
+\node[inner sep=1pt,font=\small] at (12.250,1.550) {$-1$};
+\filldraw[fill=ThreeGreen!18,draw=white,line width=.4pt] (10.900,1.150) rectangle ++(0.900,-0.800);
+\node[inner sep=1pt,font=\small] at (11.350,0.750) {$-1$};
+\filldraw[fill=ThreeGreen!18,draw=white,line width=.4pt] (11.800,1.150) rectangle ++(0.900,-0.800);
+\node[inner sep=1pt,font=\small] at (12.250,0.750) {$2$};
+\draw[ThreeGray,line width=.65pt] (10.900,1.950)--++(-.1,0)--++(0,-1.600)--++(.1,0);
+\draw[ThreeGray,line width=.65pt] (12.700,1.950)--++(.1,0)--++(0,-1.600)--++(-.1,0);
+\node[font=\footnotesize,text=ThreeGreen] at (6.700,-0.400) {下一轮只需在这个更小的方程组里继续消元};
+\end{tikzpicture}
+}{本图只拆开第一轮的更新。$\tfrac32=2-(-\tfrac12)(-1)$；第二轮就应使用这个新主元。列乘行是第3.3节的外积，这里只用它说明后续方程的系数为何改变。}
+
+
+接下来只需处理更小的剩余块。这样的图解帮助我们看清\textbf{每轮消元都在缩小尚未处理的方程组}；真正求解时，仍然使用刚才的两步：前代求 $\boldsymbol y$，回代求 $\boldsymbol x$。
+
+\subsection{为什么工程上喜欢LU分解？}
+
+回到桥梁：固定同一个线性结构模型，换一种荷载，就相当于换一个 $\boldsymbol b$。港珠澳大桥香港连接路的工程论文展示了有限元模型，并讨论不同荷载作用下的设计检查\cite{hzmb-engineering}。这里借这一背景说明重复求解的需要，不把下面的小矩阵当成实桥的设计计算。
 \ThreeFigure{港珠澳大桥西段实景。大型桥梁的分析需要比较多种作用情形，本节关注其中“相同系数、多个右端项”的计算任务。}{fig:three-hzmb-photo}{%
 \includegraphics[width=.86\linewidth]{figures/chapter03/hzmb_west_section_N509FZ.jpg}%
 }{摄影：N509FZ，2018年9月2日；Wikimedia Commons，CC BY-SA 4.0。照片未修改，仅按比例排印，来源与许可链接见文献\cite{hzmb-photo}。照片展示真实工程；以下数值均为教学自拟。}
 
-为了把计算任务看清楚，我们用三个相互连接的可动节点，代替真实工程中大量的未知量。\textbf{这是一维、线性、无量纲的三节点弹性教学模型，不是港珠澳大桥的设计模型或实测参数。}两端固定，四段连接的刚度都取1；$u_1,u_2,u_3$ 表示三个节点沿同一方向的位移，$f_1,f_2,f_3$ 表示该方向的外力。第 $i$ 个节点与相邻节点的位移差决定连接力。
-
+\Needspace{8\baselineskip}
+把复杂结构简化为三个沿同一方向移动的节点，两端固定，四段连接刚度都取1。记位移为 $\boldsymbol u$、外力为 $\boldsymbol f$，中间节点的平衡是 $(u_2-u_1)+(u_2-u_3)=f_2$；两侧节点同理：
+\[
+ K\boldsymbol u=\boldsymbol f,\qquad
+ K=\OpMat{rrr}{2&-1&0\\-1&2&-1\\0&-1&2}=A.
+\]
+$K$ 是这个无量纲教学模型的\term{stiffness-matrix}，每种指定荷载是一个\term{load-case}。它与前面的 $A$ 完全相同，所以原来的 $L,U$ 可以直接使用；只需把 $\boldsymbol x,\boldsymbol b$ 分别读作位移 $\boldsymbol u$ 与荷载 $\boldsymbol f$。
 \ThreeFigure{从真实桥梁的多工况问题，抽取一个可手算的三节点连接模型。}{fig:three-bridge-three-nodes}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
 
@@ -7070,361 +7493,15 @@ $F$ 的前两行原样取出 $A$ 的前两行，第3行取 $2r_1+r_3$，所以
 \node[] at (6,-1.1) {所有位移与力均以向右为正；模型不按实桥比例绘制};
 \end{tikzpicture}}{连接力取决于相对位移。例如中间节点的平衡为 $(u_2-u_1)+(u_2-u_3)=f_2$，所以系数自然成为 $-1,2,-1$。}
 
-三个节点的平衡关系整理为
+刚才算的就是节点1承受单位荷载。若把单位荷载移到节点2，\textbf{不用再计算任何消元乘数}，只将 $\boldsymbol f^{(2)}=(0,1,0)^{\mathrm T}$ 代入两次三角求解：
 \[
- \begin{cases}2u_1-u_2=f_1,\\-u_1+2u_2-u_3=f_2,\\-u_2+2u_3=f_3,\end{cases}
+ L\boldsymbol y=\boldsymbol f^{(2)}
+ \ \Longrightarrow\ \boldsymbol y=(0,1,\tfrac23)^{\mathrm T},
  \qquad
- K\boldsymbol u=\boldsymbol f,\qquad
- K=\begin{bmatrix}2&-1&0\\-1&2&-1\\0&-1&2\end{bmatrix}.
+ U\boldsymbol u^{(2)}=\boldsymbol y
+ \ \Longrightarrow\ \boldsymbol u^{(2)}=(\tfrac12,1,\tfrac12)^{\mathrm T}.
 \]
-$K$ 是这个模型的\term{stiffness-matrix}，即从节点位移到平衡外力的线性映射。固定连接关系与刚度，$K$ 就固定；改变荷载的位置、大小，只会改变右端项 $\boldsymbol f$。每一种指定荷载情形称为一个\term{load-case}。
-
-如果每换一个 $\boldsymbol f$ 就重新消元，系数部分的大量工作被重复执行。LU分解把消元保存下来：\textbf{结构只分析一次，新的荷载只需沿保存好的求解顺序通过。}以下一直使用同一个 $K$；第3.8节还会用它说明为什么重新排列方程后需要选主元。
-
-
-\subsection*{先看结构：依次求解的两个映射}
-
-主对角线下方全为零的方阵称为\term{upper-triangular}；主对角线上方全为零的方阵称为\term{lower-triangular}。下三角矩阵若主对角线全为1，称为\term{unit-lower-triangular}。这里“单位”只限定对角线，不表示整张矩阵等于单位矩阵。
-
-高斯消元自上而下消去主元下方的元素，最终得到上三角矩阵 $U$。要恢复原来的映射，就需要把各次消元反向撤销。若过程没有交换行，各次撤销用的都是向下倍加的矩阵，它们的乘积是单位下三角矩阵 $L$。因此原来的映射可以写成“先用 $U$，再用 $L$”。
-
-\begin{definition}[LU分解]
-若 $n$ 阶方阵 $A$ 可以写成
-\[
- \boxed{A=LU,}
-\]
-其中 $L$ 是单位下三角矩阵，$U$ 是上三角矩阵，则称之为 $A$ 的\term{lu-factorization}。本节用不交换行的高斯消元构造这种分解；所需主元不为零时，该过程可以直接进行。
-\end{definition}
-
-\ThreeFigure{LU分解把一次复杂作用拆成两个三角作用。$L$ 的对角线全为1，$U$ 保留消元后的上三角结构。}{fig:three-lu-structure}{%
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \node at (.3,1.7) {$A=$};
- \node at (3.3,1.7) {$\displaystyle
- \OpMat{cccc}{\textcolor{ThreeBlue}{1}&0&0&0\\
- \ell_{2,1}&\textcolor{ThreeBlue}{1}&0&0\\
- \ell_{3,1}&\ell_{3,2}&\textcolor{ThreeBlue}{1}&0\\
- \ell_{4,1}&\ell_{4,2}&\ell_{4,3}&\textcolor{ThreeBlue}{1}}$};
- \node[font=\Large] at (6.95,1.7) {$\cdot$};
- \node at (10.65,1.7) {$\displaystyle
- \OpMat{cccc}{u_{1,1}&u_{1,2}&u_{1,3}&u_{1,4}\\
- 0&u_{2,2}&u_{2,3}&u_{2,4}\\
- 0&0&u_{3,3}&u_{3,4}\\0&0&0&u_{4,4}}$};
- \node[text=ThreeBlue] at (3.3,-.05) {$L$：单位下三角，记录消元倍数};
- \node[text=ThreeRose] at (10.65,-.05) {$U$：上三角，保留消元结果};
-\end{tikzpicture}}{下方非零位置并不要求实际数值非零，$U$ 的对角元也可能为零；本节用于唯一求解的例子中，$U$ 的对角元均非零。矩阵的形状与它是否可逆是两件需要分别判断的事。}
-
-\subsection*{把消元过程保存下来}
-
-设每次消元对应 $F_1,\ldots,F_q$，则
-\[
- F_q\cdots F_2F_1A=U
- \quad\Longrightarrow\quad
- A=F_1^{-1}F_2^{-1}\cdots F_q^{-1}U.
-\]
-因此 $L=F_1^{-1}\cdots F_q^{-1}$。\textbf{$L$ 是按正确次序相乘的逆消元矩阵，不是把这些矩阵直接拼接。}在通常的按列消元顺序下，若用第 $k$ 行的 $\ell_{i,k}$ 倍消去第 $i$ 行的元素，那么这个\term{elimination-multiplier}恰好存入 $L$ 的第 $(i,k)$ 位置。消元时使用减号，$L$ 保存的是减号后面的倍数本身。
-
-
-\begin{example}[把三节点模型的消元保存下来]
-对刚才的 $K$ 消元。第1列需要减去主元行的 $-\frac12$ 倍；第2列需要减去新主元行的 $-\frac23$ 倍。因此
-\[
- K=\begin{bmatrix}2&-1&0\\-1&2&-1\\0&-1&2\end{bmatrix}
- \xrightarrow{r_2\leftarrow r_2+\frac12r_1}
- \begin{bmatrix}2&-1&0\\0&3/2&-1\\0&-1&2\end{bmatrix}
- \xrightarrow{r_3\leftarrow r_3+\frac23r_2}
- U=\begin{bmatrix}2&-1&0\\0&3/2&-1\\0&0&4/3\end{bmatrix}.
-\]
-保存实际的消元倍数，而不是行变换里“加号后面的数”，得到
-\[
- L=\begin{bmatrix}1&0&0\\-1/2&1&0\\0&-2/3&1\end{bmatrix},\qquad K=LU.
-\]
-第3行在第1列本来就是零，所以 $\ell_{3,1}=0$，无需执行多余操作。
-\end{example}
-
-\ThreeFigure{消元结果进入 $U$，消元倍数进入 $L$，两份记录共同恢复 $K$。}{fig:three-lu-multipliers}{%
-\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
-\fill[ThreeGray!5] (0.25,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (0.525,1.9500000000000002) {$2$};
-\fill[ThreeGray!5] (0.8,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.0750000000000002,1.9500000000000002) {$-1$};
-\fill[ThreeGray!5] (1.35,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.625,1.9500000000000002) {$0$};
-\fill[ThreeBlue!25] (0.25,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (0.525,1.4500000000000002) {$-1$};
-\fill[ThreeGray!5] (0.8,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.0750000000000002,1.4500000000000002) {$2$};
-\fill[ThreeGray!5] (1.35,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.625,1.4500000000000002) {$-1$};
-\fill[ThreeGray!5] (0.25,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (0.525,0.9500000000000002) {$0$};
-\fill[ThreeRose!25] (0.8,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.0750000000000002,0.9500000000000002) {$-1$};
-\fill[ThreeGray!5] (1.35,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.625,0.9500000000000002) {$2$};
-\draw[ThreeGray,line width=.65pt] (0.22,2.2) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (1.9300000000000002,2.2) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (1.0750000000000002,2.6) {$K$};
-\node[] at (2.4,1.45) {$\longrightarrow$};
-\fill[ThreeBlue!12] (3.25,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (3.525,1.9500000000000002) {$2$};
-\fill[ThreeBlue!12] (3.8,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.075,1.9500000000000002) {$-1$};
-\fill[ThreeBlue!12] (4.35,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.625,1.9500000000000002) {$0$};
-\fill[ThreeRose!12] (3.25,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (3.525,1.4500000000000002) {$0$};
-\fill[ThreeRose!12] (3.8,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.075,1.4500000000000002) {$\frac{3}{2}$};
-\fill[ThreeRose!12] (4.35,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.625,1.4500000000000002) {$-1$};
-\fill[ThreeGreen!12] (3.25,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (3.525,0.9500000000000002) {$0$};
-\fill[ThreeGreen!12] (3.8,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.075,0.9500000000000002) {$0$};
-\fill[ThreeGreen!12] (4.35,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.625,0.9500000000000002) {$\frac{4}{3}$};
-\draw[ThreeGray,line width=.65pt] (3.22,2.2) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (4.930000000000001,2.2) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (4.075,2.6) {$U$};
-\node[] at (6.5,1.45) {把倍数存入 $L$};
-\fill[ThreeGray!5] (9.0,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.275,1.9500000000000002) {$1$};
-\fill[ThreeGray!5] (9.55,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.825,1.9500000000000002) {$0$};
-\fill[ThreeGray!5] (10.1,2.2) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (10.375,1.9500000000000002) {$0$};
-\fill[ThreeBlue!25] (9.0,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.275,1.4500000000000002) {$-\frac{1}{2}$};
-\fill[ThreeGray!5] (9.55,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.825,1.4500000000000002) {$1$};
-\fill[ThreeGray!5] (10.1,1.7000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (10.375,1.4500000000000002) {$0$};
-\fill[ThreeGray!5] (9.0,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.275,0.9500000000000002) {$0$};
-\fill[ThreeRose!25] (9.55,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.825,0.9500000000000002) {$-\frac{2}{3}$};
-\fill[ThreeGray!5] (10.1,1.2000000000000002) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (10.375,0.9500000000000002) {$1$};
-\draw[ThreeGray,line width=.65pt] (8.97,2.2) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (10.68,2.2) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (9.825,2.6) {$L$};
-\node[] at (5.4,-0.4) {$\ell_{2,1}=-\frac12\qquad \ell_{3,1}=0\qquad \ell_{3,2}=-\frac23$};
-\end{tikzpicture}}{用“减去主元行的多少倍”定义倍数。在本例中，减去负倍数表现为加法，因此 $L$ 中记录的是负数。}
-
-\subsection*{像剥开数表一样看LU：逐次取出外积}
-
-第3.3节的列乘行视角，可以把LU分解画得更直接。记 $L$ 的列为 $\boldsymbol\ell_1,\boldsymbol\ell_2,\boldsymbol\ell_3$，$U$ 的行为 $\boldsymbol w_1^{\mathrm T},\boldsymbol w_2^{\mathrm T},\boldsymbol w_3^{\mathrm T}$。先取出
-\[
- \boldsymbol\ell_1\boldsymbol w_1^{\mathrm T}
- =\begin{bmatrix}1\\-1/2\\0\end{bmatrix}[\,2\quad-1\quad0\,].
-\]
-从 $K$ 中减去它，第一行、第一列都变成零；剩下的计算缩小到右下角的 $2\times2$ 数表。再取出第二个外积，只剩最后一个位置。\textbf{消元不是把信息丢掉，而是把已处理的部分存入外积，将尚未处理的部分留在右下角。}
-
-\ThreeFigure{LU的消元视角：每次减去一个外积，尚未处理的区域逐步缩小。}{fig:three-lu-peeling}{%
-\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
-\fill[ThreeBlue!20] (0.3,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (0.575,2.05) {$2$};
-\fill[ThreeBlue!20] (0.8500000000000001,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.125,2.05) {$-1$};
-\fill[ThreeBlue!20] (1.4000000000000001,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.675,2.05) {$0$};
-\fill[ThreeBlue!20] (0.3,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (0.575,1.5499999999999998) {$-1$};
-\fill[ThreeGray!5] (0.8500000000000001,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.125,1.5499999999999998) {$2$};
-\fill[ThreeGray!5] (1.4000000000000001,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.675,1.5499999999999998) {$-1$};
-\fill[ThreeBlue!20] (0.3,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (0.575,1.0499999999999998) {$0$};
-\fill[ThreeGray!5] (0.8500000000000001,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.125,1.0499999999999998) {$-1$};
-\fill[ThreeGray!5] (1.4000000000000001,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (1.675,1.0499999999999998) {$2$};
-\draw[ThreeGray,line width=.65pt] (0.27,2.3) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (1.9800000000000002,2.3) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (1.125,2.6999999999999997) {尚未处理：$K$};
-\draw[threearrow] (2.4,1.5)--node[above,font=\footnotesize] {$-\boldsymbol\ell_1\boldsymbol w_1^{\mathrm T}$}(4,1.5);
-\fill[ThreeGray!5] (4.35,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.625,2.05) {$0$};
-\fill[ThreeGray!5] (4.8999999999999995,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (5.175,2.05) {$0$};
-\fill[ThreeGray!5] (5.449999999999999,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (5.725,2.05) {$0$};
-\fill[ThreeGray!5] (4.35,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.625,1.5499999999999998) {$0$};
-\fill[ThreeRose!20] (4.8999999999999995,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (5.175,1.5499999999999998) {$\frac{3}{2}$};
-\fill[ThreeRose!20] (5.449999999999999,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (5.725,1.5499999999999998) {$-1$};
-\fill[ThreeGray!5] (4.35,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (4.625,1.0499999999999998) {$0$};
-\fill[ThreeRose!20] (4.8999999999999995,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (5.175,1.0499999999999998) {$-1$};
-\fill[ThreeRose!20] (5.449999999999999,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (5.725,1.0499999999999998) {$2$};
-\draw[ThreeGray,line width=.65pt] (4.319999999999999,2.3) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (6.03,2.3) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (5.175,2.6999999999999997) {剩下 $2\times2$};
-\draw[threearrow] (6.45,1.5)--node[above,font=\footnotesize] {$-\boldsymbol\ell_2\boldsymbol w_2^{\mathrm T}$}(8.1,1.5);
-\fill[ThreeGray!5] (8.45,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (8.725,2.05) {$0$};
-\fill[ThreeGray!5] (9.0,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.274999999999999,2.05) {$0$};
-\fill[ThreeGray!5] (9.549999999999999,2.3) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.825,2.05) {$0$};
-\fill[ThreeGray!5] (8.45,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (8.725,1.5499999999999998) {$0$};
-\fill[ThreeGray!5] (9.0,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.274999999999999,1.5499999999999998) {$0$};
-\fill[ThreeGray!5] (9.549999999999999,1.7999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.825,1.5499999999999998) {$0$};
-\fill[ThreeGray!5] (8.45,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (8.725,1.0499999999999998) {$0$};
-\fill[ThreeGray!5] (9.0,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.274999999999999,1.0499999999999998) {$0$};
-\fill[ThreeGreen!25] (9.549999999999999,1.2999999999999998) rectangle ++(0.55,-0.5);
-\node[inner sep=1pt] at (9.825,1.0499999999999998) {$\frac{4}{3}$};
-\draw[ThreeGray,line width=.65pt] (8.42,2.3) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (10.129999999999999,2.3) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (9.274999999999999,2.6999999999999997) {剩下 $1\times1$};
-\end{tikzpicture}}{白灰色位置已经清零；彩色方块表示剩余任务。第2个主元来自更新后的右下角，所以不能一直使用原矩阵的行。}
-
-反过来，把三张保存的数表叠加，就重建原矩阵：
-\[
- K=\boldsymbol\ell_1\boldsymbol w_1^{\mathrm T}
-  +\boldsymbol\ell_2\boldsymbol w_2^{\mathrm T}
-  +\boldsymbol\ell_3\boldsymbol w_3^{\mathrm T}=LU.
-\]
-
-\ThreeFigure{LU的重建视角：$L$ 的每一列与 $U$ 的对应行生成一张外积数表。}{fig:three-lu-outer-rebuild}{%
-\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
-\fill[ThreeBlue!16] (0.25,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (0.51,1.85) {$2$};
-\fill[ThreeBlue!16] (0.77,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (1.03,1.85) {$-1$};
-\fill[ThreeBlue!16] (1.29,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (1.55,1.85) {$0$};
-\fill[ThreeBlue!16] (0.25,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (0.51,1.35) {$-1$};
-\fill[ThreeBlue!16] (0.77,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (1.03,1.35) {$\frac{1}{2}$};
-\fill[ThreeBlue!16] (1.29,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (1.55,1.35) {$0$};
-\fill[ThreeBlue!16] (0.25,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (0.51,0.8500000000000001) {$0$};
-\fill[ThreeBlue!16] (0.77,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (1.03,0.8500000000000001) {$0$};
-\fill[ThreeBlue!16] (1.29,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (1.55,0.8500000000000001) {$0$};
-\draw[ThreeGray,line width=.65pt] (0.22,2.1) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (1.84,2.1) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (1.03,2.5) {$\boldsymbol\ell_1\boldsymbol w_1^{\mathrm T}$};
-\node[] at (2.2,1.35) {$+$};
-\fill[ThreeRose!16] (2.85,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (3.1100000000000003,1.85) {$0$};
-\fill[ThreeRose!16] (3.37,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (3.63,1.85) {$0$};
-\fill[ThreeRose!16] (3.89,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (4.15,1.85) {$0$};
-\fill[ThreeRose!16] (2.85,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (3.1100000000000003,1.35) {$0$};
-\fill[ThreeRose!16] (3.37,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (3.63,1.35) {$\frac{3}{2}$};
-\fill[ThreeRose!16] (3.89,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (4.15,1.35) {$-1$};
-\fill[ThreeRose!16] (2.85,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (3.1100000000000003,0.8500000000000001) {$0$};
-\fill[ThreeRose!16] (3.37,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (3.63,0.8500000000000001) {$-1$};
-\fill[ThreeRose!16] (3.89,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (4.15,0.8500000000000001) {$\frac{2}{3}$};
-\draw[ThreeGray,line width=.65pt] (2.8200000000000003,2.1) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (4.44,2.1) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (3.63,2.5) {$\boldsymbol\ell_2\boldsymbol w_2^{\mathrm T}$};
-\node[] at (4.8,1.35) {$+$};
-\fill[ThreeGreen!16] (5.45,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (5.71,1.85) {$0$};
-\fill[ThreeGreen!16] (5.970000000000001,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (6.23,1.85) {$0$};
-\fill[ThreeGreen!16] (6.49,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (6.75,1.85) {$0$};
-\fill[ThreeGreen!16] (5.45,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (5.71,1.35) {$0$};
-\fill[ThreeGreen!16] (5.970000000000001,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (6.23,1.35) {$0$};
-\fill[ThreeGreen!16] (6.49,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (6.75,1.35) {$0$};
-\fill[ThreeGreen!16] (5.45,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (5.71,0.8500000000000001) {$0$};
-\fill[ThreeGreen!16] (5.970000000000001,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (6.23,0.8500000000000001) {$0$};
-\fill[ThreeGreen!16] (6.49,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (6.75,0.8500000000000001) {$\frac{4}{3}$};
-\draw[ThreeGray,line width=.65pt] (5.42,2.1) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (7.04,2.1) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (6.23,2.5) {$\boldsymbol\ell_3\boldsymbol w_3^{\mathrm T}$};
-\node[] at (7.4,1.35) {$=$};
-\fill[ThreeGray!5] (8.05,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (8.31,1.85) {$2$};
-\fill[ThreeGray!5] (8.57,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (8.83,1.85) {$-1$};
-\fill[ThreeGray!5] (9.09,2.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (9.350000000000001,1.85) {$0$};
-\fill[ThreeGray!5] (8.05,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (8.31,1.35) {$-1$};
-\fill[ThreeGray!5] (8.57,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (8.83,1.35) {$2$};
-\fill[ThreeGray!5] (9.09,1.6) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (9.350000000000001,1.35) {$-1$};
-\fill[ThreeGray!5] (8.05,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (8.31,0.8500000000000001) {$0$};
-\fill[ThreeGray!5] (8.57,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (8.83,0.8500000000000001) {$-1$};
-\fill[ThreeGray!5] (9.09,1.1) rectangle ++(0.52,-0.5);
-\node[inner sep=1pt] at (9.350000000000001,0.8500000000000001) {$2$};
-\draw[ThreeGray,line width=.65pt] (8.020000000000001,2.1) -- ++(-.10,0) -- ++(0,-1.5) -- ++(.10,0);
-\draw[ThreeGray,line width=.65pt] (9.64,2.1) -- ++(.10,0) -- ++(0,-1.5) -- ++(-.10,0);
-\node[font=\small] at (8.83,2.5) {$K$};
-\node[] at (4.8,-0.2) {例如右下角：$0+\frac23+\frac43=2$};
-\end{tikzpicture}}{三张数表各自都只有一个独立列方向；相加后恢复全部连接关系。这与第3.3节矩阵乘法的外积之和是同一个规则。}
-
-
-\subsection*{先前代，再回代：一次分解，多次使用}
-
-从映射看，$A\boldsymbol x=\boldsymbol b$ 就是 $L(U\boldsymbol x)=\boldsymbol b$。把中间结果记为 $\boldsymbol y=U\boldsymbol x$，求解顺序因此是
-\[
- \boxed{L\boldsymbol y=\boldsymbol b,\qquad U\boldsymbol x=\boldsymbol y.}
-\]
-下三角方程从第1行向下求解，称为\term{forward-substitution}；上三角方程从最后一行向上回代，正是第2章已经熟悉的步骤。
-
-
-\begin{example}[工况改变，分解复用]
-把单位荷载加在节点1，$\boldsymbol f^{(1)}=(1,0,0)^{\mathrm T}$。先解 $L\boldsymbol y=\boldsymbol f^{(1)}$，再解 $U\boldsymbol u=\boldsymbol y$。
-\end{example}
-\textbf{解}\quad 下三角方程从上向下给出
-\[
- y_1=1,\qquad -\tfrac12y_1+y_2=0,\qquad
- -\tfrac23y_2+y_3=0
- \quad\Longrightarrow\quad \boldsymbol y=(1,1/2,1/3)^{\mathrm T}.
-\]
-上三角方程从下向上给出
-\[
- \tfrac43u_3=\tfrac13,\qquad
- \tfrac32u_2-u_3=\tfrac12,\qquad
- 2u_1-u_2=1
- \quad\Longrightarrow\quad
- \boldsymbol u^{(1)}=(3/4,1/2,1/4)^{\mathrm T}.
-\]
-若荷载改到节点2或节点3，只需换右端项，得到
-\[
- \begin{aligned}
- \boldsymbol f^{(2)}=(0,1,0)^{\mathrm T}&\ \longrightarrow\
- \boldsymbol u^{(2)}=(1/2,1,1/2)^{\mathrm T},\\
- \boldsymbol f^{(3)}=(0,0,1)^{\mathrm T}&\ \longrightarrow\
- \boldsymbol u^{(3)}=(1/4,1/2,3/4)^{\mathrm T}.
- \end{aligned}
-\]
-三个工况共用刚才那一组 $L,U$。这就是大型桥梁线性分析中“模型保持不变、反复比较荷载”的一个可手算缩影。
-
+同理，荷载移到节点3时，$\boldsymbol y=(0,0,1)^{\mathrm T}$，解为 $\boldsymbol u^{(3)}=(\tfrac14,\tfrac12,\tfrac34)^{\mathrm T}$。三次计算的系数矩阵相同，分解也相同，改变的只有前代的输入及随后算出的数值。
 \ThreeFigure{同一个连接模型，三种荷载位置，三组位移响应。}{fig:three-bridge-load-cases}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
 \node[] at (1.6,2.6) {工况1：荷载在节点1};
@@ -7471,79 +7548,18 @@ $K$ 是这个模型的\term{stiffness-matrix}，即从节点位移到平衡外�
 \node[] at (10.2,-0.4) {$(1/4,1/2,3/4)^{\mathrm T}$};
 \end{tikzpicture}}{每个工况中，三行依次对应三个节点。蓝色箭头长度与位移大小成比例，向右为正，与三节点模型的方向约定一致。}
 
+\Needspace{5\baselineskip}
+如果一次处理许多荷载，可以把它们并排成矩阵 $B$，把各组解并排成 $X$，就得到
+\[
+ AX=B\quad\Longrightarrow\quad LY=B\quad\Longrightarrow\quad UX=Y.
+\]
+每一列仍按同样的顺序求解。对一般稠密 $n$ 阶矩阵，分解的工作量大致随 $n^3$ 增长，每组前代与回代的工作量大致随 $n^2$ 增长；保存分解的收益，在右端项很多时尤其明显。通用数值库也将分解与随后求解组织为可分别调用的步骤\cite{lapack-linear}。对本例这种带状矩阵还可利用更多零元素减少计算，不能把稠密估计当成所有工程模型的精确成本。
 
-\ThreeFigure{分解只针对 $A$ 做一次；每个新的右端项都复用同一个 $L$ 与 $U$。}{fig:three-lu-reuse}{%
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \node[threecard,fill=ThreeGray!5,minimum width=3.4cm] at (6.2,3.3) {一次分解：$A=LU$};
- \foreach \yy/\idx in {1.8/1,.25/2} {
-  \node (b\idx) at (.6,\yy) {$\boldsymbol b_{\idx}$};
-  \node[threecard,fill=ThreeBlue!7,minimum width=3.2cm,minimum height=.8cm] (l\idx) at (3.6,\yy) {$L\boldsymbol y_{\idx}=\boldsymbol b_{\idx}$};
-  \node[threecard,fill=ThreeRose!7,minimum width=3.2cm,minimum height=.8cm] (u\idx) at (8.4,\yy) {$U\boldsymbol x_{\idx}=\boldsymbol y_{\idx}$};
-  \node (x\idx) at (11.65,\yy) {$\boldsymbol x_{\idx}$};
-  \draw[threearrow] (b\idx)--(l\idx);\draw[threearrow] (l\idx)--node[above,font=\footnotesize] {前代之后}(u\idx);\draw[threearrow] (u\idx)--(x\idx);
- }
-\end{tikzpicture}}{对一般 $n$ 阶矩阵，若不专门利用零元素等结构，分解的运算量大致随 $n^3$ 增长，每次前代与回代合计大致随 $n^2$ 增长。因此右端项越多，保存分解的价值越明显。}
+同样的思路也适用于电路和导热：三个节点由四个单位电阻依次连接、两端接地时，节点电压满足 $K\boldsymbol v=\boldsymbol j$；均匀细杆取三个内部温度未知量、连接导热系数归一化为1时，相对于端点的温升满足 $K\boldsymbol t=\boldsymbol q$。这些都是教学简化模型；电路软件实际也会组织并求解矩阵系统\cite{ngspice-matrix}。固定元件或导热系数，改变输入，就能复用已经完成的分解。
 
-对多个右端项也可以一次写为 $AX=B$：$B$ 的每一列是一个右端项，$X$ 的对应列是它的解。只需先解 $LY=B$，再解 $UX=Y$。这正是矩阵乘法的列视角在工程计算中的用法。通用数值计算库也按“先分解、后求解”的方式组织这类任务\cite{lapack-linear}。
+\textbf{一次分解、多次求解的前提，是系数矩阵确实没有改变。}若材料刚度、连接方式或边界条件改变，就应重新检查并通常重新分解矩阵；不能只换右端项继续使用。对于本节固定的 $A$，无论 $\boldsymbol b$ 怎样改变，都按“先 $L\boldsymbol y=\boldsymbol b$，后 $U\boldsymbol x=\boldsymbol y$”重复求解。
 
-
-\subsection*{同一种数表，也出现在电路与导热中}
-
-桥梁并不是孤例。考虑三个节点通过四个单位电阻依次连接，两端均接地；向节点注入电流 $j_1,j_2,j_3$。以节点2为例，流出的电流为 $(v_2-v_1)+(v_2-v_3)$，故节点电压满足 $K\boldsymbol v=\boldsymbol j$。固定电阻、改变输入电流，就能复用同一分解。电路仿真软件确实会把器件关系组织成矩阵系统\cite{ngspice-matrix}；这里仅取纯电阻网络这一最简单情形。
-
-再看一根两端保持相同参考温度的均匀细杆，只保留三个内部温度未知量。把温度写成相对于端点的温升，连接导热系数归一化为1，则稳态热平衡为 $K\boldsymbol t=\boldsymbol q$，其中 $q_i$ 是节点热源强度。改变加热位置，仍只改变右端项。
-
-\ThreeFigure{结构响应、电路电压与稳态温度，都能形成“固定矩阵、变化输入”的任务。}{fig:three-circuit-heat}{%
-\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
-
-\node[anchor=west] at (0,4.25) {(a) 电阻网络：未知量是节点电压};
-\node[anchor=west] at (0,1.15) {(b) 三点导热：未知量是相对端点的温升};
-\draw[ThreeGray] (0.4,2.6)--++(.6,0); \draw[ThreeGray,fill=white] (1.0,2.47) rectangle ++(.9,.26); \draw[ThreeGray] (1.9,2.6)--++(.6,0);
-\node[font=\footnotesize] at (1.4500000000000002,3.0) {$1\,\Omega$};
-\draw[ThreeGray] (2.5,2.6)--++(.6,0); \draw[ThreeGray,fill=white] (3.1,2.47) rectangle ++(.9,.26); \draw[ThreeGray] (4.0,2.6)--++(.6,0);
-\node[font=\footnotesize] at (3.55,3.0) {$1\,\Omega$};
-\draw[ThreeGray] (4.6000000000000005,2.6)--++(.6,0); \draw[ThreeGray,fill=white] (5.2,2.47) rectangle ++(.9,.26); \draw[ThreeGray] (6.1000000000000005,2.6)--++(.6,0);
-\node[font=\footnotesize] at (5.65,3.0) {$1\,\Omega$};
-\draw[ThreeGray] (6.700000000000001,2.6)--++(.6,0); \draw[ThreeGray,fill=white] (7.300000000000001,2.47) rectangle ++(.9,.26); \draw[ThreeGray] (8.200000000000001,2.6)--++(.6,0);
-\node[font=\footnotesize] at (7.750000000000001,3.0) {$1\,\Omega$};
-\fill[ThreeBlue] (2.5,2.6) circle (.07);
-\node[] at (2.5,2.2) {$v_1$};
-\draw[oprose] (2.5,3.55)--(2.5,2.7) node[pos=0,above] {$j_1$};
-\fill[ThreeBlue] (4.6000000000000005,2.6) circle (.07);
-\node[] at (4.6000000000000005,2.2) {$v_2$};
-\draw[oprose] (4.6000000000000005,3.55)--(4.6000000000000005,2.7) node[pos=0,above] {$j_2$};
-\fill[ThreeBlue] (6.700000000000001,2.6) circle (.07);
-\node[] at (6.700000000000001,2.2) {$v_3$};
-\draw[oprose] (6.700000000000001,3.55)--(6.700000000000001,2.7) node[pos=0,above] {$j_3$};
-\node[] at (0.4,2.2) {$0$};
-\draw[ThreeGray] (0.4,2.6)--++(0,-.15) ++(-.2,0)--++(.4,0);
-\node[] at (8.8,2.2) {$0$};
-\draw[ThreeGray] (8.8,2.6)--++(0,-.15) ++(-.2,0)--++(.4,0);
-\node[] at (11,2.6) {$K\boldsymbol v=\boldsymbol j$};
-\draw[ThreeGreen,line width=4pt] (0.4,-0.5)--++(2.1,0);
-\draw[ThreeGreen,line width=4pt] (2.5,-0.5)--++(2.1,0);
-\draw[ThreeGreen,line width=4pt] (4.6000000000000005,-0.5)--++(2.1,0);
-\draw[ThreeGreen,line width=4pt] (6.700000000000001,-0.5)--++(2.1,0);
-\fill[ThreeBlue] (2.5,-0.5) circle (.07);
-\node[] at (2.5,-0.9) {$t_1$};
-\draw[oprose] (2.5,0.44999999999999996)--(2.5,-0.4) node[pos=0,above] {$q_1$};
-\fill[ThreeBlue] (4.6000000000000005,-0.5) circle (.07);
-\node[] at (4.6000000000000005,-0.9) {$t_2$};
-\draw[oprose] (4.6000000000000005,0.44999999999999996)--(4.6000000000000005,-0.4) node[pos=0,above] {$q_2$};
-\fill[ThreeBlue] (6.700000000000001,-0.5) circle (.07);
-\node[] at (6.700000000000001,-0.9) {$t_3$};
-\draw[oprose] (6.700000000000001,0.44999999999999996)--(6.700000000000001,-0.4) node[pos=0,above] {$q_3$};
-\node[] at (0.4,-0.9) {$0$};
-\node[] at (8.8,-0.9) {$0$};
-\node[] at (11,-0.5) {$K\boldsymbol t=\boldsymbol q$};
-\end{tikzpicture}}{电阻、导热系数与节点划分均为教学简化；三种问题共享矩阵 $K$，因此共享同一套LU求解过程。物理量不同，保存计算的理由相同。}
-
-这三个模型的共同点，不是物理对象相似，而是\textbf{每个位置与相邻位置发生线性联系，改变外部输入不改变这些联系}。实际工程模型会更大、结构更复杂；本章要掌握的运算组织方式已经在这三张小图中出现了。
-
-
-大型结构、电路和流体的线性模型会使用多种直接或迭代求解方法，LU是通用直接方法中的重要一类，并非所有工程软件唯一的底层算法。这里最值得带走的思想是：\textbf{把不随右端项变化的工作提取出来，保存后重复利用。}
-
-本节的例子中，消元一路遇到非零主元。若某一步的主元恰好为零，或者虽非零却小得容易放大舍入误差，原来的行次序就未必合适。下一节选读将说明：在消元前加上一个选主元的动作，怎样得到工程中更常用的带换行分解。
+我们现在可以把LU的意义连成一句话：\textbf{消元把方程组整理成三角形，$L$ 留下整理时的乘数，$U$ 留下整理后的系数；新问题沿着前代、回代两条路线就能得到解。}若消元中遇到零主元，或过小的主元使数值计算不稳，就需要改变行次序。下一节选读将用同一个桥梁模型说明PLU如何处理这件事。
 
 \section{【选读】PLU分解：选主元与数值稳定性}
 \label{sec:three-plu}
