@@ -298,3 +298,18 @@
 \DeclareLectureTerm{active-rotation}{主动旋转}{Active Rotation}{固定坐标基，对向量或物体施加旋转作用，用同一组基记录作用前后的坐标；转轴上的向量可以保持不变。}
 \DeclareLectureTerm{passive-rotation}{被动旋转}{Passive Rotation}{向量不动，转动描述它的坐标架；新坐标由对应主动旋转矩阵的逆矩阵换算。}
 \DeclareLectureTerm{orthogonal-matrix}{正交矩阵}{Orthogonal Matrix}{满足 $Q^{\mathrm T}Q=E$ 的实方阵；列向量单位且两两垂直，逆矩阵等于转置，保持标准点积；不一定表示旋转，也可能包含反射。}
+
+
+% 第5章动态选读：区分解轨迹的自由度与平衡集合的自由度。
+\DeclareLectureTerm{homogeneous-recurrence}{齐次递推}{Homogeneous Recurrence}{没有外部输入的线性状态更新，如 $\boldsymbol x_{k+1}=F\boldsymbol x_k$；全部解序列对逐项加法和数乘封闭。}
+\DeclareLectureTerm{nonhomogeneous-recurrence}{非齐次递推}{Nonhomogeneous Recurrence}{带不恒为零的给定外部输入的线性状态更新，如 $\boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u_k$；其通解是一串特解加任意齐次解序列。}
+\DeclareLectureTerm{discrete-linear-system}{离散线性动力系统}{Discrete-Time Linear Dynamical System}{按离散时刻用线性规则更新状态的系统，如 $\boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u_k$；解是一串状态记录。}
+\DeclareLectureTerm{homogeneous-solution-space}{齐次解空间}{Homogeneous Solution Space}{齐次线性方程全部解在相应加法与数乘下构成的向量空间；动态系统中，其元素是解序列或解函数，不能与平衡状态的零空间混同。}
+\DeclareLectureTerm{transient-response}{暂态响应}{Transient Response}{在本书选读的衰减模型中，由初始状态偏离特解所产生、并随时间消失的齐次响应；一般齐次偏离未必衰减。}
+\DeclareLectureTerm{viscous-damping}{黏性阻尼}{Viscous Damping}{采用阻力与速度成正比、方向相反的线性近似；在一维教学模型中写为 $-c\dot x$。}
+\DeclareLectureTerm{phase-plane}{状态平面}{Phase Plane}{用二维状态的两个分量作为坐标形成的平面；点代表状态，曲线代表状态演化，不一定是物体运动的实际空间。}
+\DeclareLectureTerm{streamline}{流线}{Streamline}{在自治矢量场中处处与场向量相切的曲线；本书连续系统中用作状态轨线的几何描述。}
+\DeclareLectureTerm{stable-node}{稳定结点}{Stable Node}{附近状态向平衡点靠近而不绕行的典型线性矢量场形态；本节通过两个分量分别衰减的例子观察。}
+\DeclareLectureTerm{saddle-point}{鞍点}{Saddle Point}{有的方向靠近平衡点、有的方向离开的矢量场形态；本节通过一个分量增长、另一个分量衰减的例子观察。}
+\DeclareLectureTerm{center}{中心}{Center}{附近非平衡状态沿闭合轨线绕行的典型矢量场形态；本书用二维圆周运动模型建立直观。}
+\DeclareLectureTerm{steady-state-response}{稳态响应}{Steady-State Response}{在本节周期受迫且齐次偏离衰减的模型中，长期保留下来的周期响应；稳态不意味着状态静止，一般特解不一定是稳态响应。}

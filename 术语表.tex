@@ -28,6 +28,7 @@
 \GlossaryLetter{C}
 \GlossaryEntry{加法消去律}{Cancellation Law for Addition}{由 $\boldsymbol u+\boldsymbol w=\boldsymbol v+\boldsymbol w$ 可推出 $\boldsymbol u=\boldsymbol v$。}
 \GlossaryEntry{柯西--施瓦茨不等式}{Cauchy-Schwarz Inequality}{实向量点积的绝对值不超过两向量长度之积；保证非零向量夹角余弦公式的取值在 $[-1,1]$ 内，第7章给出证明。}
+\GlossaryEntry{中心}{Center}{附近非平衡状态沿闭合轨线绕行的典型矢量场形态；本书用二维圆周运动模型建立直观。}
 \GlossaryEntry{基变换}{Change of Basis}{改变描述向量所用的有序基，从而改变坐标表示；向量本身不变。第4章选读讨论坐标转换。}
 \GlossaryEntry{过渡矩阵}{Change-of-Coordinates Matrix}{把同一向量在一组有序基下的坐标转换到另一组基下的坐标的可逆矩阵；必须同时指明输入基与输出基。}
 \GlossaryEntry{对运算封闭}{Closure under an Operation}{集合中允许的元素按指定运算组合后，结果仍属于该集合。}
@@ -66,6 +67,7 @@
 \GlossaryEntry{有向角}{Directed Angle}{同时记录转动大小与方向的角；本附录约定逆时针为正、顺时针为负。}
 \GlossaryEntry{方向余弦矩阵}{Direction Cosine Matrix}{两组单位且两两垂直的基之间的坐标过渡矩阵；第 $(i,j)$ 个元素为旧基第 $i$ 个向量与新基第 $j$ 个向量的夹角余弦，须注明换算方向。}
 \GlossaryEntry{离散余弦变换}{Discrete Cosine Transform}{把有限个采样值改写为不同余弦模式的系数；本书使用规范化的二型DCT，完整保留系数时可以逆变换恢复输入。}
+\GlossaryEntry{离散线性动力系统}{Discrete-Time Linear Dynamical System}{按离散时刻用线性规则更新状态的系统，如 $\boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u_k$；解是一串状态记录。}
 \GlossaryEntry{分配律}{Distributive Law}{数乘对向量加法与标量加法分别满足分配规则。}
 \GlossaryEntry{定义域}{Domain}{映射允许的全部输入组成的集合；对 $T:\mathbb R^n\to \mathbb R^m$，定义域为 $\mathbb R^n$。}
 \GlossaryEntry{数量积（点积）}{Dot Product}{实向量对应分量乘积之和；在二维、三维中等于两向量长度之积乘夹角余弦，零向量与任意向量的点积为0。}
@@ -113,6 +115,8 @@
 \GlossaryEntry{齐次性}{Homogeneity}{映射保持数乘的性质，即对所有实数 $c$ 和允许的向量 $\boldsymbol x$ 有 $T(c\boldsymbol x)=cT(\boldsymbol x)$。}
 \GlossaryEntry{齐次坐标}{Homogeneous Coordinates}{用增加一个分量的方式表示几何点；本章把二维点记为 $(x,y,1)^{\mathrm T}$，以三阶矩阵统一表示平移与线性作用。}
 \GlossaryEntry{齐次线性方程组}{Homogeneous Linear System}{常数项全为0的线性方程组 $A\boldsymbol x=\boldsymbol 0$，必有零解。}
+\GlossaryEntry{齐次递推}{Homogeneous Recurrence}{没有外部输入的线性状态更新，如 $\boldsymbol x_{k+1}=F\boldsymbol x_k$；全部解序列对逐项加法和数乘封闭。}
+\GlossaryEntry{齐次解空间}{Homogeneous Solution Space}{齐次线性方程全部解在相应加法与数乘下构成的向量空间；动态系统中，其元素是解序列或解函数，不能与平衡状态的零空间混同。}
 \GlossaryEntry{超平面}{Hyperplane}{$\mathbb R^n$ 中维数为 $n-1$ 的仿射子空间；可由一条系数不全为零的线性方程描述。}
 \GlossaryLetter{I}
 \GlossaryEntry{恒等映射}{Identity Map}{把每个输入原样输出的映射，$I(\boldsymbol x)=\boldsymbol x$，其标准基矩阵为单位矩阵。}
@@ -172,6 +176,7 @@
 \GlossaryEntry{$n$ 维实向量}{n-Dimensional Real Vector}{由 $n$ 个实数按固定次序组成的数组，是 $\mathbb R^n$ 的元素。}
 \GlossaryEntry{负矩阵}{Negative Matrix}{将原矩阵各元素变号所得的矩阵，表示把原映射的每个输出取相反向量。}
 \GlossaryEntry{非齐次线性方程组}{Nonhomogeneous Linear System}{至少有一个常数项不为0的线性方程组 $A\boldsymbol x=\boldsymbol b$。}
+\GlossaryEntry{非齐次递推}{Nonhomogeneous Recurrence}{带不恒为零的给定外部输入的线性状态更新，如 $\boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u_k$；其通解是一串特解加任意齐次解序列。}
 \GlossaryEntry{非零解}{Nontrivial Solution}{分量不全为0的解向量；不要求每个分量都非零。}
 \GlossaryEntry{正规方程}{Normal Equations}{最小二乘问题对应的线性方程组 $A^{\mathrm T}A\boldsymbol x=A^{\mathrm T}\boldsymbol b$；它始终有解，全部解构成原矩阵零空间的一次平移。}
 \GlossaryEntry{复数的 $n$ 次根}{nth Root of a Complex Number}{满足 $w^n=z$ 的复数 $w$；非零复数有 $n$ 个互异的 $n$ 次根。}
@@ -195,6 +200,7 @@
 \GlossaryEntry{特解}{Particular Solution}{一个确实满足给定方程组的具体解；一个特解未必代表全部解。}
 \GlossaryEntry{被动旋转}{Passive Rotation}{向量不动，转动描述它的坐标架；新坐标由对应主动旋转矩阵的逆矩阵换算。}
 \GlossaryEntry{置换矩阵}{Permutation Matrix}{单位矩阵的行重新排列所得矩阵，每行每列恰有一个1；左乘它可重排行，且 $P^{-1}=P^{\mathrm T}$。}
+\GlossaryEntry{状态平面}{Phase Plane}{用二维状态的两个分量作为坐标形成的平面；点代表状态，曲线代表状态演化，不一定是物体运动的实际空间。}
 \GlossaryEntry{主元}{Pivot}{阶梯形非零行的首个非零元素，用于组织消元与确定主元变量。}
 \GlossaryEntry{主元列}{Pivot Column}{阶梯形中含主元的列；原矩阵对应列号的列可用于选取极大无关组。}
 \GlossaryEntry{主元位置}{Pivot Position}{阶梯形中主元所在的位置；讨论原矩阵时指与化简后主元对应的位置。}
@@ -240,6 +246,7 @@
 \GlossaryEntry{行空间}{Row Space}{矩阵各行竖排后张成的空间，等于转置矩阵的列空间；$m\times n$ 矩阵的行空间是 $\mathbb R^n$ 的子空间。第3.5节从转置引入。}
 \GlossaryEntry{行向量}{Row Vector}{将分量按固定次序横排得到的向量形式，是相应列向量的转置。}
 \GlossaryLetter{S}
+\GlossaryEntry{鞍点}{Saddle Point}{有的方向靠近平衡点、有的方向离开的矢量场形态；本节通过一个分量增长、另一个分量衰减的例子观察。}
 \GlossaryEntry{标量}{Scalar}{来自所选域、用于数乘向量的数。}
 \GlossaryEntry{数乘}{Scalar Multiplication}{以一个标量乘一个向量；在 $\mathbb R^n$ 中，每个分量都乘同一个数。}
 \GlossaryEntry{映射的数乘}{Scalar Multiplication of a Map}{把映射的每个输出同乘标量，$(\lambda T)(\boldsymbol x)=\lambda T(\boldsymbol x)$。}
@@ -260,10 +267,13 @@
 \GlossaryEntry{张成空间}{Span}{给定向量组的全部线性组合构成的集合，是包含该组向量的最小子空间。}
 \GlossaryEntry{生成组}{Spanning Set}{能够张成给定空间的向量组，不要求线性无关。}
 \GlossaryEntry{方阵}{Square Matrix}{行数与列数相同的矩阵；$n\times n$ 方阵称为 $n$ 阶方阵。}
+\GlossaryEntry{稳定结点}{Stable Node}{附近状态向平衡点靠近而不绕行的典型线性矢量场形态；本节通过两个分量分别衰减的例子观察。}
 \GlossaryEntry{标准基}{Standard Basis}{在 $\mathbb R^n$ 中由 $\boldsymbol e_1,\ldots ,\boldsymbol e_n$ 组成的有序基，第 $i$ 个向量仅第 $i$ 分量为1。}
 \GlossaryEntry{状态向量}{State Vector}{把模型中足以描述当前状态、并结合更新规则与输入确定后续演化的量有序排成的向量；其分量与所选模型有关。}
 \GlossaryEntry{状态转移矩阵}{State-Transition Matrix}{在线性离散模型中把当前状态映到下一状态的矩阵；本书以固定矩阵$F$和无外部输入的关系$\boldsymbol x_{k+1}=F\boldsymbol x_k$作初步说明。}
+\GlossaryEntry{稳态响应}{Steady-State Response}{在本节周期受迫且齐次偏离衰减的模型中，长期保留下来的周期响应；稳态不意味着状态静止，一般特解不一定是稳态响应。}
 \GlossaryEntry{刚度矩阵}{Stiffness Matrix}{在线性结构模型中把节点位移映射为平衡外力的矩阵；本章三节点教学模型写成 $K\boldsymbol u=\boldsymbol f$。}
+\GlossaryEntry{流线}{Streamline}{在自治矢量场中处处与场向量相切的曲线；本书连续系统中用作状态轨线的几何描述。}
 \GlossaryEntry{严格对角占优}{Strict Diagonal Dominance}{本书采用按行条件：每行主对角元绝对值严格大于其余元素绝对值之和；它是无换行LU消元可行的一类充分条件。}
 \GlossaryEntry{子空间}{Subspace}{沿用母空间运算、对加法和数乘封闭的非空子集。}
 \GlossaryEntry{代入消元法}{Substitution Method}{先由一个方程表示某未知数，再代入其他方程以减少未知数的方法。}
@@ -274,6 +284,7 @@
 \GlossaryLetter{T}
 \GlossaryEntry{泰勒多项式}{Taylor Polynomial}{用函数在某一点的有限阶导数作系数构造的多项式，本书用于选读的函数近似例子。}
 \GlossaryEntry{词元}{Token}{分词器按规则将文本切分得到的基本处理单元，可为完整的词、词的一部分或标点等，不必与汉字或自然语言中的词一一对应。模型先将其映射为初始向量，再通过后续计算融入上下文信息。}
+\GlossaryEntry{暂态响应}{Transient Response}{在本书选读的衰减模型中，由初始状态偏离特解所产生、并随时间消失的齐次响应；一般齐次偏离未必衰减。}
 \GlossaryEntry{传递性}{Transitivity}{若对象一与二、二与三具有某种关系，则对象一与三也具有该关系。}
 \GlossaryEntry{转置}{Transpose}{行列互换的操作；对向量即横排与竖排互换，记作上标 $\mathrm T$。}
 \GlossaryEntry{三角形定则}{Triangle Rule}{把两个向量首尾相接，从第一支起点指向第二支终点的向量表示它们的和。}
@@ -296,6 +307,7 @@
 \GlossaryEntry{向量组}{Vector List}{按次序列出的有限个向量，允许出现重复向量和零向量。}
 \GlossaryEntry{向量空间}{Vector Space}{配有封闭的加法与数乘并满足相应八条运算公理的非空集合。}
 \GlossaryEntry{向量减法}{Vector Subtraction}{加上相反向量的运算，$\boldsymbol u-\boldsymbol v=\boldsymbol u+(-\boldsymbol v)$。}
+\GlossaryEntry{黏性阻尼}{Viscous Damping}{采用阻力与速度成正比、方向相反的线性近似；在一维教学模型中写为 $-c\dot x$。}
 \GlossaryLetter{W}
 \GlossaryEntry{权重矩阵}{Weight Matrix}{包含模型可训练系数、用于线性映射的矩阵；注意力中的 $A$ 也称权重矩阵，但它由当前输入计算得到，与可训练投影参数 $W_Q,W_K,W_V$ 不同。}
 \GlossaryEntry{全空间}{Whole Space}{所讨论的整个向量空间，它也是自身的子空间。}

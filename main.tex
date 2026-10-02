@@ -12961,168 +12961,580 @@ n=\dim\FNull A+\FRank(A).
 \clearpage
 % CHAPTER 5 LEAST SQUARES END
 
+% 动态选读：只替换原有两节；字母图号随当前节号自动生成。
+\newcommand{\FiveDynFigure}[4]{%
+ \begin{figure}[htbp]\centering
+ \renewcommand{\thefigure}{\thesection#1}%
+ \renewcommand{\theHfigure}{five.dynamic.\thesection.#1}%
+ #4\par\caption{#2}\label{#3}
+ \end{figure}\FloatBarrier}
+% 统一比例的箭头；三种场使用同一坐标范围与箭头缩放。
+\newcommand{\FiveFieldAxes}{%
+ \draw[FiveK!15,step=1] (-2.25,-2.25) grid (2.25,2.25);
+ \draw[fiveax] (-2.4,0)--(2.45,0) node[right] {$y_1$};
+ \draw[fiveax] (0,-2.4)--(0,2.45) node[above] {$y_2$};}
+\newcommand{\FiveFieldNode}{%
+ \FiveFieldAxes
+ \foreach \xx in {-2,-1,0,1,2}{\foreach \yy in {-2,-1,0,1,2}{
+  \draw[FiveB,-{Stealth[length=1.3mm]},line width=.55pt]
+   (\xx,\yy)--({.86*\xx},{.72*\yy});}}
+ \foreach \sx in {-1,1}{\foreach \sy in {-1,1}{
+  \draw[FiveG,line width=.9pt,domain=.07:2,samples=35]
+   plot ({\sx*\x},{\sy*.45*\x*\x});
+  \draw[FiveG,-{Stealth[length=1.5mm]},domain=1.25:1.1,samples=12]
+   plot ({\sx*\x},{\sy*.45*\x*\x});}}
+ \fill[FiveR] (0,0) circle(1.8pt);}
+\newcommand{\FiveFieldSaddle}{%
+ \FiveFieldAxes
+ \foreach \xx in {-2,-1,0,1,2}{\foreach \yy in {-2,-1,0,1,2}{
+  \draw[FiveB,-{Stealth[length=1.3mm]},line width=.55pt]
+   (\xx,\yy)--({1.14*\xx},{.86*\yy});}}
+ \foreach \sx in {-1,1}{\foreach \sy in {-1,1}{
+  \draw[FiveG,line width=.9pt,domain=.3:2.15,samples=40]
+   plot ({\sx*\x},{\sy*.6/\x});
+  \draw[FiveG,-{Stealth[length=1.5mm]},domain=.95:1.1,samples=12]
+   plot ({\sx*\x},{\sy*.6/\x});}}
+ \fill[FiveR] (0,0) circle(1.8pt);}
+\newcommand{\FiveFieldCenter}{%
+ \FiveFieldAxes
+ \foreach \xx in {-2,-1,0,1,2}{\foreach \yy in {-2,-1,0,1,2}{
+  \draw[FiveB,-{Stealth[length=1.3mm]},line width=.55pt]
+   (\xx,\yy)--({\xx-.14*\yy},{\yy+.14*\xx});}}
+ \foreach \rr in {.7,1.35,2}{
+  \draw[FiveG,line width=.9pt] (0,0) circle(\rr);
+  \draw[FiveG,-{Stealth[length=1.5mm]}]
+   (\rr,0) arc[start angle=0,end angle=25,radius=\rr];}
+ \fill[FiveR] (0,0) circle(1.8pt);}
+
 \section{【选读】从斐波那契到状态递推：\mbox{离散系统中的线性代数}}
 \label{sec:five-discrete}
 
-\textbf{本节为拓展内容，不做考核要求。}一个库存记录或递推数列，不只问“现在等于多少”，还问“下一次怎样由这次得到”。若更新规则是线性的，就可以让矩阵反复作用，把静态的向量关系扩展到一串状态。
+\textbf{选读·不做考核要求。}第五章前面问的是“状态满足什么约束”，工程中还常问“状态怎样一步步演化”。后一类问题由\term{discrete-linear-system}描述。本节的库存比例、数量和图示均为教学简化模型，不代表真实仓储系统的完整设计。我们仍然关心同一件事：齐次解如何组成空间，非齐次解如何由一个特解生成，平衡状态又有多少自由度。
 
-\FiveHead{把两项记忆，装进一个状态向量}
-取斐波那契数列 $F_0=0,F_1=1$，满足 $F_{k+2}=F_{k+1}+F_k$。计算下一项，需要同时记住当前两项，所以定义状态 $\boldsymbol s_k=(F_{k+1},F_k)^{\mathrm T}$。更新规则便成为
+\FiveHead{先看一晚的调拨：今天的库存，怎样变成明天的库存？}
+设两个相邻仓库分别记为A仓、B仓。每晚，A仓把原库存的70\%留在本仓、30\%调往B仓；B仓把原库存的60\%留在本仓、40\%调往A仓。随后向A仓补货10单位，B仓暂不补货。所有比例均针对调拨前的库存计算，两个方向的调拨同时完成。把第 $k$ 天的库存排成\term{state-vector} $\boldsymbol x_k=(x_{A,k},x_{B,k})^{\mathrm T}$，便有
+\begin{equation}
+ \begin{cases}
+ x_{A,k+1}=0.7x_{A,k}+0.4x_{B,k}+u_A,\\
+ x_{B,k+1}=0.3x_{A,k}+0.6x_{B,k}+u_B,
+ \end{cases}
+ \qquad u_A=10,\quad u_B=0.
+ \label{eq:five-warehouse-update}
+\end{equation}
+第一行数清明天A仓的三份来源，第二行数清明天B仓的三份来源；给定今天的库存，明天便能确定。
+
+\FiveDynFigure{a}{两仓库存调拨：按原库存同时调拨，再补入新货。}{fig:five-inventory}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fivebox] (0,0) rectangle(3.8,2.1);
+ \draw[fivebox] (8.3,0) rectangle(12.1,2.1);
+ \node[font=\bfseries] at (1.9,1.55) {A仓};
+ \node at (1.9,.65) {自留 $0.7x_{A,k}$};
+ \node[font=\bfseries] at (10.2,1.55) {B仓};
+ \node at (10.2,.65) {自留 $0.6x_{B,k}$};
+ \draw[fiveb] (3.85,1.65)--node[above] {$0.3x_{A,k}$} (8.25,1.65);
+ \draw[fiveg] (8.25,.45)--node[below] {$0.4x_{B,k}$} (3.85,.45);
+ \draw[fiver] (1.9,3.2)--node[right] {补货 $u_A=10$} (1.9,2.15);
+ \node[text=FiveK] at (6.05,-.9) {调拨只换仓库，不减少两仓的总库存};
+\end{tikzpicture}}
+
+这个场景有一个值得先问的现实问题：只补货、不出库，库存会不会停下来？把两行相加，得到
+\begin{equation}
+ x_{A,k+1}+x_{B,k+1}=x_{A,k}+x_{B,k}+10.
+\end{equation}
+总库存每天增加10单位，所以这里\textbf{不存在固定不变的平衡库存}。调拨只能重新分配库存，不能把新增货物消耗掉。先看清这一点，才不会因公式里出现“平衡态”三个字，就误以为任何系统都能回到平衡。
+
+\FiveHead{先从最熟悉的递推入门：把两项记忆装进一个向量}
+库存需要记住两个仓库的数量，斐波那契数列也需要记住两个相邻项。取 $F_0=0,F_1=1$，\term{recurrence-relation}为
+\begin{equation}
+ F_{k+2}=F_{k+1}+F_k,\qquad
+ \boldsymbol s_k=(F_{k+1},F_k)^{\mathrm T}.
+\end{equation}
+把“后一项、前一项”一起记住，下一次更新便不需要再回头查找。
 \begin{equation}
  \boldsymbol s_{k+1}=M\boldsymbol s_k,\qquad
  M=\FiveMat{rr}{1&1\\1&0},\qquad \boldsymbol s_0=(1,0)^{\mathrm T}.
+ \label{eq:five-fibonacci-state}
 \end{equation}
-\Needspace{4\baselineskip}
-第一行把两项相加，第二行把原第一项移到第二个位置。它是一条\term{recurrence-relation}的矩阵表示。反复应用矩阵乘法，得到
-\begin{equation}
- \boldsymbol s_1=M\boldsymbol s_0,\quad
- \boldsymbol s_2=M^2\boldsymbol s_0,\quad
- \boldsymbol s_k=M^k\boldsymbol s_0.
-\end{equation}
-第三章的矩阵的幂在这里有了直接含义：$M^k$ 记录 $k$ 次更新的复合，并不需要先寻找一个新的运算规则。
+矩阵第一行把两项相加，第二行把原来的后一项保存下来；一个二阶数列递推就变成了向量的一阶更新。
 
-\FiveFigure{斐波那契递推：每一步用同一个矩阵更新两项记忆。}{fig:five-fibonacci}{%
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \foreach \xx/\kk/\aa/\bb in {0/0/1/0,3.8/1/1/1,7.6/2/2/1,11.4/3/3/2}{
-  \draw[fivebox] (\xx,0) rectangle ++(3,2.4);
-  \node at (\xx+1.5,1.9) {$\boldsymbol s_{\kk}$};
-  \node[text=FiveB] at (\xx+1.5,1) {$\FiveMat{r}{\aa\\\bb}$};}
- \foreach \xx in {3.05,6.85,10.65}{\draw[fiveb] (\xx,1.2)--(\xx+.7,1.2) node[midway,above] {$M$};}
+\FiveDynFigure{b}{斐波那契的状态轨迹：状态按同一规则逐步跳跃。}{fig:five-fibonacci}{%
+\begin{tikzpicture}[font=\small,x=1.2cm,y=1.2cm]
+ \draw[FiveK!15,step=1] (0,0) grid(5.5,3.5);
+ \draw[fiveax] (0,0)--(5.9,0) node[right] {$F_{k+1}$};
+ \draw[fiveax] (0,0)--(0,3.9) node[above] {$F_k$};
+ \draw[fiveg] (1,0)--(1,1);\draw[fiveg] (1,1)--(2,1);
+ \draw[fiveg] (2,1)--(3,2);\draw[fiveg] (3,2)--(5,3);
+ \foreach \xx/\yy/\kk in {1/0/0,1/1/1,2/1/2,3/2/3,5/3/4}{
+  \fill[FiveR] (\xx,\yy) circle(2pt);
+  \node[above left,font=\footnotesize] at (\xx,\yy) {$\boldsymbol s_{\kk}$};}
+ \node[anchor=west,text=FiveK] at (6.05,2.45) {$\boldsymbol s_0=(1,0)^{\mathrm T}$};
+ \node[anchor=west,text=FiveK] at (6.05,1.85) {$\boldsymbol s_4=(5,3)^{\mathrm T}$};
+ \node[anchor=west,text=FiveK,font=\footnotesize] at (6.05,1.05) {折线只连接离散记录};
+ \node[anchor=west,text=FiveK,font=\footnotesize] at (6.05,.6) {不表示点之间的连续运动};
 \end{tikzpicture}}
-{状态中两项的顺序固定为“后一项、前一项”。矩阵相乘既计算新项，也把旧项移到下一次更新所需的位置。}
 
-\FiveHead{有外部输入时，平衡状态要解哪一个方程}
-有进货、消耗或调拨的系统，通常需要加一个输入。先考察输入固定的教学模型
+只要有限阶线性递推能够从已知项确定下一项，就可以把所需的若干项并排装入状态向量，改写为一阶矩阵递推。“阶数降低、分量增加”只是记忆方式改变，原来的更新规则没有丢失。
+
+\FiveHead{抽象出共同规则：同一个矩阵，反复作用}
+斐波那契的 $M$ 和库存的调拨矩阵承担同一类任务。一般地，令 $F$ 为 $n$ 阶矩阵，$E$ 为同阶单位矩阵；无外部输入与有常数输入的更新分别写成
 \begin{equation}
+ \boldsymbol x_{k+1}=F\boldsymbol x_k,
+ \qquad
  \boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u.
  \label{eq:five-forced-discrete}
 \end{equation}
-若某个状态在更新后不改变，就称为\term{equilibrium-state}，记作 $\boldsymbol x_*$。令更新前后都等于它，得到
+前式称为\term{homogeneous-recurrence}；后式在输入非零时称为\term{nonhomogeneous-recurrence}。$F$ 称为\term{state-transition-matrix}，输入 $\boldsymbol u$ 是每次更新额外加入的量；库存例中
+\begin{equation}
+ F=\FiveMat{rr}{0.7&0.4\\0.3&0.6},\qquad
+ \boldsymbol u=(10,0)^{\mathrm T}.
+\end{equation}
+矩阵记录“怎样调拨”，输入向量记录“额外补入什么”；二者职责不同。
+
+\begin{example}[把库存连续更新三晚]
+从 $\boldsymbol x_0=(100,50)^{\mathrm T}$ 出发，按上述调拨与补货规则求三次记录。
+\end{example}
+\textbf{解}\quad 第一次，A仓为 $0.7\times100+0.4\times50+10=100$，B仓为 $0.3\times100+0.6\times50=60$。继续把新记录代回相同规则：
+\begin{equation}
+ \boldsymbol x_1=(100,60)^{\mathrm T},\qquad
+ \boldsymbol x_2=(104,66)^{\mathrm T},\qquad
+ \boldsymbol x_3=(109.2,70.8)^{\mathrm T}.
+\end{equation}
+三次总库存依次为160、170、180，验证了每天净增10单位，而非向某个固定库存靠近。
+
+\FiveDynFigure{c}{库存的逐步更新：同一矩阵与输入，联系每晚的记录。}{fig:five-discrete-hand-steps}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \foreach \xx/\kk/\aa/\bb/\tt in {0/0/100/50/150,4/1/100/60/160,8/2/104/66/170,12/3/109.2/70.8/180}{
+  \draw[fivebox] (\xx,0) rectangle ++(2.7,2.6);
+  \node at (\xx+1.35,2.1) {$\boldsymbol x_{\kk}$};
+  \node[text=FiveB] at (\xx+1.35,1.3) {$\FiveMat{r}{\aa\\\bb}$};
+  \node[font=\footnotesize,text=FiveK] at (\xx+1.35,.35) {合计 \tt};}
+ \foreach \xx in {2.8,6.8,10.8}{
+  \draw[fiveg] (\xx,1.3)--(\xx+1.1,1.3);
+  \node[font=\scriptsize,above] at (\xx+.55,1.4) {$F\boldsymbol x+\boldsymbol u$};}
+\end{tikzpicture}}
+
+\FiveHead{齐次解为什么仍然组成一个空间？}
+这里的解不是一个静止向量，而是一整串记录 $(\boldsymbol x_0,\boldsymbol x_1,\ldots)$。两串齐次解 $\boldsymbol a_k,\boldsymbol b_k$ 满足同一规则；逐项作线性组合，便有
+\begin{equation}
+ c\boldsymbol a_{k+1}+d\boldsymbol b_{k+1}
+ =F(c\boldsymbol a_k+d\boldsymbol b_k).
+\end{equation}
+所以两串解的线性组合还是解，零序列也是解，全部齐次解序列构成\term{homogeneous-solution-space}。这与代数方程 $A\boldsymbol x=\boldsymbol0$ 的解空间同源，只是空间中的元素改成了序列。
+
+给定初始状态后，下一项、下下项都依次确定。先算前两次，再归纳到第 $k$ 次：
+\begin{equation}
+ \boldsymbol x_1=F\boldsymbol x_0,\quad
+ \boldsymbol x_2=F(F\boldsymbol x_0)=F^2\boldsymbol x_0,\quad
+ \boldsymbol x_k=F^k\boldsymbol x_0,\qquad F^0=E.
+\end{equation}
+$F^k$ 就是“更新 $k$ 次”的线性映射矩阵，呼应第三章“矩阵乘法对应映射复合”。
+
+取标准基 $\mathbf e_1,\ldots,\mathbf e_n$ 分别作为初值，得到 $n$ 串解 $F^k\mathbf e_j$。任意初值是这些标准基的线性组合，因而任意齐次解序列也是这 $n$ 串解的线性组合。若它们的一组线性组合在所有时刻都为零，考察 $k=0$ 就得到各系数都为零。于是\textbf{全部齐次解序列的空间维数为 $n$；固定初值后，只有一条解序列。}这个 $n$ 不是 $\dim\Nul(F)$：例如 $F=E$ 时，每个初值生成一串常值记录，而 $\Nul(E)$ 只含零向量。
+
+\FiveHead{非齐次通解：先找到一串记录，再加上齐次变化}
+若 $\boldsymbol p_k$ 是同一输入下的一串特解，把任意解与它相减，外部输入恰好抵消：
+\begin{equation}
+ \boldsymbol z_{k+1}
+ =\boldsymbol x_{k+1}-\boldsymbol p_{k+1}
+ =(F\boldsymbol x_k+\boldsymbol u)-(F\boldsymbol p_k+\boldsymbol u)
+ =F\boldsymbol z_k.
+\end{equation}
+两串非齐次解之差是一串齐次解。反过来，把任意齐次解加到特解上，代回更新式仍然成立。因此
+\begin{equation}
+ \boldsymbol x_k=\boldsymbol p_k+F^k(\boldsymbol x_0-\boldsymbol p_0).
+ \label{eq:five-discrete-general}
+\end{equation}
+这就是第五章“特解加全部齐次解”的动态版本；$\boldsymbol p_k$ 可以变化，不必是固定的平衡状态。输入改为给定的 $\boldsymbol u_k$ 时，相减证明也完全成立。
+
+\FiveHead{平衡状态：动态问题中嵌着一个代数方程组}
+若更新后状态不变，称为\term{equilibrium-state}，记为 $\boldsymbol x_*$。把“不变”代入递推，再移项，得到
 \begin{equation}
  \boldsymbol x_*=F\boldsymbol x_*+\boldsymbol u
  \quad\Longleftrightarrow\quad
  (E-F)\boldsymbol x_*=\boldsymbol u.
  \label{eq:five-discrete-equilibrium}
 \end{equation}
-所以平衡状态是否存在，由 $\Col(E-F)$ 决定；存在时，其集合是一个特解加 $\Nul(E-F)$。\textbf{这里决定平衡自由度的是 $E-F$，不是更新矩阵 $F$ 的零空间。}
+平衡状态是一串常值特解；求它时，未知量又回到了一个向量，能够直接使用本章代数方程组的理论。
 
-若平衡状态存在，令 $\boldsymbol z_k=\boldsymbol x_k-\boldsymbol x_*$，减去平衡关系就得到
-\begin{align}
- \boldsymbol z_{k+1}&=F\boldsymbol z_k,\\
- \boldsymbol x_k&=\boldsymbol x_*+F^k(\boldsymbol x_0-\boldsymbol x_*),\qquad k\geq0.
- \label{eq:five-discrete-shift}
-\end{align}
-这正是“平衡状态加随时间演化的偏离”。偏离可能缩小、保持，也可能增大，例如一维更新 $z_{k+1}=2z_k$ 会使非零偏离按 $2^k$ 增长。不能只凭叠加形式，就断言系统会回到平衡状态。
-
-\Needspace{10\baselineskip}
-\begin{example}[两个仓库的逐月更新]
-设某教学库存模型每月更新一次：一仓现有库存的一半留在一仓，四分之一转入二仓，其余出库；二仓现有库存的一半留存，其余出库；每次更新另向一仓补入10单位。以 $\boldsymbol x_k$ 记录第 $k$ 次更新后的两仓库存，初始状态为零。写出前三次记录及平衡状态。
-\end{example}
-\textbf{解}\quad 规则直接给出
+先判断 $\boldsymbol u\in\Col(E-F)$，否则平衡状态不存在。有解时，任选一个 $\boldsymbol x_{*,p}$，全部平衡状态为
 \begin{equation}
- F=\FiveMat{rr}{\tfrac12&0\\\tfrac14&\tfrac12},\qquad
- \boldsymbol u=(10,0)^{\mathrm T},\qquad \boldsymbol x_0=(0,0)^{\mathrm T}.
+ \boldsymbol x_{*,p}+\Nul(E-F),\qquad
+ \text{平衡自由度}=n-r(E-F).
 \end{equation}
-依次更新三次，而不是求一张新的消元表：
-\begin{align}
- \boldsymbol x_1&=(10,0)^{\mathrm T},\\
- \boldsymbol x_2&=(15,\tfrac52)^{\mathrm T},\\
- \boldsymbol x_3&=(\tfrac{35}{2},5)^{\mathrm T}.
-\end{align}
-平衡状态满足 $\tfrac12x_{*,1}=10$、$-\tfrac14x_{*,1}+\tfrac12x_{*,2}=0$，解得 $\boldsymbol x_*=(20,10)^{\mathrm T}$。$E-F$ 的两个主元非零，故这个平衡状态唯一。把它代入原更新规则，仍得到 $(20,10)^{\mathrm T}$，验证了“更新后不变”。
+\textbf{决定平衡自由度的是 $E-F$ 的零空间，不是 $F$ 的零空间。}有解且零空间只含零向量时平衡状态唯一；有解且零空间维数大于0时有无穷多个平衡状态。由于 $E-F$ 是方阵，可逆时任何常数输入都对应唯一平衡状态。
 
-\FiveFigure{库存记录与平衡状态：同一更新规则联系一串状态。}{fig:five-inventory}{%
+在开头的库存模型中，$E-F$ 两行互为相反数：
+\begin{equation}
+ E-F=\FiveMat{rr}{0.3&-0.4\\-0.3&0.4}.
+\end{equation}
+所以平衡方程两行相加必须给出 $u_A+u_B=0$。只向A仓补货的 $(10,0)^{\mathrm T}$ 不满足这一条件，正是“目标不在列空间内”的工程解释。
+
+若没有补货也没有出库，平衡关系变成 $0.3x_A=0.4x_B$，全部代数平衡状态为 $t(4,3)^{\mathrm T}$。其自由度为1，因为总库存尚未指定；若另给定总库存，就在这条线上选定一个点。无需调拨比例完全对称，这种自由度来自总库存守恒。实际库存还要求分量非负，因此工程上只取其中合适的部分，这不改变代数方程的解空间结论。
+
+\FiveDynFigure{d}{平衡状态的自由度：有解时，由 $\Nul(E-F)$ 的维数决定。}{fig:five-equilibrium-freedom}{%
 \begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \draw[fivebox] (0,1.3) rectangle(2.2,3.1);\node at (1.1,2.6) {一仓};
- \node[font=\footnotesize] at (1.1,1.85) {留存 $\tfrac12$};
- \draw[fivebox] (4.2,1.3) rectangle(6.4,3.1);\node at (5.3,2.6) {二仓};
- \node[font=\footnotesize] at (5.3,1.85) {留存 $\tfrac12$};
- \draw[fiveb] (2.3,2.2)--(4.1,2.2) node[midway,above] {调拨 $\tfrac14$};
- \draw[fiver] (1.1,.3)--(1.1,1.2) node[midway,right,font=\footnotesize] {补入10};
- \draw[fiveax] (8,.7)--(13.3,.7) node[right,font=\footnotesize] {一仓};
- \draw[fiveax] (8,.7)--(8,3.4) node[above,font=\footnotesize] {二仓};
- \draw[fiveg] (8,.7)--(10.2,.7);\draw[fiveg] (10.2,.7)--(11.3,1.15);
- \draw[fiveg] (11.3,1.15)--(11.85,1.6);
- \foreach \xx/\yy/\kk in {8/.7/0,10.2/.7/1,11.3/1.15/2,11.85/1.6/3}
-  \fill[FiveG] (\xx,\yy) circle(2pt);
- \node[below left,font=\footnotesize] at (8,.7) {$\boldsymbol x_0$};
- \node[below,font=\footnotesize] at (10.2,.7) {$\boldsymbol x_1$};
- \node[right,font=\footnotesize] at (11.3,1.15) {$\boldsymbol x_2$};
- \node[right,font=\footnotesize] at (11.85,1.6) {$\boldsymbol x_3$};
- \fill[FiveR] (12.4,2.5) circle(2.5pt) node[above right] {$\boldsymbol x_*=(20,10)^{\mathrm T}$};
+ \begin{scope}
+  \draw[fiveax] (0,0)--(5,0) node[right] {$x_A$};
+  \draw[fiveax] (0,0)--(0,3.6) node[above] {$x_B$};
+  \fill[FiveR] (3.4,1.6) circle(2.8pt);
+  \node[above,text=FiveR] at (3.4,1.8) {$\boldsymbol x_*$};
+  \node[align=center] at (2.4,-.75) {唯一平衡点\\$\dim\Nul(E-H)=0$};
+  \node[font=\footnotesize,text=FiveK] at (2.4,3.6) {增加出库的模型：$H=0.8F$};
+ \end{scope}
+ \begin{scope}[shift={(8.2,0)}]
+  \draw[fiveax] (-.6,0)--(5,0) node[right] {$x_A$};
+  \draw[fiveax] (0,-.5)--(0,3.6) node[above] {$x_B$};
+  \draw[FiveG,line width=1.3pt] (-.5,-.375)--(4.5,3.375);
+  \foreach \tt in {.5,1.2,1.9,2.6,3.3,4}{\fill[FiveG] (\tt,{.75*\tt}) circle(1.8pt);}
+  \node[above,text=FiveG,font=\footnotesize] at (2.6,2.4) {$x_B=\tfrac34x_A$};
+  \node[align=center] at (2.4,-.75) {一条平衡直线\\$\dim\Nul(E-F)=1$};
+  \node[font=\footnotesize,text=FiveK] at (2.4,3.6) {原调拨模型：无补货、无出库};
+ \end{scope}
 \end{tikzpicture}}
-{所有比例与库存数量均为自拟教学数据。右图只连出前三次离散更新，红点标出更新后不变的状态；绿色折线不代表两次记录之间的连续运动。}
 
-若输入改为随时刻变化的 $\boldsymbol u_k$，固定平衡状态未必存在，但叠加结构仍保留：两条满足同一输入序列的解序列之差满足 $\boldsymbol z_{k+1}=F\boldsymbol z_k$；一个特解序列加任意齐次解序列，仍是原递推的解。这里变化的是\emph{整串记录}，不能把某一时刻的 $\Nul(F)$ 当成全部齐次序列。
+若平衡状态存在，把式\eqref{eq:five-discrete-general}的特解选成常值 $\boldsymbol x_*$，就得到
+\begin{equation}
+ \boldsymbol x_k=\boldsymbol x_*+F^k(\boldsymbol x_0-\boldsymbol x_*).
+ \label{eq:five-discrete-shift}
+\end{equation}
+任意时刻的状态等于平衡状态加上随时间演化的偏离。\textbf{“偏离”未必衰减}；例如一维 $F=[2]$ 会把非零偏离逐次加倍。只有在偏离确实趋于零的模型中，才把这一部分称为\term{transient-response}。
 
-离散更新把“当前状态”送到“下一状态”。如果时间不再按月或按步记录，而是连续变化，矩阵又会记录什么？下一节只建立这幅连续变化的图景。
+\FiveHead{回到仓库：什么时候能看见“回到平衡”？}
+为体现出库的作用，另设一个明确的教学变体：先按原比例调拨，再从每个仓库发出20\%的货，最后向A仓补货10单位。转移矩阵变为 $H=0.8F$。平衡方程给出
+\begin{equation}
+ H=\FiveMat{rr}{0.56&0.32\\0.24&0.48},\qquad
+ (E-H)\boldsymbol x_*=(10,0)^{\mathrm T},\qquad
+ \boldsymbol x_*=\frac1{19}(650,300)^{\mathrm T}.
+\end{equation}
+两条独立方程确定唯一平衡点；其总库存为50，每日发出总量的20\%，恰好与补货10单位平衡。
 
-\Needspace{11\baselineskip}
+为什么这个变体的偏离会消失？两个独立方向 $(4,3)^{\mathrm T}$、$(1,-1)^{\mathrm T}$ 能表示任意初始偏离；直接计算可见
+\begin{equation}
+ H(4,3)^{\mathrm T}=0.8(4,3)^{\mathrm T},\qquad
+ H(1,-1)^{\mathrm T}=0.24(1,-1)^{\mathrm T}.
+\end{equation}
+沿两个方向的偏离每次分别缩为0.8倍、0.24倍。若初始偏离为 $a(4,3)^{\mathrm T}+b(1,-1)^{\mathrm T}$，更新 $k$ 次便为 $a(0.8)^k(4,3)^{\mathrm T}+b(0.24)^k(1,-1)^{\mathrm T}$，两项都趋于零。这只是用矩阵乘法逐次验证现象，没有提前使用后续的判据。
+
+\FiveDynFigure{e}{存在平衡状态时，轨迹可写为平衡状态加偏离；本例偏离逐渐消失。}{fig:five-discrete-transient}{%
+\begin{tikzpicture}[font=\small,x=.1cm,y=.1cm]
+ \draw[fiveax] (0,0)--(50,0) node[right] {$x_A$};
+ \draw[fiveax] (0,0)--(0,27) node[above] {$x_B$};
+ \draw[FiveG,line width=1pt,-{Stealth[length=1.8mm]}] (0,0)--(10,0)--(15.6,2.4)--(19.504,4.896);
+ \draw[FiveG,line width=1pt] (19.504,4.896)--(22.48896,7.03104)--(24.8437504,8.7722496)--(26.719620096,10.173179904)--(28.21840482304,11.29583517696)--(29.4169739575296,12.1944180424704);
+ \fill[FiveR] (34.2105263,15.7894737) circle(2.6pt);
+ \draw[fivedash,-{Stealth[length=1.8mm]}] (34.2105263,15.7894737)--(19.504,4.896);
+ \node[text=FiveR,above] at (34.2,17) {平衡状态 $\boldsymbol x_*$};
+ \node[text=FiveK,left,font=\footnotesize] at (20,12) {偏离 $\boldsymbol x_k-\boldsymbol x_*$};
+ \node[below] at (0,-1) {$\boldsymbol x_0$};
+ \node[text=FiveB,anchor=west,align=left] at (57,17) {$\boldsymbol x_k=\boldsymbol x_*+\boldsymbol z_k$\\[5pt]$\boldsymbol z_k=H^k(\boldsymbol x_0-\boldsymbol x_*)$};
+ \node[text=FiveK,anchor=west,font=\footnotesize,align=left] at (57,4) {图中用 $H=0.8F$，初值为零；\\衰减来自明确增加的出库条件。};
+\end{tikzpicture}}
+
+无输入时保存总库存，有出库并补货时可能达到固定库存，只补货时则持续积累。同样的矩阵语言帮助我们识别三种不同的工程结果，而不是预先给所有系统贴上“最终稳定”的标签。
+
+\FiveDynFigure{f}{斐波那契数列的增长：同一转移规则反复作用，后续增量不断增大。}{fig:five-fibonacci-growth}{%
+\begin{tikzpicture}[font=\small,x=.8cm,y=.11cm]
+ \draw[fiveax] (0,0)--(10,0) node[right] {$k$};
+ \draw[fiveax] (0,0)--(0,39) node[above] {$F_k$};
+ \foreach \kk/\vv in {0/0,1/1,2/1,3/2,4/3,5/5,6/8,7/13,8/21,9/34}{
+  \draw[FiveB!25] (\kk,0)--(\kk,\vv);
+  \fill[FiveB] (\kk,\vv) circle(1.9pt);
+  \node[below,font=\footnotesize] at (\kk,-1) {\kk};}
+ \foreach \kk/\vv in {4/3,5/5,6/8,7/13,8/21,9/34}{\node[above left,font=\footnotesize] at (\kk,\vv) {\vv};}
+ \node[anchor=west,text=FiveK,align=left,font=\footnotesize] at (10.7,23) {这里列出 $F_0$ 至 $F_9$；\\后面几次增长越来越快。};
+ \node[anchor=west,text=FiveK,align=left,font=\footnotesize] at (10.7,10) {第8章将用特征空间\\解释这些演化方向。};
+\end{tikzpicture}}
+
+本节把“特解加齐次解”从一个向量延伸到一串记录，把平衡问题重新落回 $(E-F)\boldsymbol x_*=\boldsymbol u$。轨迹空间的自由度来自初始条件，平衡集合的自由度来自 $\Nul(E-F)$，二者不能混为一谈。一步更新会怎样改变区域的面积、能否反向还原，将与第6章的行列式联系起来；不同方向为什么会增长、衰减或往复变化，第8章将用特征空间进一步解释。下一节把时间从一次次记录改为连续流动，继续观察同一套叠加结构。
+\FloatBarrier
+\clearpage
+
 \section{【选读】从逐步更新到连续变化：微分方程与矢量场}
 \label{sec:five-continuous}
 
-\textbf{本节为拓展内容，不做考核要求。}连续变化中的 $\boldsymbol y(t)$ 表示状态，$\dot{\boldsymbol y}(t)$ 表示各分量的瞬时变化率。若变化率由当前状态线性决定，就得到\term{linear-differential-system}
+\textbf{选读·不做考核要求。}离散系统一步一步更新状态，连续系统则时时刻刻都在变化。这里需要一个新记号：$\dot x$ 表示位移的瞬时变化率，即速度；$\ddot x$ 表示速度的瞬时变化率，即加速度。我们只借用这些直观含义与简单的求导规则，不要求先学会求解微分方程。全部模型、参数和图示均为教学简化；本节仍围绕“齐次解构成空间，非齐次通解等于特解加齐次解”展开。
+
+\FiveHead{从一块会运动的质量块开始：方程为什么是这样写的？}
+先把系统看清楚。一个质量为 $m>0$ 的块，通过劲度系数为 $k>0$ 的弹簧、系数为 $c\geq0$ 的阻尼器与固定端相连，另受外力 $f(t)$。设 $x$ 从静止平衡位置量起，向右为正；忽略其他作用或认为它们已互相平衡。
+
+\FiveDynFigure{a}{弹簧、阻尼器与外力共同作用；图中取 $x>0$、$\dot x>0$、$f(t)>0$ 的瞬间。}{fig:five-spring-forces}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \fill[FiveK!15] (-.3,-.3) rectangle(0,3.2);
+ \draw[FiveK,thick] (0,-.3)--(0,3.2);
+ \draw[FiveB,thick] (0,2.4)--(.5,2.4)--(.7,2.65)--(.95,2.15)--(1.2,2.65)--(1.45,2.15)--(1.7,2.65)--(1.95,2.15)--(2.2,2.65)--(2.45,2.15)--(2.7,2.4)--(3.5,2.4);
+ \node[above,text=FiveB] at (1.8,2.9) {弹簧 $k$};
+ \draw[FiveK,thick] (0,.9)--(1.2,.9);
+ \draw[FiveK,thick] (1.2,.5)--(1.2,1.3)--(2.5,1.3);
+ \draw[FiveK,thick] (1.2,.5)--(2.5,.5);
+ \draw[FiveK,thick] (2.1,.6)--(2.1,1.2);
+ \draw[FiveK,thick] (2.1,.9)--(3.5,.9);
+ \node[below,text=FiveK] at (1.8,.25) {阻尼器 $c$};
+ \draw[fivebox,fill=FiveB!8] (3.5,.2) rectangle(6.1,3.1);
+ \node[font=\large] at (4.8,1.6) {$m$};
+ \draw[fiveb] (3.45,2.4)--(1.95,2.4) node[midway,below,font=\footnotesize] {$-kx$};
+ \draw[fiveg] (3.45,.9)--(2.65,.9) node[midway,above,font=\footnotesize] {$-c\dot x$};
+ \draw[fiver] (6.15,1.65)--(8.5,1.65) node[midway,above] {$f(t)$};
+ \draw[fiveax] (3.3,-.7)--(8.6,-.7) node[right] {$x$ 正向};
+ \draw[fivedash] (4.25,-1.2)--(4.25,-.35);
+ \node[below,font=\footnotesize] at (4.25,-1.2) {$x=0$ 的参考位置};
+ \node[text=FiveK,anchor=west,font=\footnotesize,align=left] at (9,2.3) {恢复力看位移；\\阻尼力看速度；\\外力由外部给定。};
+\end{tikzpicture}}
+
+再数清三个力。弹簧恢复力为 $-kx$：位移向右时弹簧向左拉，位移向左时弹簧向右推，负号表示“反着位移”。\term{viscous-damping}采用最简单的线性近似 $-c\dot x$，表示油液等介质产生的阻力随速度增大、方向与速度相反；实际空气阻力或材料内摩擦不一定服从这一简化规律。外力为 $f(t)$，其正负号决定方向。
+
+接着使用牛顿第二定律。合力等于质量乘加速度，所以三个力相加必须满足
+\begin{equation}
+ -kx-c\dot x+f(t)=m\ddot x.
+ \label{eq:five-newton-balance}
+\end{equation}
+右边记录质量块怎样加速，左边记录造成这份加速的全部力；这一步把物理图变成方程。
+
+把弹簧力与阻尼力移到右边，再交换等号两侧，得到标准形式
+\begin{equation}
+ m\ddot x+c\dot x+kx=f(t).
+ \label{eq:five-spring-ode}
+\end{equation}
+加速度、速度、位移各只出现一次，而且没有互相相乘；这就是方程的“线性”。
+
+最后看熟悉的特例。没有阻尼也没有外力时，$c=0,f(t)=0$，方程变成 $m\ddot x+kx=0$，即高中熟悉的简谐振动。没有外力而 $c>0$ 时，阻尼消耗运动中的机械能，运动趋向静止；阻尼较大时可以不往复振动。有持续外力时，运动是否消失还要看外力，不能只凭 $c>0$ 下结论。这便是连续时间的线性动力模型：状态不等到下一晚更新，而是随时间连续变化。
+
+\FiveHead{最简特例告诉我们：只记位置不够，还要记速度}
+同样位于 $x=0$，向右运动和向左运动的质量块接下来走向不同；因此一个位置数不能完整确定运动。先取 $m=k=1,c=0,f(t)=0$，令 $v=\dot x$，得到
+\begin{equation}
+ \dot x=v,\qquad \dot v=-x.
+\end{equation}
+第一条说速度怎样推动位置，第二条说弹簧怎样改变速度；二阶方程所需的两份信息，恰好组成一个二维状态。
+
+回到一般弹簧模型，令 $\boldsymbol y=(x,v)^{\mathrm T}=(x,\dot x)^{\mathrm T}$。第一分量的导数就是第二分量；第二分量的导数由式\eqref{eq:five-spring-ode}除以 $m$ 得到。于是
+\begin{equation}
+ \dot{\boldsymbol y}
+ =\begin{pmatrix}0&1\\-k/m&-c/m\end{pmatrix}\boldsymbol y
+ +\begin{pmatrix}0\\f(t)/m\end{pmatrix}.
+\end{equation}
+两行分别是“位置怎样变”和“速度怎样变”，没有新添物理规律，只把原方程中的信息重新排列。
+
+\FiveDynFigure{b}{二阶方程化为一阶系统：降低阶数，同时保留位置与速度两份状态。}{fig:five-ode-state-lift}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fivebox] (0,0) rectangle(5.8,2.3);
+ \node at (2.9,1.55) {一个二阶方程};
+ \node[text=FiveB] at (2.9,.8) {$m\ddot x+c\dot x+kx=f(t)$};
+ \draw[fiveg] (6,1.15)--(9.7,1.15);
+ \node[above,font=\footnotesize] at (7.85,1.5) {令 $\boldsymbol y=(x,\dot x)^{\mathrm T}$};
+ \draw[fivebox] (9.9,0) rectangle(15.6,2.3);
+ \node at (12.75,1.55) {两个一阶方程};
+ \node[text=FiveB] at (12.75,.8) {$\dot{\boldsymbol y}=A\boldsymbol y+\boldsymbol g(t)$};
+ \node[text=FiveK,font=\footnotesize] at (7.8,-.55) {需要给定的初始信息仍是 $x(0)$ 与 $\dot x(0)$};
+\end{tikzpicture}}
+
+抽象出共同形式，就得到\term{linear-differential-system}；本节取 $A$ 为常矩阵、外部输入 $\boldsymbol g(t)$ 为连续函数：
+\begin{equation}
+ \dot{\boldsymbol y}=A\boldsymbol y+\boldsymbol g(t).
+ \label{eq:five-continuous-general}
+\end{equation}
+$A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给出外部作用补上的变化率。离散系统的 $F\boldsymbol x_k$ 是下一次状态；连续系统的 $A\boldsymbol y$ 是此刻的变化率，二者保持相同的线性叠加结构，却不能当成同一种数值记录。
+
+\FiveHead{先看箭头，再看运动：矢量场怎样读？}
+先去掉外部输入，考察
 \begin{equation}
  \dot{\boldsymbol y}=A\boldsymbol y.
  \label{eq:five-continuous-homogeneous}
 \end{equation}
-这里 $A\boldsymbol y$ 不是下一时刻的状态，而是当前状态怎样开始变化的记录。只要保持这一分别，矩阵运算仍然是熟悉的“输入一个向量，输出一个向量”。
+在二维情形，位置与速度等两个状态分量组成一个\term{phase-plane}；它是状态记录的平面，不一定是物体实际所在的平面。
 
-\begin{definition}[矢量场与平衡状态]
-在状态空间的每个点 $\boldsymbol y$ 上，放一支向量 $A\boldsymbol y$，就得到一个\term{vector-field}。若 $A\boldsymbol y=\boldsymbol0$，该状态没有变化率，保持不变，称为平衡状态。对式\eqref{eq:five-continuous-homogeneous}，平衡状态全体正是 $\Nul(A)$。
+\begin{definition}[矢量场与轨线]
+在每个状态点 $\boldsymbol y$ 处画出向量 $A\boldsymbol y$，所得箭头图称为\term{vector-field}。箭头的指向表示状态变化的方向；按统一比例绘制的长度表示变化率的大小。与这些箭头处处相切的运动曲线称为\term{streamline}，这里也是状态随时间形成的轨线。
 \end{definition}
+箭头表示“此刻怎样开始变化”，不是一次更新后的完整位移。沿轨线前进时，要不断参考新位置处的箭头，不能只顺着第一支箭头一直走直线。
 
 \begin{example}[一条平衡直线，许多变化轨线]
-考察二维连续系统
-\begin{equation}
- \dot{\boldsymbol y}=\FiveMat{rr}{-1&0\\0&0}\boldsymbol y,
- \quad\text{即}\quad \dot y_1=-y_1,\ \dot y_2=0.
-\end{equation}
-不求解函数表达式，说明每个状态点的变化方向、平衡状态和所有可能的变化率。
+取 $A=\FiveMat{rr}{-1&0\\0&0}$。每个点的箭头为 $(-y_1,0)^{\mathrm T}$：右半平面向左，左半平面向右，第二分量不变。
 \end{example}
-\textbf{解}\quad 每个点被送成 $(-y_1,0)^{\mathrm T}$。第一分量为正时，箭头向左；第一分量为负时，箭头向右；第二分量不变，所以状态在固定高度的水平线上变化。纵轴上 $y_1=0$，箭头为零，整条纵轴都是平衡状态。由此读出
+从初值 $(a,b)^{\mathrm T}$ 出发，函数 $(ae^{-t},b)^{\mathrm T}$ 的导数正好是 $(-ae^{-t},0)^{\mathrm T}$，直接代回即可验证。状态沿固定高度的水平线向纵轴靠近；纵轴上所有箭头为零，全部点都保持不动。
 \begin{equation}
  \Nul(A)=\operatorname{Span}\{(0,1)^{\mathrm T}\},\qquad
  \Col(A)=\operatorname{Span}\{(1,0)^{\mathrm T}\}.
 \end{equation}
-零空间回答“哪些状态不动”，列空间回答“哪些变化率可能出现”。这两类向量的物理含义不同，即使都由两个分量记录，也不能互换。
+零空间记录“不动的状态”，列空间记录“可能出现的变化率”；它们仍在同一个坐标平面中，却承担不同角色。
 
-\FiveFigure{矢量场：箭头表示变化率，绿色纵轴上的全部状态保持不变。}{fig:five-vector-field}{%
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \draw[fiveax] (-3.7,0)--(3.7,0) node[right] {$y_1$};
- \draw[FiveG,line width=1.6pt,-{Stealth[length=1.8mm]}] (0,-2.7)--(0,2.9) node[above] {$y_2$};
+\FiveDynFigure{c}{线性矢量场：箭头表示变化率，纵轴是平衡状态，水平线是运动轨线。}{fig:five-vector-field}{%
+\begin{tikzpicture}[font=\small,x=1.05cm,y=1.05cm]
+ \draw[FiveK!15,step=1] (-3,-2.2) grid(3,2.2);
+ \draw[fiveax] (-3.5,0)--(3.6,0) node[right] {$y_1$};
+ \draw[fiveax] (0,-2.5)--(0,2.65) node[above] {$y_2$};
+ \draw[FiveG,line width=1.7pt] (0,-2.2)--(0,2.2);
  \foreach \xx in {-3,-2,-1,1,2,3}{\foreach \yy in {-2,-1,0,1,2}{
-  \fill[FiveK!45] (\xx,\yy) circle(.8pt);
-  \draw[fiveb] (\xx,\yy)--({.65*\xx},\yy);}}
- \foreach \yy in {-2,-1,0,1,2}{\fill[FiveG] (0,\yy) circle(2pt);}
- \draw[fivedash] (-3.5,1)--(3.5,1);
- \node[text=FiveG,anchor=west] at (.25,2.65) {$\Nul(A)$：平衡直线};
- \node[text=FiveR,anchor=west] at (4,.7) {不同高度的状态};
- \node[text=FiveR,anchor=west] at (4,.2) {沿各自的水平线变化};
+  \draw[fiveb] (\xx,\yy)--({.78*\xx},\yy);}}
+ \draw[FiveR,line width=1pt,-{Stealth[length=1.8mm]}] (-3,1.45)--(-.15,1.45);
+ \draw[FiveR,line width=1pt,-{Stealth[length=1.8mm]}] (3,-1.45)--(.15,-1.45);
+ \node[anchor=west,text=FiveG] at (4,1.6) {平衡直线 $\Nul(A)$};
+ \node[anchor=west,text=FiveB] at (4,.65) {蓝色箭头：矢量场};
+ \node[anchor=west,text=FiveR] at (4,-.3) {红色曲线：两条轨线};
 \end{tikzpicture}}
-{箭头均由 $(-y_1,0)^{\mathrm T}$ 按统一比例画出。箭头长度表示变化率的大小，不表示一步后的完整位移；轴上零箭头用绿色点标记。灰色虚线示意一条保持第二分量不变的轨线。}
 
-\FiveHead{动态方程的解，是函数而非静止的点}
-平衡状态只是特殊的、不随时间变化的解。其他初始状态可以生成变化的函数 $\boldsymbol y(t)$；这些函数即使满足齐次动态方程，也不必在每一时刻属于 $\Nul(A)$。\textbf{“齐次动态解”与“零空间中的平衡点”不是同一概念。}
+\FiveHead{三种箭头图：向内收拢、拉开两端、绕圈运动}
+先看\term{stable-node}。取 $A=\FiveMat{rr}{-1&0\\0&-2}$，两条分量关系是 $\dot y_1=-y_1$、$\dot y_2=-2y_2$。从 $(a,b)^{\mathrm T}$ 出发，直接验证可得
+\begin{equation}
+ \boldsymbol y(t)=(ae^{-t},be^{-2t})^{\mathrm T}.
+\end{equation}
+两个分量都向零靠近，但第二分量缩得更快，所以轨线通常是弯曲的；箭头并非都沿直线正对原点。这个矩阵描述的是两个简化状态量，不直接等于弹簧系统在“位置、速度”下的矩阵。它帮助我们看见无往复的回归方式，而非替代弹簧模型的推导。
 
-为了观察特解加齐次解，先写有外部变化率输入的非齐次系统
-\begin{equation}
- \dot{\boldsymbol y}=A\boldsymbol y+\boldsymbol g(t).
-\end{equation}
-若 $\boldsymbol y_1(t),\boldsymbol y_2(t)$ 都满足它，在同一个时间区间相减，便得到
-\begin{equation}
- \frac{\mathrm d}{\mathrm dt}(\boldsymbol y_1-\boldsymbol y_2)
- =A(\boldsymbol y_1-\boldsymbol y_2).
-\end{equation}
-反过来，一个特解函数 $\boldsymbol y_p(t)$ 加任意齐次解函数 $\boldsymbol h(t)$，满足
-\begin{equation}
- \frac{\mathrm d}{\mathrm dt}(\boldsymbol y_p+\boldsymbol h)
- =A\boldsymbol y_p+\boldsymbol g+A\boldsymbol h
- =A(\boldsymbol y_p+\boldsymbol h)+\boldsymbol g.
-\end{equation}
-因此，不附加初值时，全部解函数仍具有“一个特解函数加全部齐次解函数”的叠加结构。这只是本章结构在函数对象上的选读观察，不等于直接使用代数方程 $A\boldsymbol x=\boldsymbol0$ 的基础解系来求动态解。怎样真正解出函数，属于后续动态系统的学习。
+\FiveDynFigure{d}{稳定结点：两分量都趋向零，轨线通常弯曲地靠近原点。}{fig:five-field-node}{%
+\begin{tikzpicture}[font=\small,x=1.2cm,y=1.2cm]
+ \FiveFieldNode
+ \node[text=FiveB,anchor=west] at (3.4,1.5) {$A=\FiveMat{rr}{-1&0\\0&-2}$};
+ \node[text=FiveK,anchor=west,align=left] at (3.4,.2) {第一分量：$ae^{-t}$\\[5pt]第二分量：$be^{-2t}$};
+ \node[text=FiveG,anchor=west,font=\footnotesize] at (3.4,-1.3) {绿色轨线指向原点};
+\end{tikzpicture}}
 
-从按步更新到瞬时变化，我们始终先分清对象：静态方程求一个向量，递推求一串向量，微分方程求随时间变化的函数。形式中相似的线性结构值得观察，但每一项的角色和条件也必须随对象重新核对。带着这一习惯，再回望本章主线，就能把计算和结构同时看清。
+再看\term{saddle-point}。取 $A=\FiveMat{rr}{1&0\\0&-1}$，得到
+\begin{equation}
+ \boldsymbol y(t)=(ae^t,be^{-t})^{\mathrm T}.
+\end{equation}
+第一分量在非零时向外增长，第二分量向零靠近。只有初值落在纵轴上，才会回到原点；一般轨线沿横向离开。当 $ab\ne0$ 时，$y_1y_2=ab$ 始终不变，图中的弯曲轨线是双曲线。这种“一边收、一边放”的形态称为鞍点。
+
+\FiveDynFigure{e}{鞍点：纵向收拢，横向离开；一般轨线为双曲线。}{fig:five-field-saddle}{%
+\begin{tikzpicture}[font=\small,x=1.2cm,y=1.2cm]
+ \FiveFieldSaddle
+ \node[text=FiveB,anchor=west] at (3.4,1.5) {$A=\FiveMat{rr}{1&0\\0&-1}$};
+ \node[text=FiveK,anchor=west,align=left] at (3.4,.2) {横向：$ae^t$\\[5pt]纵向：$be^{-t}$};
+ \node[text=FiveG,anchor=west,font=\footnotesize] at (3.4,-1.3) {绿色轨线满足 $y_1y_2=ab$};
+\end{tikzpicture}}
+
+第三种是\term{center}。取 $A=\FiveMat{rr}{0&-1\\1&0}$，箭头为 $(-y_2,y_1)^{\mathrm T}$：正横轴上的箭头向上，正纵轴上的箭头向左，整个图按逆时针方向绕原点转。直接代入验证
+\begin{equation}
+ \boldsymbol y(t)=
+ (a\cos t-b\sin t,\ a\sin t+b\cos t)^{\mathrm T},\qquad
+ y_1^2+y_2^2=a^2+b^2.
+\end{equation}
+两个分量不断改变，平方和保持不变，所以轨线是圆。这个中心模型与无阻尼振动有相同的往复结构；物理状态取 $(x,v)$ 且 $m=k=1$ 时矩阵为 $\FiveMat{rr}{0&1\\-1&0}$，绕行方向相反，两者不能混写。取 $y_1=x,y_2=-v$ 就得到这里的中心模型，平方和对应该归一化模型机械能的两倍。
+
+\FiveDynFigure{f}{中心：状态沿圆周逆时针运动，平方和保持不变。}{fig:five-field-center}{%
+\begin{tikzpicture}[font=\small,x=1.2cm,y=1.2cm]
+ \FiveFieldCenter
+ \node[text=FiveB,anchor=west] at (3.4,1.5) {$A=\FiveMat{rr}{0&-1\\1&0}$};
+ \node[text=FiveK,anchor=west,align=left] at (3.4,.2) {$y_1^2+y_2^2$ 不变\\[5pt]非零状态不会趋于原点};
+ \node[text=FiveG,anchor=west,font=\footnotesize] at (3.4,-1.3) {绿色圆周：状态轨线};
+\end{tikzpicture}}
+
+三种图的共同点不是“运动一定回到原点”，而是每个箭头都由同样的矩阵乘向量计算得到。图\ref{fig:five-fields-compare}使用相同坐标范围与箭头缩放，帮助我们比较变化方式；这三类是典型例子，并未穷尽所有线性矢量场。
+
+\FiveDynFigure{g}{三种典型矢量场对照：同一种矩阵语言，可以产生不同的运动形态。}{fig:five-fields-compare}{%
+\begin{tikzpicture}[font=\scriptsize,x=.85cm,y=.85cm]
+ \begin{scope}\FiveFieldNode\node[font=\small] at (0,-3.05) {稳定结点};\end{scope}
+ \begin{scope}[shift={(6.1,0)}]\FiveFieldSaddle\node[font=\small] at (0,-3.05) {鞍点};\end{scope}
+ \begin{scope}[shift={(12.2,0)}]\FiveFieldCenter\node[font=\small] at (0,-3.05) {中心};\end{scope}
+ \node[text=FiveK,font=\footnotesize] at (6.1,-4) {第8章将用特征空间解释不同方向上的演化模式};
+\end{tikzpicture}}
+
+\FiveHead{哪里不动？平衡状态是零空间，但齐次解远不止这些点}
+箭头为零的状态在这一刻不变；在自治齐次系统中，始终保持这个状态也是一个解。因此
+\begin{equation}
+ \text{平衡状态集合}=\{\boldsymbol y_*:A\boldsymbol y_*=\boldsymbol0\}
+ =\Nul(A).
+\end{equation}
+其自由度就是 $\dim\Nul(A)$，直接回扣本章齐次代数方程的结论。前面的三个矩阵都只有原点一个平衡状态，图\ref{fig:five-vector-field}的矩阵则有整条平衡直线。
+
+若输入是常向量 $\boldsymbol g_0$，平衡状态要解 $A\boldsymbol y_*=-\boldsymbol g_0$：先检查目标是否在列空间，有解时再用“特解加零空间”描述全部平衡状态。输入随时间改变时，不一定存在常值平衡状态。
+
+\textbf{齐次微分方程的解是函数，平衡状态只是其中的常值函数。}例如稳定结点的 $\Nul(A)$ 只含零向量，仍有任意初值 $(a,b)^{\mathrm T}$ 生成的运动 $\boldsymbol y(t)$；不能据此说“只有零解”。
+
+\FiveHead{为什么完整运动仍是“特解加齐次解”？}
+先看齐次系统。若 $\boldsymbol y_1(t),\boldsymbol y_2(t)$ 都满足 $\dot{\boldsymbol y}=A\boldsymbol y$，求导的线性性质给出
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}(a\boldsymbol y_1+b\boldsymbol y_2)
+ =aA\boldsymbol y_1+bA\boldsymbol y_2
+ =A(a\boldsymbol y_1+b\boldsymbol y_2).
+\end{equation}
+线性组合还是解，零函数也是解，所以齐次解函数组成一个向量空间；这与代数方程的解空间、离散递推的解序列空间完全平行。
+
+再看同一输入 $\boldsymbol g(t)$ 下的两条解。设 $\boldsymbol y_p(t)$ 为一个特解，任意另一解为 $\boldsymbol y(t)$，逐项相减：
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}(\boldsymbol y-\boldsymbol y_p)
+ =(A\boldsymbol y+\boldsymbol g)-(A\boldsymbol y_p+\boldsymbol g)
+ =A(\boldsymbol y-\boldsymbol y_p).
+\end{equation}
+外部输入消掉了，差函数满足齐次系统。这正是第5.2节“两个非齐次解之差是齐次解”的同一个证明。
+
+反过来，若 $\boldsymbol y_h$ 是任意齐次解，便有
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}(\boldsymbol y_p+\boldsymbol y_h)
+ =A\boldsymbol y_p+\boldsymbol g+A\boldsymbol y_h
+ =A(\boldsymbol y_p+\boldsymbol y_h)+\boldsymbol g.
+\end{equation}
+所以相加确实得到原系统的解，而且前面的相减证明保证没有遗漏任何解。于是
+\begin{equation}
+ \boldsymbol y(t)=\boldsymbol y_p(t)+\boldsymbol y_h(t).
+ \label{eq:five-continuous-superposition}
+\end{equation}
+完整运动等于一条特解运动，加上任意齐次运动；这里相加的是每个时刻的状态，不是把两条轨线的形状直接拼接。
+
+对常系数一阶系统，在上述连续输入条件下，给定初值 $\boldsymbol y(0)$ 后解存在且唯一，这是微分方程课程中的基本事实，本节不展开其一般证明。因而不固定初值时，$n$ 维状态系统的齐次解空间有 $n$ 个独立初值参数；固定初值后，运动唯一。对于二阶弹簧方程，这两份参数就是初始位置与初始速度。\textbf{运动的自由度来自初值，平衡集合的自由度才是 $\dim\Nul(A)$。}不能把代数方程 $A\boldsymbol x=0$ 的基础解系直接当作动态方程的全部解函数。
+
+\FiveHead{回到弹簧：外力的持续作用，怎样与初始偏移叠加？}
+取 $m=1,c=2,k=2$，外力 $f(t)=\cos t$；时间与各量均已按教学单位归一化。原方程为
+\begin{equation}
+ \ddot x+2\dot x+2x=\cos t.
+\end{equation}
+不推导通用求解方法，只给出可代回检查的运动，让叠加结构落到具体数值上。
+
+先取一条周期特解 $x_p(t)=(\cos t+2\sin t)/5$。它满足 $\ddot x_p=-x_p$，所以
+\begin{equation}
+ \ddot x_p+2\dot x_p+2x_p
+ =x_p+2\dot x_p
+ =\frac{\cos t+2\sin t+2(-\sin t+2\cos t)}5
+ =\cos t.
+\end{equation}
+代回后恰好得到外力，证明它确实是一条特解。它持续按外力的周期运动，称为本例的\term{steady-state-response}；“稳态”不表示静止，而表示这里持续存在的周期响应。
+
+再看齐次部分。令 $q=a\cos t+b\sin t$，则 $\ddot q=-q$；对 $x_h=e^{-t}q$ 连续求两次导数，有
+\begin{equation}
+ \dot x_h=e^{-t}(\dot q-q),\quad
+ \ddot x_h=e^{-t}(\ddot q-2\dot q+q),\quad
+ \ddot x_h+2\dot x_h+2x_h=e^{-t}(\ddot q+q)=0.
+\end{equation}
+这说明 $e^{-t}\cos t$ 与 $e^{-t}\sin t$ 都是齐次解。若两者的一组线性组合恒为零，取 $t=0$ 得 $a=0$，再取 $t=\pi/2$ 得 $b=0$，故它们线性无关。初始位置、初始速度各提供一个独立条件，两个解函数因此足以表示全部齐次运动。
+
+按叠加结论，完整运动为
+\begin{equation}
+ x(t)=\frac{\cos t+2\sin t}{5}
+      +e^{-t}(a\cos t+b\sin t).
+ \label{eq:five-forced-spring-solution}
+\end{equation}
+第一项记录外力持续推动的周期运动，第二项记录初始状态与这条特解之间的偏离；在本例中它随 $e^{-t}$ 衰减，因而是暂态响应。若给定 $x(0)=x_0$、$\dot x(0)=v_0$，则 $a=x_0-1/5$、$b=v_0-2/5+a$，两个参数也被唯一确定。
+
+\FiveDynFigure{h}{本例完整运动等于周期特解加衰减的齐次偏离；两图展示同一条运动。}{fig:five-forced-spring-response}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \begin{scope}[x=2cm,y=2cm]
+  \draw[fiveax] (-.65,0)--(1.45,0) node[right] {$x$};
+  \draw[fiveax] (0,-.85)--(0,.8) node[above] {$v$};
+  \draw[FiveB,line width=1.15pt,domain=0:360,samples=100]
+   plot ({(cos(\x)+2*sin(\x))/5},{(-sin(\x)+2*cos(\x))/5});
+  \draw[FiveG,line width=.8pt,domain=0:12,samples=250]
+   plot ({(cos(deg(\x))+2*sin(deg(\x)))/5+exp(-\x)*cos(deg(\x))},{(-sin(deg(\x))+2*cos(deg(\x)))/5-exp(-\x)*(cos(deg(\x))+sin(deg(\x)))});
+  \fill[FiveR] (1.2,-.6) circle(1.9pt);
+  \node[above right,font=\footnotesize] at (1.2,-.6) {初始状态};
+  \node[font=\footnotesize] at (.35,-1.15) {状态平面：绿线趋近蓝色周期轨线};
+ \end{scope}
+ \begin{scope}[shift={(6.7,0)},x=.55cm,y=2cm]
+  \draw[fiveax] (0,0)--(11.4,0) node[right] {$t$};
+  \draw[fiveax] (0,-.75)--(0,1.4) node[above] {$x(t)$};
+  \draw[FiveB,line width=1pt,domain=0:10.8,samples=180]
+   plot (\x,{(cos(deg(\x))+2*sin(deg(\x)))/5});
+  \draw[FiveG,line width=.9pt,domain=0:10.8,samples=180]
+   plot (\x,{(cos(deg(\x))+2*sin(deg(\x)))/5+exp(-\x)*cos(deg(\x))});
+  \draw[FiveR,densely dashed,domain=0:10.8,samples=160]
+   plot (\x,{exp(-\x)*cos(deg(\x))});
+  \node[text=FiveB,font=\footnotesize] at (7.2,1.16) {蓝：周期特解};
+  \node[text=FiveG,font=\footnotesize] at (7.2,.93) {绿：完整运动};
+  \node[text=FiveR,font=\footnotesize] at (7.2,.7) {红虚线：暂态偏离};
+  \node[font=\footnotesize] at (5.1,-1.15) {取 $a=1,b=0$，即 $x(0)=1.2,v(0)=-0.6$};
+ \end{scope}
+\end{tikzpicture}}
+
+这个结论有明确的使用条件：本例有正阻尼、正恢复系数，输入为周期外力，所选齐次运动确实衰减。一般的 $\boldsymbol g(t)$ 可能不周期，任意特解也不自动成为“稳态”；不应把本例的最终行为套到所有非齐次系统上。但“特解加齐次解”在相同输入下始终成立。
+
+从向量到序列，再到函数，改变的是解的对象，保持的是“特解加齐次解”的结构。\textbf{动态运动的自由度看初值，不动的平衡集合看零空间。}第6章将用行列式描述有限时间映射对面积、体积的改变；第8章将用特征空间解释回归、离开与绕行。这里先从箭头图看见运动，再代回方程验证，不提前计算迹、散度或稳定性判据。
+\FloatBarrier
 
 \clearpage
 \section*{本章小结}
