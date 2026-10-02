@@ -11994,23 +11994,8 @@ n=\dim\FNull A+\FRank(A).
 列空间维数是矩阵秩的定义，零空间维数由秩与零度定理给出。第四章已证明行秩等于列秩，因而 $r(A^{\mathrm T})=r(A)=r$；把秩与零度定理用于 $A^{\mathrm T}:\mathbb R^m\to\mathbb R^n$，就得到左零空间维数 $m-r$。注意，两次计数所用的输入维数分别为 $n$ 与 $m$。
 \end{proof}
 
-\FiveFigure{四个空间各有位置：两块属于输入端，两块属于输出端。}{fig:five-four-dimensions}{%
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \draw[fivebox] (0,0) rectangle(6.1,5.2);\draw[fivebox] (8.4,0) rectangle(14.5,5.2);
- \node[font=\large\bfseries] at (3.05,4.65) {输入空间 $\mathbb R^n$};
- \node[font=\large\bfseries] at (11.45,4.65) {输出空间 $\mathbb R^m$};
- \fill[FiveB!10] (.4,2.7) rectangle(5.7,4);
- \fill[FiveG!10] (.4,.9) rectangle(5.7,2.2);
- \fill[FiveB!10] (8.8,2.7) rectangle(14.1,4);
- \fill[FiveG!10] (8.8,.9) rectangle(14.1,2.2);
- \node[text=FiveB,align=center] at (3.05,3.35) {$\Row(A)$\\维数 $r$};
- \node[text=FiveG,align=center] at (3.05,1.55) {$\Nul(A)$\\维数 $n-r$};
- \node[text=FiveB,align=center] at (11.45,3.35) {$\Col(A)$\\维数 $r$};
- \node[text=FiveG,align=center] at (11.45,1.55) {$\Nul(A^{\mathrm T})$\\维数 $m-r$};
- \draw[fiveb] (6.25,3.35)--(8.25,3.35) node[midway,above] {$A$};
- \node[font=\footnotesize,align=center] at (7.25,1.6) {位置不同\\维数配合};
-\end{tikzpicture}}
-{色块表示空间的角色和维数，不是把向量集合切成互不接触的区域。两端可以有不同维数；下一小节将证明每端的两块空间确实构成正交的直和。}
+% 原图5.8的单张概览由第5.4.3节的图5.4a--5.4c替换；保留后续既有图号。
+\stepcounter{figure}
 
 \begin{example}[贯穿矩阵的四个空间]
 求式\eqref{eq:five-running-A}中的矩阵 $A$ 的四个基本子空间及其维数。
@@ -12097,6 +12082,160 @@ n=\dim\FNull A+\FRank(A).
 于是任意输入唯一写成 $\boldsymbol x=\boldsymbol x_R+\boldsymbol x_N$，其中 $\boldsymbol x_R\in\Row(A)$、$\boldsymbol x_N\in\Nul(A)$，并且 $A\boldsymbol x=A\boldsymbol x_R$。零空间分量不影响输出。输出端同样唯一写成 $\boldsymbol b=\boldsymbol b_C+\boldsymbol b_L$；只有列空间中的向量能由 $A$ 产生，非零的左零空间分量则使整个目标不可达。
 
 四个空间现在各有维数，也各有相对方向。下一节把这幅分解图重新放回 $A\boldsymbol x=\boldsymbol b$，回答解的存在性和自由度。
+
+% FOUR SPACES INTUITIVE BEGIN
+\subsection{直观总结：正交互补的两组子空间}
+\label{sec:five-intuitive-summary}
+
+以上我们用代数严格证明了四个子空间的正交与直和关系。我们也可以换一个更直观的视角，把这四个子空间的定位、意义和相互关系，用一句话、一张图总结清楚。所谓\term{orthogonal-complementary-subspaces}，既要求两部分互相正交，也要求它们的直和等于整个空间；两部分的维数不必各占一半。
+
+先把空间分到两侧：\textbf{行空间与零空间属于输入端，列空间与左零空间属于输出端。}表中的“方向”指非零方向；零向量仍共同属于每一对子空间。“消灭”则指映射后的输出为零，不是输入向量从空间中消失。
+
+\definecolor{FiveDark}{HTML}{172333}
+\definecolor{FiveGold}{HTML}{EAC76B}
+\definecolor{FiveRose}{HTML}{EB8798}
+\definecolor{FiveSky}{HTML}{7FC3EE}
+\definecolor{FiveSilver}{HTML}{BAC5D0}
+\definecolor{FiveWhite}{HTML}{F3F2EC}
+\definecolor{FiveGrid}{HTML}{8F9FB4}
+\newcommand{\FiveLetterFigure}[5]{%
+ \begingroup\edef\FiveSavedFigure{\arabic{figure}}%
+ \renewcommand{\thefigure}{\thechapter.4#1}%
+ \renewcommand{\theHfigure}{\thechapter.intuitive.#1}%
+ \FiveFigure{#2}{#3}{#4}{#5}%
+ \setcounter{figure}{\FiveSavedFigure}\endgroup}
+\tikzset{
+ fivedarkax/.style={-{Stealth[length=1.8mm]},FiveSilver!65,line width=.55pt},
+ fivedarkdash/.style={FiveSilver!70,densely dashed,line width=.65pt},
+ fivedarklabel/.style={fill=FiveDark,inner sep=2pt},
+ fivedarkvec/.style={-{Stealth[length=2.3mm]},line width=1.3pt}}
+
+\FiveLetterFigure{a}{四个基本子空间总览：输入、输出两侧各有一组正交互补的子空间。}{fig:five-intuitive-overview}{%
+\begin{tikzpicture}[x=1cm,y=1cm,
+ font=\linespread{1}\fontsize{10.5pt}{14.5pt}\selectfont,text=FiveWhite]
+ \fill[FiveDark,rounded corners=4pt] (-.25,-.65) rectangle(15.05,10.6);
+ \node[font=\bfseries\fontsize{12.5pt}{17pt}\selectfont] at (7.4,9.95)
+  {同一矩阵的两端：输入与输出};
+ \fill[FiveWhite!7!FiveDark] (0,8.6) rectangle(14.8,9.35);
+ \fill[FiveGold!7!FiveDark] (0,6.7) rectangle(14.8,8.6);
+ \fill[FiveRose!7!FiveDark] (0,4.8) rectangle(14.8,6.7);
+ \fill[FiveSky!7!FiveDark] (0,2.9) rectangle(14.8,4.8);
+ \fill[FiveSilver!7!FiveDark] (0,1) rectangle(14.8,2.9);
+ \foreach \yy in {1,2.9,4.8,6.7,8.6,9.35}
+  {\draw[FiveSilver!55,line width=.45pt] (0,\yy)--(14.8,\yy);}
+ \foreach \xx in {0,3,5.3,7.2,10,14.8}
+  {\draw[FiveSilver!55,line width=.45pt] (\xx,1)--(\xx,9.35);}
+ \node[font=\bfseries] at (1.5,8.98) {空间名称};
+ \node[font=\bfseries] at (4.15,8.98) {所在宇宙};
+ \node[font=\bfseries] at (6.25,8.98) {维度};
+ \node[font=\bfseries] at (8.6,8.98) {几何意义};
+ \node[font=\bfseries] at (12.4,8.98) {工程直觉};
+ \node[text=FiveGold,align=center,text width=2.7cm] at (1.5,7.65) {\textbf{行空间}\\$\Row(A)$};
+ \node[text=FiveGold,align=center] at (4.15,7.65) {输入空间\\$\mathbb R^n$};
+ \node[text=FiveGold] at (6.25,7.65) {$r(A)$};
+ \node[text=FiveGold,align=center,text width=2.55cm] at (8.6,7.65) {所有行向量\\张成的子空间};
+ \node[text=FiveGold,align=center,text width=4.4cm] at (12.4,7.65)
+  {\textbf{能被看见的输入方向}\\真正对输出产生贡献的分量};
+ \node[text=FiveRose,align=center,text width=2.7cm] at (1.5,5.75) {\textbf{零空间}\\$\Nul(A)$};
+ \node[text=FiveRose,align=center] at (4.15,5.75) {输入空间\\$\mathbb R^n$};
+ \node[text=FiveRose] at (6.25,5.75) {$n-r(A)$};
+ \node[text=FiveRose,align=center,text width=2.55cm] at (8.6,5.75) {齐次方程的\\解空间};
+ \node[text=FiveRose,align=center,text width=4.4cm] at (12.4,5.75)
+  {\textbf{会被消灭的输入方向}\\经过映射后会被压成零向量};
+ \node[text=FiveSky,align=center,text width=2.7cm] at (1.5,3.85) {\textbf{列空间}\\$\Col(A)$};
+ \node[text=FiveSky,align=center] at (4.15,3.85) {输出空间\\$\mathbb R^m$};
+ \node[text=FiveSky] at (6.25,3.85) {$r(A)$};
+ \node[text=FiveSky,align=center,text width=2.55cm] at (8.6,3.85) {所有列向量\\张成的子空间};
+ \node[text=FiveSky,align=center,text width=4.4cm] at (12.4,3.85)
+  {\textbf{能到达的输出方向}\\所有可能产生的结果都在这里};
+ \node[text=FiveSilver,align=center,text width=2.7cm] at (1.5,1.95) {\textbf{左零空间}\\$\Nul(A^{\mathrm T})$};
+ \node[text=FiveSilver,align=center] at (4.15,1.95) {输出空间\\$\mathbb R^m$};
+ \node[text=FiveSilver] at (6.25,1.95) {$m-r(A)$};
+ \node[text=FiveSilver,align=center,text width=2.55cm] at (8.6,1.95) {转置矩阵的\\零空间};
+ \node[text=FiveSilver,align=center,text width=4.4cm] at (12.4,1.95)
+  {\textbf{到不了的输出方向}\\永远无法被矩阵产生的方向};
+ \node[font=\fontsize{10pt}{14pt}\selectfont] at (7.4,.35)
+  {$\mathbb R^n=\Row(A)\oplus\Nul(A)\qquad
+    \mathbb R^m=\Col(A)\oplus\Nul(A^{\mathrm T})$};
+\end{tikzpicture}}
+{从输入端向输出端看，行空间与列空间配成“有效作用”的两端；从各自的环境空间看，每一端再与自己的零空间组成正交直和。}
+
+先看输入端。整个输入空间 $\mathbb R^n$ 分成两个互相正交的部分：行空间和零空间。它们没有重叠的非零方向，合起来刚好铺满整个 $\mathbb R^n$。这不是把空间中的点分到两个不相交的区域，而是把\emph{每一个向量}唯一写成两部分之和。
+
+任意输入 $\boldsymbol x$ 都可以拆成行空间分量 $\boldsymbol x_{\text{row}}$ 与零空间分量 $\boldsymbol x_{\text{null}}$，即前文的 $\boldsymbol x_R,\boldsymbol x_N$。\textbf{行空间分量是“活下来”的部分}，它被映向列空间，真正产生输出；\textbf{零空间分量是“被消灭”的部分}，无论怎样改变它，映射后的这一部分始终为零。因此
+\begin{align}
+ \boldsymbol x&=\boldsymbol x_{\text{row}}+\boldsymbol x_{\text{null}},\\
+ A\boldsymbol x&=A\boldsymbol x_{\text{row}},\qquad
+ A\boldsymbol x_{\text{null}}=\boldsymbol0.
+\end{align}
+零空间里的所有变动，当前输出都看不见。例如电网络中的循环流可以改变线路记录，却不改变节点收支；“看不见”是针对这个矩阵所记录的量而言的。
+
+\FiveLetterFigure{b}{输入空间的正交分解：任意输入都可以拆成“有效分量＋被消分量”。}{fig:five-intuitive-input}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small,text=FiveWhite]
+ \fill[FiveDark,rounded corners=4pt] (-7.35,-3.7) rectangle(7.35,4.3);
+ \node at (0,3.55) {$\mathbb R^n=\Row(A)\oplus\Nul(A)$};
+ \draw[step=.5cm,FiveGrid!25!FiveDark,line width=.3pt] (-4,-2.5) grid(4,2.5);
+ \draw[fivedarkax] (-4.4,0)--(4.4,0) node[right,text=FiveSilver] {$x_1$};
+ \draw[fivedarkax] (0,-2.7)--(0,2.8) node[above,text=FiveSilver] {$x_2$};
+ \draw[FiveGold,line width=1.3pt] (-2.4,-2.4)--(2.4,2.4);
+ \draw[FiveRose,line width=1.3pt] (-2.4,2.4)--(2.4,-2.4);
+ \draw[fivedarkdash] (1.8,1.8)--(2.8,.8)--(1,-1);
+ \draw[fivedarkvec,FiveGold] (0,0)--(1.8,1.8)
+  node[fivedarklabel,above left] {$\boldsymbol x_{\text{row}}$};
+ \draw[fivedarkvec,FiveRose] (0,0)--(1,-1)
+  node[fivedarklabel,below left] {$\boldsymbol x_{\text{null}}$};
+ \draw[fivedarkvec,FiveWhite] (0,0)--(2.8,.8)
+  node[fivedarklabel,above right] {$\boldsymbol x$};
+ \draw[FiveSilver,line width=.6pt] (.18,.18)--(.36,0)--(.18,-.18);
+ \fill[FiveWhite] (0,0) circle(1.6pt) node[below left] {$O$};
+ \node[text=FiveGold,align=left,anchor=west,fivedarklabel] at (2.65,2.25)
+  {$\Row(A)$\\可存活的输入方向};
+ \node[text=FiveRose,align=left,anchor=west,fivedarklabel] at (-6.35,2.25)
+  {$\Nul(A)$\\必消亡的输入方向};
+ \node at (0,-3.05) {$r+(n-r)=n,\qquad r=r(A)$};
+\end{tikzpicture}}
+{图取 $A=\FiveMat{rr}{1&1\\2&2}$，故 $n=2$、$r(A)=1$。两个分量均从原点出发，虚线连接它们与白色向量的端点。高维情形仍有唯一分解，但两部分未必都是直线，维数也未必相等。}
+
+再看输出端，结构完全对称。整个输出空间 $\mathbb R^m$ 也有两个正交互补的部分：列空间和左零空间。\textbf{列空间是所有能到达的范围}：只要目标在其中，就存在输入能产生它。\textbf{左零空间给出不可到达的方向}：若目标带有非零的左零空间分量，就一定不在列空间中，方程组因而无解。
+
+把前文的 $\boldsymbol b_C,\boldsymbol b_L$ 分别记为 $\boldsymbol b_{\text{col}},\boldsymbol b_{\text{left}}$，便得到
+\begin{align}
+ \boldsymbol b&=\boldsymbol b_{\text{col}}+\boldsymbol b_{\text{left}},\qquad
+ \boldsymbol b_{\text{col}}\in\Col(A),\quad
+ \boldsymbol b_{\text{left}}\in\Nul(A^{\mathrm T}),\\
+ A\boldsymbol x=\boldsymbol b\text{ 有解}
+ &\quad\Longleftrightarrow\quad\boldsymbol b_{\text{left}}=\boldsymbol0.
+\end{align}
+所以，目标有没有“伸向盲区”，要看这一分量是否为零；它是方向上的判断，不是看图上的点落在哪一块颜色里。
+
+\FiveLetterFigure{c}{输出空间的正交分解：目标是否有解，取决于它有没有伸向盲区的分量。}{fig:five-intuitive-output}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small,text=FiveWhite]
+ \fill[FiveDark,rounded corners=4pt] (-7.35,-3.7) rectangle(7.35,4.3);
+ \node at (0,3.55) {$\mathbb R^m=\Col(A)\oplus\Nul(A^{\mathrm T})$};
+ \draw[step=.5cm,FiveGrid!25!FiveDark,line width=.3pt] (-4,-2.5) grid(4,2.5);
+ \draw[fivedarkax] (-4.4,0)--(4.4,0) node[right,text=FiveSilver] {$y_1$};
+ \draw[fivedarkax] (0,-2.7)--(0,2.8) node[above,text=FiveSilver] {$y_2$};
+ \draw[FiveSky,line width=1.3pt] (-1.2,-2.4)--(1.2,2.4);
+ \draw[FiveSilver,line width=1.3pt] (-3,1.5)--(3,-1.5);
+ \draw[fivedarkdash] (1,2)--(3,1)--(2,-1);
+ \draw[fivedarkvec,FiveSky] (0,0)--(1,2)
+  node[fivedarklabel,above left] {$\boldsymbol b_{\text{col}}$};
+ \draw[fivedarkvec,FiveSilver] (0,0)--(2,-1)
+  node[fivedarklabel,below left] {$\boldsymbol b_{\text{left}}$};
+ \draw[fivedarkvec,FiveWhite] (0,0)--(3,1)
+  node[fivedarklabel,above right] {$\boldsymbol b$};
+ \draw[FiveSilver,line width=.6pt] (.1,.2)--(.3,.1)--(.2,-.1);
+ \fill[FiveWhite] (0,0) circle(1.6pt) node[below left] {$O$};
+ \node[text=FiveSky,align=left,anchor=west,fivedarklabel] at (1.55,2.3)
+  {$\Col(A)$\\可到达的输出方向};
+ \node[text=FiveSilver,align=left,anchor=west,fivedarklabel] at (-6.35,2.25)
+  {$\Nul(A^{\mathrm T})$\\不可到达的输出方向};
+ \node at (0,-3.05) {$r+(m-r)=m,\qquad r=r(A)$};
+\end{tikzpicture}}
+{仍取上一图的 $A$。白色目标为 $(3,1)^{\mathrm T}$，蓝色分量为 $(1,2)^{\mathrm T}$，灰色分量为 $(2,-1)^{\mathrm T}$。灰色分量非零，所以目标不可达；蓝色与灰色方向虽正交，仍共同含有原点。}
+
+回到解的问题。既然零空间分量会被映射消灭，所有输入只要行空间分量相同，输出就完全相同。反过来，只要方程组有解，行空间中就恰好有一个解：它是所有解里不带零空间分量的那一个，这就是这里所说的“干净”。其他解只是在它上面加入不同的零空间向量。\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}下一节将把这幅直观画面完整写成解的判定，并证明行空间与列空间之间的一一对应。
+% FOUR SPACES INTUITIVE END
 
 \section{四个子空间怎样共同决定解}
 \label{sec:five-spaces-solutions}
