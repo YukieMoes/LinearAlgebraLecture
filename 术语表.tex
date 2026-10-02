@@ -59,7 +59,7 @@
 \GlossaryLetter{D}
 \GlossaryEntry{棣莫弗定理}{De Moivre's Theorem}{对整数 $n$，$(\cos \theta +i\sin \theta )^n=\cos (n\theta )+i\sin (n\theta )$。}
 \GlossaryEntry{自由度}{Degrees of Freedom}{表示全部解所需的独立自由参数个数；线性方程组有解时等于相应零空间的维数。}
-\GlossaryEntry{行列式}{Determinant}{与方阵对应的标量，用来刻画有向体积缩放及可逆性；第5章展开。}
+\GlossaryEntry{行列式}{Determinant}{与方阵对应的标量，绝对值是线性变换的体积缩放倍数，符号记录方向是否翻转；为零时方阵不可逆。第6章展开。}
 \GlossaryEntry{对角矩阵}{Diagonal Matrix}{主对角线以外的元素全为零的方阵，对应各坐标分量分别缩放。}
 \GlossaryEntry{矩阵对角化}{Diagonalization}{选择适当的基，使某个线性变换的矩阵表示成为对角矩阵；并非所有方阵都能对角化。第9章展开。}
 \GlossaryEntry{维数}{Dimension}{有限维空间中任意一组基所含的向量个数，记为 $\dim V$；零子空间的维数为0。}
@@ -197,6 +197,7 @@
 \GlossaryEntry{外积}{Outer Product}{列向量与行向量的矩阵乘积 $\boldsymbol u\boldsymbol v^{\mathrm T}$；第 $(i,j)$ 个元素为 $u_iv_j$，两向量均非零时秩为1。}
 \GlossaryLetter{P}
 \GlossaryEntry{平行四边形定则}{Parallelogram Rule}{以同一起点的两个向量为邻边作平行四边形，其从共同起点出发的对角线表示向量和。}
+\GlossaryEntry{平行多面体}{Parallelotope}{由同一空间中的向量作为邻边、系数分别在0到1之间变化而得到的区域；边向量相关时退化到较低维子空间。}
 \GlossaryEntry{部分选主元}{Partial Pivoting}{每一步在当前列尚未处理的行中选绝对值最大的元素，交换到主元行后再消元。}
 \GlossaryEntry{特解}{Particular Solution}{一个确实满足给定方程组的具体解；一个特解未必代表全部解。}
 \GlossaryEntry{被动旋转}{Passive Rotation}{向量不动，转动描述它的坐标架；新坐标由对应主动旋转矩阵的逆矩阵换算。}
@@ -309,6 +310,7 @@
 \GlossaryEntry{向量空间}{Vector Space}{配有封闭的加法与数乘并满足相应八条运算公理的非空集合。}
 \GlossaryEntry{向量减法}{Vector Subtraction}{加上相反向量的运算，$\boldsymbol u-\boldsymbol v=\boldsymbol u+(-\boldsymbol v)$。}
 \GlossaryEntry{黏性阻尼}{Viscous Damping}{采用阻力与速度成正比、方向相反的线性近似；在一维教学模型中写为 $-c\dot x$。}
+\GlossaryEntry{体积缩放倍数}{Volume Scale Factor}{实方阵表示的线性变换对区域体积的乘数，等于行列式的绝对值；退化变换的倍数为0。}
 \GlossaryLetter{W}
 \GlossaryEntry{权重矩阵}{Weight Matrix}{包含模型可训练系数、用于线性映射的矩阵；注意力中的 $A$ 也称权重矩阵，但它由当前输入计算得到，与可训练投影参数 $W_Q,W_K,W_V$ 不同。}
 \GlossaryEntry{全空间}{Whole Space}{所讨论的整个向量空间，它也是自身的子空间。}

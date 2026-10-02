@@ -14003,7 +14003,394 @@ SIGIR 2025的AlphaFuse提供了一个真实的子空间应用：它分开语言�
 % --- 第 6 章 ---
 \chapter{行列式：从体积到可逆性}
 \label{chap:determinants}
-% 在这里编写本章正文。
+% CHAPTER 6 OPENING BEGIN
+% 6.0为章首主线；导入图独立使用6.0.1--6.0.9，不占后续正文图号。
+\begingroup
+\catcode`。=12 \catcode`，=12 \catcode`：=12 \catcode`；=12
+\catcode`？=12 \catcode`！=12 \catcode`（=12 \catcode`）=12
+\linespread{1}\fontsize{12pt}{20pt}\selectfont
+\setlength{\parindent}{2em}\setlength{\parskip}{3pt}
+\setlength{\abovedisplayskip}{8pt}\setlength{\belowdisplayskip}{8pt}
+\clubpenalty=10000 \widowpenalty=10000
+\ctexset{section={format=\raggedright\Large\bfseries\color{MainText},
+ beforeskip=18pt,afterskip=12pt},
+ subsection={format=\raggedright\large\bfseries,beforeskip=12pt,afterskip=8pt}}
+\definecolor{SixBlue}{HTML}{397AA1}
+\definecolor{SixRose}{HTML}{AC4963}
+\definecolor{SixGreen}{HTML}{448678}
+\definecolor{SixGray}{HTML}{68747D}
+\captionsetup[figure]{font=small,labelfont=bf,skip=5pt}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{\thechapter.0.\arabic{figure}}
+\renewcommand{\theHfigure}{\thechapter.opening.\arabic{figure}}
+\newcommand{\SixFigure}[3]{%
+ \par\addvspace{7pt}\noindent\begin{minipage}{\linewidth}
+ \centering #3\par\captionof{figure}{#1}\label{#2}
+ \end{minipage}\par\addvspace{7pt}}
+\newcommand{\SixHead}[1]{\par\addvspace{5pt}\Needspace{4\baselineskip}%
+ \noindent\textbf{#1}\par\nobreak}
+\tikzset{
+ sixaxis/.style={SixGray!70,line width=.65pt,-{Stealth[length=1.8mm]}},
+ sixblue/.style={SixBlue,line width=1.15pt,-{Stealth[length=2mm]}},
+ sixrose/.style={SixRose,line width=1.15pt,-{Stealth[length=2mm]}},
+ sixgreen/.style={SixGreen,line width=1.15pt,-{Stealth[length=2mm]}},
+ sixguide/.style={SixGray!55,densely dashed,line width=.6pt},
+ sixcard/.style={draw=SixBlue!55,fill=SixBlue!5,rounded corners=2pt,
+   align=center,minimum height=9mm,inner sep=4pt}}
+% 单位立方体的三个可见面；可选参数指定可见的x面，避免旋转后涂到背面。
+\newcommand{\SixSolid}[2][1]{%
+ \filldraw[fill=#2!8,draw=#2,line width=.8pt]
+  (0,0,0)--(1,0,0)--(1,0,1)--(0,0,1)--cycle;
+ \filldraw[fill=#2!13,draw=#2,line width=.8pt]
+  (#1,0,0)--(#1,1,0)--(#1,1,1)--(#1,0,1)--cycle;
+ \filldraw[fill=#2!5,draw=#2,line width=.8pt]
+  (0,0,1)--(1,0,1)--(1,1,1)--(0,1,1)--cycle;
+ \ifnum#1=1
+  \draw[sixguide] (0,0,0)--(0,1,0)--(1,1,0);
+  \draw[sixguide] (0,1,0)--(0,1,1);
+ \else
+  \draw[sixguide] (1,0,0)--(1,1,0)--(0,1,0);
+  \draw[sixguide] (1,1,0)--(1,1,1);
+ \fi}
+\setcounter{section}{-1}
+\section{结构之后：度量变换的缩放因子}
+\label{sec:six-volume-opening}
+
+走到这里，我们已经能从一张数表里辨认出许多东西。第一章教我们看独立方向、张成空间与基；第二章把方程组读成列向量的线性表示；第三章让矩阵成为映射的代数语言；第四章区分向量的变化与描述方式的变化；第五章则把一次求解扩展为对全部解、不可达目标与近似解的认识。连同第0章的向量直观，这些知识已经搭起一副可以承载复杂问题的骨架。
+
+这副骨架还留下了一个很具体的问题：\textbf{矩阵作用以后，一块空间变大了多少，还是被压得不再有体积？}秩告诉我们保留了几个独立方向，却没有告诉我们这些方向围出的区域有多大。两个矩阵都可能满秩，一个让区域放大十倍，另一个让它缩小到原来的十分之一。结构相同，尺度却很不同。
+
+\SixFigure{已有知识汇到一个新问题：方向与解的结构已经看清，现在还要量一量空间怎样缩放。}{fig:six-knowledge-tree}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \node[sixcard,text width=4.2cm] (v) at (2.7,3.7) {向量与线性关系\\空间、基与维数};
+ \node[sixcard,text width=4.2cm] (a) at (11.4,3.7) {方程组与线性表示\\目标能否由列向量产生？};
+ \node[sixcard,text width=5.2cm] (m) at (7.05,2.2) {矩阵与映射\\基的像、复合与逆映射};
+ \node[sixcard,text width=5.2cm] (s) at (7.05,.65) {子空间与解的结构\\列空间、零空间、秩与自由度};
+ \draw[sixblue] (v.south)--(m.north west);
+ \draw[sixblue] (a.south)--(m.north east);
+ \draw[sixblue] (m)--(s);
+ \draw[sixrose] (s.south)--(7.05,-.6);
+ \node[text=SixRose,font=\fontsize{29}{32}\selectfont] at (4.2,-1.15) {?};
+ \node[anchor=west,font=\large\bfseries,text=SixRose] at (5,-1.15) {体积缩放因子？};
+\end{tikzpicture}}
+
+人面对混沌，往往先需要辨认关系，再需要知道变化的分量。数学不能替我们消除所有不确定，却能让一个笼统的担心成为可以回答的问题：方向是否还在，信息是否还能恢复，范围到底扩大了多少？本章继续做这样的工作。\textbf{先看见一块区域的变化，再理解变化背后的结构，最后才把它压缩成一个可计算的数。}
+
+\subsection*{先让矩阵作用于一块区域}
+
+一支箭头的像我们会算，那么一整个正方形的像怎样得到？把正方形内每一个点的坐标向量都送入同一个矩阵，所得的点共同构成它的像。在线性变换下，原点不动，平行边仍然平行；单位正方形的两条邻边 $\boldsymbol e_1,\boldsymbol e_2$，变成矩阵的两列。因此，像通常是一个平行四边形，也可能退化成线段或一个点。
+
+先取一个可以直接画出的教学矩阵：
+\begin{equation}
+ A=\begin{pmatrix}2&1\\0&1\end{pmatrix},\qquad
+ A\boldsymbol e_1=\begin{pmatrix}2\\0\end{pmatrix},\qquad
+ A\boldsymbol e_2=\begin{pmatrix}1\\1\end{pmatrix}.
+ \label{eq:six-square-image}
+\end{equation}
+第一条边加长到2，第二条边向右倾斜；四个顶点的像分别是 $(0,0)$、$(2,0)$、$(3,1)$、$(1,1)$。新图形的底为2、高为1，面积是2，恰好是原面积的两倍。
+
+\SixFigure{左边面积为1；右边由两列围出，底为2、高为1，所以面积缩放倍数 $k=2$。一般的像也可能被压成线段，此时 $k=0$。}{fig:six-square-stretch}{%
+\begin{tikzpicture}[x=1.25cm,y=1.25cm,font=\small]
+ \begin{scope}[shift={(.3,0)}]
+  \draw[sixaxis] (-.2,0)--(1.65,0) node[right] {$x$};
+  \draw[sixaxis] (0,-.2)--(0,1.6) node[above] {$y$};
+  \filldraw[fill=SixBlue!8,draw=SixBlue] (0,0) rectangle (1,1);
+  \draw[sixblue] (0,0)--(1,0) node[below] {$\boldsymbol e_1$};
+  \draw[sixblue] (0,0)--(0,1) node[left] {$\boldsymbol e_2$};
+  \node at (.5,.55) {面积1};
+  \node[below left] at (0,0) {$O$};
+ \end{scope}
+ \draw[sixrose] (2.5,.6)--node[above] {$A$} (4.3,.6);
+ \begin{scope}[shift={(5,0)}]
+  \draw[sixaxis] (-.2,0)--(3.55,0) node[right] {$x$};
+  \draw[sixaxis] (0,-.2)--(0,1.6) node[above] {$y$};
+  \filldraw[fill=SixBlue!10,draw=SixBlue,line width=1pt]
+   (0,0)--(2,0)--(3,1)--(1,1)--cycle;
+  \draw[sixblue] (0,0)--(2,0) node[below] {$(2,0)$};
+  \draw[sixblue] (0,0)--(1,1) node[above left] {$(1,1)$};
+  \node[above right] at (3,1) {$(3,1)$};
+  \draw[sixguide] (1,1)--(1,0);
+  \node at (1.6,.5) {面积 $k=2$};
+  \node[below left] at (0,0) {$O$};
+ \end{scope}
+\end{tikzpicture}}
+
+三维里，问题只是把“面积”换成“体积”。单位立方体的三条邻边被送到矩阵的三列，得到一个平行六面体。若第三个独立方向消失，立方体就被压到一个平面上。这个平面上的图形仍可能有面积，但它的\textbf{三维体积}已经为0；不要把“没有三维体积”误读成“什么都没有留下”。
+
+例如取
+\begin{equation}
+ B=\begin{pmatrix}1&0&0\\0&1&0\\0&0&0\end{pmatrix},\qquad
+ B\begin{pmatrix}s\\t\\h\end{pmatrix}
+ =\begin{pmatrix}s\\t\\0\end{pmatrix}.
+ \label{eq:six-collapse-three}
+\end{equation}
+这是向 $xy$ 平面的正交投影。高度 $h$ 不再出现在输出中：同一竖线上所有点，都变成同一个点。
+
+\SixFigure{立方体被压到平面上。右边的正方形仍有面积，三维体积却为0；不同高度产生相同输出，丢失的是竖直方向的信息。}{fig:six-cube-collapse}{%
+\begin{tikzpicture}[font=\small]
+ \begin{scope}[shift={(1,1)},x={(1.6cm,-.55cm)},y={(1cm,.7cm)},z={(0cm,1.65cm)}]
+  \SixSolid{SixBlue}
+  \draw[sixaxis] (0,0,0)--(1.6,0,0) node[right] {$x$};
+  \draw[sixaxis] (0,0,0)--(0,1.55,0) node[above right] {$y$};
+  \draw[sixaxis] (0,0,0)--(0,0,1.45) node[above] {$z$};
+  \fill[SixRose] (.5,.5,.2) circle(2pt);
+  \fill[SixRose] (.5,.5,.85) circle(2pt);
+  \draw[sixrose] (.5,.5,.85)--(.5,.5,.2);
+ \end{scope}
+ \draw[sixrose] (5.1,1.6)--node[above] {$B$} (7.2,1.6);
+ \begin{scope}[shift={(9,1)},x={(1.6cm,-.55cm)},y={(1cm,.7cm)},z={(0cm,1.65cm)}]
+  \draw[sixaxis] (0,0,0)--(1.8,0,0) node[right] {$x$};
+  \draw[sixaxis] (0,0,0)--(0,1.75,0) node[above right] {$y$};
+  \draw[sixguide] (0,0,0)--(0,0,1.3) node[above] {$z$};
+  \filldraw[fill=SixBlue!12,draw=SixBlue,line width=1pt]
+   (0,0,0)--(1,0,0)--(1,1,0)--(0,1,0)--cycle;
+  \fill[SixRose] (.5,.5,0) circle(2.3pt);
+  \node[above right,text=SixRose] at (.5,.5,0) {同一个像};
+ \end{scope}
+ \node[text=SixRose,font=\bfseries] at (10.4,-.35) {体积变为0，信息丢失};
+\end{tikzpicture}}
+
+我们要度量的究竟是什么？是所有方向共同围出的量，不是任意一条边的长度。沿三个坐标方向分别放大2、1、1倍，单位体积变为2；旋转改变朝向，却不改变体积；向一个平面投影，则让三维体积归零。矩阵的元素可能看起来很不同，这三个效果却都能用一个体积缩放倍数表达。
+
+\SixFigure{灰色虚线是原单位立方体，蓝色实线是像。缩放把体积变为2，旋转仍为1，投影变为0；这里比较的是三维体积。}{fig:six-three-volume-effects}{%
+\begin{tikzpicture}[font=\footnotesize]
+ \foreach \d/\title in {0/缩放,5.2/旋转,10.4/投影}{
+  \node[font=\small\bfseries] at (\d+1.7,2.65) {\title};
+  \pgfmathsetmacro{\sixorigin}{\d+1}
+  \begin{scope}[shift={(\sixorigin cm,0)},x={(.9cm,-.5cm)},y={(.3cm,.8cm)},z={(0cm,1.15cm)}]
+   \foreach \h in {0,1}{\draw[sixguide]
+    (0,0,\h)--(1,0,\h)--(1,1,\h)--(0,1,\h)--cycle;}
+   \foreach \xx/\yy in {0/0,1/0,1/1,0/1}{\draw[sixguide] (\xx,\yy,0)--(\xx,\yy,1);}
+  \end{scope}}
+ \begin{scope}[shift={(1cm,0)},x={(1.8cm,-1cm)},y={(.3cm,.8cm)},z={(0cm,1.15cm)}]
+  \SixSolid{SixBlue}
+ \end{scope}
+ \begin{scope}[shift={(6.2cm,0)},x={(.848528cm,.212132cm)},y={(-.424264cm,.919239cm)},z={(0cm,1.15cm)}]
+  \SixSolid[0]{SixBlue}
+ \end{scope}
+ \begin{scope}[shift={(11.4cm,0)},x={(.9cm,-.5cm)},y={(.3cm,.8cm)},z={(0cm,1.15cm)}]
+  \filldraw[fill=SixBlue!12,draw=SixBlue,line width=1.1pt]
+   (0,0,0)--(1,0,0)--(1,1,0)--(0,1,0)--cycle;
+ \end{scope}
+ \node[align=center] at (1.7,-1.6) {$D=\operatorname{diag}(2,1,1)$\\[4pt]体积倍数2};
+ \node[align=center] at (6.9,-1.6) {$R_z(45^\circ)$\\[4pt]体积倍数1};
+ \node[align=center] at (12.1,-1.6) {$P=\operatorname{diag}(1,1,0)$\\[4pt]体积倍数0};
+\end{tikzpicture}}
+
+\subsection*{体积为0，把前三种判断连在一起}
+
+什么时候会围不出体积？先统一讨论范围：\textbf{以下关联都针对实 $n\times n$ 方阵 $A$，以及 $\mathbb R^n$ 中的 $n$ 维体积。}若把长方形矩阵也不加区别地塞进这些结论，“可逆”“唯一解”和“体积”就可能说的不是同一件事。
+
+把 $A$ 的列写成 $\boldsymbol a_1,\ldots,\boldsymbol a_n$。单位区域的像为
+\begin{equation}
+ \mathcal P_A=\left\{t_1\boldsymbol a_1+\cdots+t_n\boldsymbol a_n:
+          0\leq t_j\leq1\right\}.
+ \label{eq:six-image-cell}
+\end{equation}
+这就是说，让每条列向量分别取0到1倍，所有组合恰好填出一块\term{parallelotope}。二维时它是平行四边形，三维时是平行六面体。
+
+若列向量相关，它们只能张成一个维数小于 $n$ 的子空间，$\mathcal P_A$ 也被限制在其中，因而没有 $n$ 维体积。若列向量无关，则它们构成 $\mathbb R^n$ 的一组基，围出的区域没有塌缩，体积为正。于是，第一个联系是
+\begin{equation}
+ \operatorname{Vol}_n(\mathcal P_A)=0
+ \quad\Longleftrightarrow\quad r(A)<n
+ \quad\Longleftrightarrow\quad A\text{ 的列线性相关}.
+ \label{eq:six-zero-volume-rank}
+\end{equation}
+体积归零与秩不足，是同一次降维的两种读法。图中观察到的塌缩，将在本章与行列式的代数性质严格对接。
+
+\SixFigure{左边三个不共面的方向围出非零体积；右边第三个向量留在前两个张成的平面内，围不出三维体积。共面图形仍可能有非零面积。}{fig:six-independent-volume}{%
+\begin{tikzpicture}[font=\small]
+ \begin{scope}[shift={(1.1,1.1)},x={(1.8cm,-.5cm)},y={(1.2cm,.7cm)},z={(0cm,1.8cm)}]
+  \SixSolid{SixBlue}
+  \draw[sixblue] (0,0,0)--(1,0,0) node[below] {$\boldsymbol e_1$};
+  \draw[sixblue] (0,0,0)--(0,1,0) node[left] {$\boldsymbol e_2$};
+  \draw[sixrose] (0,0,0)--(0,0,1) node[above] {$\boldsymbol e_3$};
+ \end{scope}
+ \begin{scope}[shift={(9,1.1)},x={(1.8cm,-.5cm)},y={(1.2cm,.7cm)},z={(0cm,1.8cm)}]
+  \filldraw[fill=SixBlue!10,draw=SixBlue!55]
+   (-.15,-.15,0)--(1.2,-.15,0)--(1.2,1.2,0)--(-.15,1.2,0)--cycle;
+  \draw[sixblue] (0,0,0)--(1,0,0) node[below] {$\boldsymbol e_1$};
+  \draw[sixblue] (0,0,0)--(0,1,0) node[left] {$\boldsymbol e_2$};
+  \draw[sixrose] (0,0,0)--(1,1,0) node[above right] {$\boldsymbol e_1+\boldsymbol e_2$};
+ \end{scope}
+ \node[align=center] at (2.8,-.2) {三个独立方向\\$r=3$，体积1};
+ \node[align=center] at (10.5,-.2) {只有两个独立方向\\$r=2$，三维体积0};
+\end{tikzpicture}}
+
+那“信息丢失”具体丢在哪里？不是一个含糊的比喻。若 $r(A)<n$，秩--零度定理给出 $\dim\operatorname{Null}(A)=n-r(A)>0$，所以可以找到非零向量 $\boldsymbol z$，满足 $A\boldsymbol z=\boldsymbol0$。于是
+\begin{equation}
+ A(\boldsymbol x+\boldsymbol z)=A\boldsymbol x,
+ \qquad\boldsymbol z\ne\boldsymbol0.
+ \label{eq:six-information-loss}
+\end{equation}
+两个不同输入得到相同输出。只凭输出，我们不能判断原输入是哪一个，也就不存在能恢复所有输入的逆映射。反过来，满秩方阵的零空间只有零向量，不会发生这种混淆，前几章已经证明它可逆。第二个联系因此是
+\begin{equation}
+ \operatorname{Vol}_n(\mathcal P_A)=0
+ \quad\Longleftrightarrow\quad \operatorname{Null}(A)\ne\{\boldsymbol0\}
+ \quad\Longleftrightarrow\quad A\text{ 不可逆}.
+ \label{eq:six-zero-volume-inverse}
+\end{equation}
+所谓丢失信息，正是零空间中的变化无法从输出中辨认。恢复不了整个空间，不妨碍我们在一个合适的受限子空间上恢复；这里讨论的是整个 $\mathbb R^n$ 上的可逆性。
+
+\SixFigure{左边可把每个点送回原处；右边不同高度都落到同一位置，输出无法告诉我们该恢复哪个高度。可逆性讨论的是点的对应，不能只比较外轮廓。}{fig:six-invertible-recovery}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \node[font=\small\bfseries] at (3.2,3.7) {可逆：可以逐点恢复};
+ \filldraw[fill=SixBlue!8,draw=SixBlue] (.1,.9) rectangle (1.2,2);
+ \filldraw[fill=SixBlue!8,draw=SixBlue] (4.2,.9) rectangle (6.4,2);
+ \draw[sixblue] (1.6,1.9)--node[above] {$D=\operatorname{diag}(2,1)$} (3.8,1.9);
+ \draw[sixgreen] (3.8,1.1)--node[below] {$D^{-1}$} (1.6,1.1);
+ \node at (3.2,.1) {每个输出恰好对应一个输入};
+ \node[font=\small\bfseries] at (11,3.7) {不可逆：高度被忘记};
+ \filldraw[fill=SixBlue!8,draw=SixBlue] (8,.9) rectangle (9.1,2);
+ \fill[SixRose] (8.55,1.1) circle(2pt);
+ \fill[SixRose] (8.55,1.8) circle(2pt);
+ \draw[sixrose] (9.6,1.5)--node[above] {$P=\operatorname{diag}(1,0)$} (12.3,1.5);
+ \draw[SixBlue,line width=2pt] (12.8,1.45)--(14.1,1.45);
+ \fill[SixRose] (13.45,1.45) circle(2.3pt);
+ \node[align=center] at (11,.1) {$(s,t)$ 与 $(s,t')$，$t\ne t'$\\都变成 $(s,0)$};
+\end{tikzpicture}}
+
+\subsection*{回到方程组：体积怎样回答有解与唯一？}
+
+一块区域塌缩了，对求解 $A\boldsymbol x=\boldsymbol b$ 意味着什么？第五章已经把答案分成两部分：列空间决定目标是否可达，零空间决定到达同一目标的自由度。现在，体积让我们一眼看见这两部分为何同时发生变化。
+
+若 $r(A)=n$，列空间就是整个 $\mathbb R^n$，所有目标都可达；零空间又只有零向量，每个目标只有一个原像。若 $r(A)<n$，目标在列空间外时无解，在列空间内时有解，但非零零空间向量会带来无穷多个解。这两个条件必须分别检查，\textbf{体积为0本身不能告诉我们某个具体目标到底无解，还是有无穷多解。}
+
+\SixFigure{满秩时，每个目标都有唯一解；秩不足时，还要看红色目标是否在蓝色列空间中。中图可达而不唯一，右图不可达。这三幅图均在输出空间中。}{fig:six-solutions-volume}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \node[font=\small\bfseries] at (2.25,3.1) {满秩：唯一解};
+ \fill[SixBlue!6] (.1,-.3) rectangle (4.1,2.4);
+ \foreach \t in {.5,1.5,2.5,3.5}{\draw[SixGray!20] (\t,-.3)--(\t,2.4);}
+ \foreach \t in {0,1,2}{\draw[SixGray!20] (.1,\t)--(4.1,\t);}
+ \draw[sixaxis] (.45,0)--(4.3,0);
+ \draw[sixaxis] (.65,-.3)--(.65,2.65);
+ \draw[sixrose] (.65,0)--(2.65,1) node[above] {$\boldsymbol b=(2,1)^{\mathrm T}$};
+ \node[text=SixBlue] at (2.45,2.05) {$\operatorname{Col}(A)=\mathbb R^2$};
+ \node[align=center] at (2.25,-1.25)
+  {$A=\left(\begin{smallmatrix}2&1\\0&1\end{smallmatrix}\right)$\\[5pt]$\boldsymbol x=(\tfrac12,1)^{\mathrm T}$};
+ \foreach \d/\h/\title in {5.2/0/秩不足：无穷多解,10.4/1/秩不足：无解}{
+  \begin{scope}[shift={(\d,0)}]
+   \node[font=\small\bfseries] at (2.25,3.1) {\title};
+   \draw[SixBlue,line width=1.7pt] (.1,0)--(4.15,0);
+   \draw[sixaxis] (.65,-.3)--(.65,2.65);
+   \draw[sixrose] (.65,0)--(2.65,\h);
+   \fill[SixRose] (2.65,\h) circle(2pt);
+   \node[above,text=SixRose] at (2.65,\h) {$\boldsymbol b=(1,\h)^{\mathrm T}$};
+   \node[below,text=SixBlue] at (2.8,0) {$\operatorname{Col}(C)$};
+   \node[align=center] at (2.25,-1.25)
+    {$C=\left(\begin{smallmatrix}1&1\\0&0\end{smallmatrix}\right)$\\[5pt]
+     \ifnum\h=0 $x_1+x_2=1$\else $0=1$，矛盾\fi};
+  \end{scope}}
+\end{tikzpicture}}
+
+记住这个数之后，本章会把三重联系整理成同一套判定。它们不是互不相干的口诀：满秩是独立方向的说法，非零体积是几何的说法，可逆与唯一解是映射及方程组的说法。我们正在从不同侧面认识同一个结构。
+
+\subsection*{最后计算：底乘高为什么给出 $ad-bc$？}
+
+既然先看图，我们是否能从图里读出一个公式？取矩阵的两列
+\begin{equation}
+ A=\begin{pmatrix}a&c\\b&d\end{pmatrix},\qquad
+ \boldsymbol u=\begin{pmatrix}a\\b\end{pmatrix},\qquad
+ \boldsymbol v=\begin{pmatrix}c\\d\end{pmatrix}.
+ \label{eq:six-two-columns}
+\end{equation}
+它们分别是单位正方形两条邻边的像。我们不数乘积项，先以 $\boldsymbol u$ 为底，把 $\boldsymbol v$ 沿底边方向的偏移与垂直方向的高度分开。沿底边滑动不会改变面积，真正参与“底乘高”的，是垂直方向留下的长度。
+
+\SixFigure{把 $\boldsymbol v$ 分成沿底边的偏移和垂直高度。虚线垂足把高度画出来；沿底边的偏移可以改变倾斜程度，却不改变底乘高。本图底为2、高为1，面积为2。}{fig:six-base-height}{%
+\begin{tikzpicture}[x=1.65cm,y=1.65cm,font=\small]
+ \draw[sixaxis] (-.2,0)--(3.65,0);
+ \draw[sixaxis] (0,-.2)--(0,1.5);
+ \filldraw[fill=SixBlue!10,draw=SixBlue,line width=1pt]
+  (0,0)--(2,0)--(3,1)--(1,1)--cycle;
+ \draw[sixblue] (0,0)--(2,0) node[below] {$\boldsymbol u=(2,0)^{\mathrm T}$};
+ \draw[sixblue] (0,0)--(1,1) node[above left] {$\boldsymbol v=(1,1)^{\mathrm T}$};
+ \draw[sixguide] (1,1)--(1,0);
+ \draw[sixrose] (1,0)--(1,1);
+ \draw[SixGray] (.87,0)--(.87,.13)--(1,.13);
+ \node[anchor=west,text=SixRose] at (1.08,.5) {$h=1$};
+ \node[below] at (1,0) {垂足};
+ \node[anchor=west,align=left,text width=6.4cm] at (4.2,.7)
+  {底长 $\|\boldsymbol u\|$\\[7pt]高 $h=|\boldsymbol v\cdot\boldsymbol n|$\\[7pt]
+   $\boldsymbol n$ 是垂直于底边的单位向量\\[7pt]面积 $=\|\boldsymbol u\|h$};
+\end{tikzpicture}}
+
+假设 $\boldsymbol u\ne\boldsymbol0$，把它逆时针转过 $90^\circ$ 再除以长度，得到
+\begin{equation}
+ \boldsymbol n=\frac{1}{\sqrt{a^2+b^2}}\begin{pmatrix}-b\\a\end{pmatrix},
+ \qquad \boldsymbol u\cdot\boldsymbol n=0,\qquad \|\boldsymbol n\|=1.
+\end{equation}
+这支单位箭头垂直于底边，点积 $\boldsymbol v\cdot\boldsymbol n$ 给出带正负的高度；取绝对值才是通常的高度。第0章的点积已经足够完成这一步。
+\begin{align}
+ h&=|\boldsymbol v\cdot\boldsymbol n|
+     =\frac{|ad-bc|}{\sqrt{a^2+b^2}},\\
+ \text{面积}&=\|\boldsymbol u\|h
+     =\sqrt{a^2+b^2}\,\frac{|ad-bc|}{\sqrt{a^2+b^2}}
+     =|ad-bc|.
+ \label{eq:six-base-height-area}
+\end{align}
+底长与分母抵消，留下的就是 $|ad-bc|$。若 $\boldsymbol u=\boldsymbol0$，图形直接退化为线段或点，面积仍为0，$ad-bc$ 也为0，不必使用上面含分母的计算。\cite{mit-determinant-geometry}
+
+这里终于遇见\term{determinant}：二维中记作 $\det A=ad-bc$。\textbf{通常面积的缩放倍数是 $|\det A|$，行列式本身还保留了方向的正负。}交换两条有序边，或者作一次镜面反射，可能保留面积大小，却颠倒方向；正负号记录的正是这一区别。
+
+\SixFigure{两边面积都为1。左边两条有序基边保持原方向，右边关于 $x$ 轴反射后方向翻转；行列式分别是 $+1$ 和 $-1$，面积倍数都为1。}{fig:six-volume-orientation}{%
+\begin{tikzpicture}[x=1.5cm,y=1.5cm,font=\small]
+ \begin{scope}[shift={(.5,0)}]
+  \filldraw[fill=SixBlue!8,draw=SixBlue] (0,0) rectangle (1,1);
+  \draw[sixaxis] (-.2,0)--(1.5,0);
+  \draw[sixaxis] (0,-1.2)--(0,1.4);
+  \draw[sixblue] (0,0)--(1,0) node[below] {$\boldsymbol e_1$};
+  \draw[sixblue] (0,0)--(0,1) node[left] {$\boldsymbol e_2$};
+  \draw[sixrose] (.45,0) arc[start angle=0,end angle=90,radius=.45];
+  \node[align=center] at (.6,-1.7) {$I_2$：方向保持\\$\det I_2=1$};
+ \end{scope}
+ \draw[sixrose] (2.8,.1)--node[above] {反射} (4.3,.1);
+ \begin{scope}[shift={(5.4,0)}]
+  \filldraw[fill=SixBlue!8,draw=SixBlue] (0,-1) rectangle (1,0);
+  \draw[sixaxis] (-.2,0)--(1.5,0);
+  \draw[sixaxis] (0,-1.2)--(0,1.4);
+  \draw[sixblue] (0,0)--(1,0) node[above] {$\boldsymbol e_1$};
+  \draw[sixblue] (0,0)--(0,-1) node[left] {$-\boldsymbol e_2$};
+  \draw[sixrose] (.45,0) arc[start angle=0,end angle=-90,radius=.45];
+  \node[align=center] at (.6,-1.7)
+   {$F=\operatorname{diag}(1,-1)$：方向翻转\\$\det F=-1$};
+ \end{scope}
+\end{tikzpicture}}
+
+三维及更高维，也有一个带符号的数记录这种整体缩放。这里先用单位区域的像把它看见：
+\begin{equation}
+ k(A)=\operatorname{Vol}_n(\mathcal P_A)=|\det A|.
+ \label{eq:six-volume-factor}
+\end{equation}
+原单位区域的体积是1，所以像的体积就是\term{volume-scale-factor}。本章后面将给出一般行列式的严谨定义与计算规则，并说明为什么同一个线性变换对其他具有体积的区域也给出同样的倍数；此处不把高维图形假装成一张能看全的三维图。
+
+于是，前面三重联系可以收拢为
+\begin{align}
+ \det A\ne0
+ &\ \Longleftrightarrow\ r(A)=n
+ \ \Longleftrightarrow\ A\text{ 可逆}\\
+ &\ \Longleftrightarrow\ \text{对每个 }\boldsymbol b,\ A\boldsymbol x=\boldsymbol b\text{ 有唯一解};\notag\\
+ \det A=0
+ &\ \Longleftrightarrow\ r(A)<n
+ \ \Longleftrightarrow\ A\text{ 不可逆}.
+ \label{eq:six-det-structure}
+\end{align}
+第二行还要接上目标的位置：$\boldsymbol b\notin\operatorname{Col}(A)$ 时无解，$\boldsymbol b\in\operatorname{Col}(A)$ 时有无穷多解。特别是齐次方程总有零解，所以行列式为0时，齐次方程属于后者。这就把第六章的新度量，牢牢接回第五章的解的结构。
+
+\subsection*{公式应当照亮图景，而不是遮住它}
+
+为什么不从排列、逆序数与一长串乘积开始？这些工具有自己的价值，能够给出适用于任意阶方阵的严格公式。但如果把它们放在动机之前，让学生先背符号、后猜用途，行列式就容易变成一个“逆序数算术怪物”：算出了数，却不知道它究竟量了什么。\textbf{这样的教学次序值得纠正。}几何不是算完以后附送的插图，它是我们提出这个概念的理由之一；代数定义则让这份直观能够经受证明，并推广到眼睛看不见的维数。
+
+这也解释了它为什么会进入现代工程。图形处理中，把一块纹理区域线性拉伸成新的区域，需要知道覆盖面积的倍数；在本节的 $A$ 下，这个倍数就是2。把三维状态只保留平面分量，得到简化表示的同时也丢掉高度，原始状态无法从这个输出唯一恢复。在第五章的离散系统教学模型中，一步状态更新若由 $n\times n$ 矩阵给出，单位状态区域下一步的 $n$ 维体积就变为 $|\det A|$。这些都是线性模型中的几何判断，不把真实系统中的非线性、误差与额外约束抹去。
+
+还应记住一个界限：整体体积不变，不表示每个方向都不变。例如 $\operatorname{diag}(2,\tfrac12)$ 把一个方向拉长、另一个方向压短，面积仍为1。仅凭一个行列式，不能看清全部形状，也不能判断动态系统的全部长期行为。\textbf{秩数出方向，行列式度量整体缩放；二者各有任务，不能互相替代。}
+
+回望前五章，我们并不是又添了一项孤立的计算。原来用基辨认的方向、用矩阵描述的作用、用零空间解释的丢失、用解集刻画的自由，如今在一块区域的体积中相遇。秩让我们知道结构是否还完整，行列式让我们知道这副结构经过变换后有多大、方向是否翻转。面对复杂世界，理性所能给予的温柔，是把变化说清楚，把条件留完整，让我们在不确定中仍有一件可以认真辨认、计算和核验的事。带着这幅图景，再进入行列式的定义与运算法则，符号便有了来处。
+
+\par\clearpage
+\endgroup
+\setcounter{figure}{0}
+% 后续第6章正文从6.1节、图6.1起继续；不另填未经要求的章节内容。
+% CHAPTER 6 OPENING END
 
 % --- 第 7 章 ---
 \chapter{内积空间与正交性：线性空间中的几何}
@@ -14500,6 +14887,10 @@ $i=\cos(\pi/2)+i\sin(\pi/2)$，模为1，辐角为 $\pi/2$。因此乘以 $i$ �
 \bibitem{axler2024}
 Axler S. \textit{Linear Algebra Done Right} (《线性代数应该这样学》)[M]. 4th ed. Cham: Springer, 2024.
 \newblock \url{https://doi.org/10.1007/978-3-031-41026-0}.
+
+\bibitem{mit-determinant-geometry}
+MIT OpenCourseWare. \textit{18.013A Calculus with Applications}, Fall 2001, Online Textbook, sec. 4.1: Area, Volume and the Determinant in Two and Three Dimensions[EB/OL]. 面积、体积与行列式绝对值的几何联系 [2026-10-02].
+\newblock \url{https://ocw.mit.edu/ans7870/18/18.013a/textbook/chapter04/section01.html}.
 
 \bibitem{lay2021}
 Lay D C, Lay S R, McDonald J J. \textit{Linear Algebra and Its Applications}（《线性代数及其应用》）[M]. 6th ed., Global Edition. Pearson, 2021.
