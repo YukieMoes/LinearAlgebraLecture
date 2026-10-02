@@ -1,3 +1,16 @@
+% 第5章完整正文：解集结构、正交直和与动态选读。
+\DeclareLectureTerm{fundamental-solutions}{基础解系}{Fundamental Set of Solutions}{齐次线性方程组零空间的一组基；每个齐次解均可唯一表示为这些基向量的线性组合，向量个数为未知数个数减系数矩阵的秩。}
+\DeclareLectureTerm{general-solution}{通解}{General Solution}{以任意参数或自由的齐次解完整表示全部解的表达式；不是一个特解或有限几个解。}
+\DeclareLectureTerm{affine-subspace}{仿射子空间}{Affine Subspace}{子空间的一次平移 $\boldsymbol p+W$；其维数为 $\dim W$，当 $\boldsymbol p\notin W$ 时不经过原点。}
+\DeclareLectureTerm{hyperplane}{超平面}{Hyperplane}{$\mathbb R^n$ 中维数为 $n-1$ 的仿射子空间；可由一条系数不全为零的线性方程描述。}
+\DeclareLectureTerm{degrees-freedom}{自由度}{Degrees of Freedom}{表示全部解所需的独立自由参数个数；线性方程组有解时等于相应零空间的维数。}
+\DeclareLectureTerm{orthogonal-subspaces}{子空间正交}{Orthogonal Subspaces}{两个子空间中任取一支向量配对，标准点积均为零的关系；仅有正交并不保证二者之和为整个空间。}
+\DeclareLectureTerm{orthogonal-direct-sum}{正交直和}{Orthogonal Direct Sum}{互相正交的子空间所构成的直和；其中每个向量的分量分解唯一。}
+\DeclareLectureTerm{recurrence-relation}{递推关系}{Recurrence Relation}{用已有项或当前状态确定后续项或状态的关系；线性状态更新可写为 $\boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u_k$。}
+\DeclareLectureTerm{equilibrium-state}{平衡状态}{Equilibrium State}{更新后或随时间不改变的状态；离散系统满足 $(E-F)\boldsymbol x_*=\boldsymbol u$，齐次连续系统满足 $A\boldsymbol y_*=\boldsymbol0$。}
+\DeclareLectureTerm{linear-differential-system}{线性微分方程组}{Linear System of Differential Equations}{以状态分量的导数为未知变化率的线性关系，如 $\dot{\boldsymbol y}=A\boldsymbol y+\boldsymbol g(t)$；其解是随时间变化的函数。}
+\DeclareLectureTerm{vector-field}{矢量场}{Vector Field}{为状态空间的每个点指定一支向量的对应；连续系统的 $A\boldsymbol y$ 在该点表示瞬时变化率。}
+
 % 第5章章首导入：网络结构与状态更新（正式理论在后续正文展开）。
 \DeclareLectureTerm{incidence-matrix}{关联矩阵}{Incidence Matrix}{记录网络节点与线路连接的矩阵；本书取节点为行、定向线路为列，每列在流出节点记$+1$、流入节点记$-1$，其余为$0$。}
 \DeclareLectureTerm{state-vector}{状态向量}{State Vector}{把模型中足以描述当前状态、并结合更新规则与输入确定后续演化的量有序排成的向量；其分量与所选模型有关。}

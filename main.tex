@@ -11617,7 +11617,846 @@ n=\dim\FNull A+\FRank(A).
 \endgroup
 \setcounter{figure}{0}
 % CHAPTER 5 INTRODUCTION END
-% 后续5.1及各节正文待编写；保留章首介绍性实例。
+% CHAPTER 5 BODY BEGIN
+\begingroup
+\catcode`。=12 \catcode`，=12 \catcode`：=12 \catcode`；=12
+\catcode`？=12 \catcode`！=12 \catcode`（=12 \catcode`）=12
+\linespread{1}\fontsize{12pt}{20pt}\selectfont
+\ctexset{section={format=\raggedright\Large\bfseries\color{MainText},
+ beforeskip=18pt,afterskip=12pt},
+ subsection={format=\raggedright\large\bfseries,beforeskip=14pt,afterskip=8pt}}
+\setlength{\parindent}{2em}\setlength{\parskip}{4pt}
+\setlength{\abovedisplayskip}{8pt}\setlength{\belowdisplayskip}{8pt}
+\clubpenalty=10000 \widowpenalty=10000
+\tcbset{commonbox/.append style={breakable,
+ fontupper=\linespread{1}\fontsize{11.5pt}{18pt}\selectfont,
+ before skip=12pt,after skip=10pt}}
+\captionsetup[figure]{font=small,labelfont=bf,skip=6pt}
+\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
+\renewcommand{\theHfigure}{\thechapter.body.\arabic{figure}}
+\definecolor{FiveB}{HTML}{397AA1}
+\definecolor{FiveG}{HTML}{448678}
+\definecolor{FiveR}{HTML}{AC4963}
+\definecolor{FiveK}{HTML}{68747D}
+\newcommand{\Nul}{\operatorname{Null}}
+\newcommand{\Col}{\operatorname{Col}}
+\newcommand{\Row}{\operatorname{Row}}
+\newcommand{\FiveMat}[2]{\left(\begin{array}{#1}#2\end{array}\right)}
+\newcommand{\FiveHead}[1]{\par\addvspace{6pt}\Needspace{4\baselineskip}\noindent\textbf{#1}\par\nobreak}
+% 模板在标题内部推进共用计数器；正文标签须显式取该计数器的值。
+\makeatletter
+\newcommand{\FiveBoxLabel}[1]{%
+ \begingroup\protected@edef\@currentlabel{\thetheorem}\label{#1}\endgroup}
+\makeatother
+\newcommand{\FiveFigure}[4]{%
+ \par\addvspace{8pt}\noindent\begin{minipage}{\linewidth}
+ \centering #3\par\captionof{figure}{#1}\label{#2}
+ \par\vspace{4pt}\begingroup\raggedright
+ \linespread{1}\fontsize{9.5pt}{14pt}\selectfont\color{FiveK}
+ \noindent\textbf{读图说明：}#4\par\endgroup
+ \end{minipage}\par\addvspace{8pt}}
+\tikzset{
+ fiveax/.style={-{Stealth[length=1.7mm]},FiveK!80,line width=.6pt},
+ fiveb/.style={-{Stealth[length=2.2mm]},FiveB,line width=1.1pt},
+ fiveg/.style={-{Stealth[length=2.2mm]},FiveG,line width=1.1pt},
+ fiver/.style={-{Stealth[length=2.2mm]},FiveR,line width=1.1pt},
+ fivedash/.style={FiveK!60,densely dashed,line width=.6pt},
+ fivebox/.style={draw=FiveK!35,rounded corners=2pt,fill=FiveK!3}}
+
+\FiveHead{从一个答案，到全部答案}
+第二章教我们把方程组化简，第四章教我们辨认映射的零空间和值域。现在的问题是：消元得到的几个自由变量，怎样组织成一个完整的空间？一个非齐次方程组的所有解，又怎样与这个空间联系起来？本章沿这两个问题前进，逐渐把矩阵两端的四个基本子空间放进同一幅图。计算仍使用第二章的方法，新的重点在于解释计算结果。
+
+\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}这句话将贯穿全章。第5.1至5.6节为主线；第5.7、5.8节为选读，把同样的线性结构放到随时间更新的状态中观察。
+
+\section{齐次方程组：从自由变量到基础解系}
+\label{sec:five-homogeneous}
+
+解出一个齐次方程组后，我们常把自由变量记成 $s,t$，然后写出各未知数的表达式。这已经给出了全部解，但还没有回答一个结构性问题：这些参数究竟对应哪些独立方向？第四章已经初步构造过零空间的基，本节把这一方法整理成求\textbf{基础解系}的标准语言。
+
+\begin{example}[把参数解写成向量组合]
+\FiveBoxLabel{ex:five-running-null}
+求矩阵
+\begin{equation}
+ A=\FiveMat{rrr}{1&1&0\\2&2&0\\-1&-1&0}
+ \label{eq:five-running-A}
+\end{equation}
+对应的齐次方程组 $A\boldsymbol x=\boldsymbol0$ 的全部解，并说明解空间的基与维数。
+\end{example}
+\textbf{解}\quad 按第二章的行变换，$r_2\leftarrow r_2-2r_1$、$r_3\leftarrow r_3+r_1$，只剩一个独立方程 $x_1+x_2=0$。无需重复展开消元表：主元变量是 $x_1$，自由变量是 $x_2,x_3$。取 $x_2=s,x_3=t$，得到
+\begin{align}
+ \boldsymbol x&=(-s,s,t)^{\mathrm T}
+ =s\boldsymbol\xi_1+t\boldsymbol\xi_2,\qquad s,t\in\mathbb R,\\
+ \boldsymbol\xi_1&=(-1,1,0)^{\mathrm T},\qquad
+ \boldsymbol\xi_2=(0,0,1)^{\mathrm T}.
+ \label{eq:five-running-basis}
+\end{align}
+两支向量都满足齐次方程，所有解也都由它们表示。若 $s\boldsymbol\xi_1+t\boldsymbol\xi_2=\boldsymbol0$，检查第二个分量得 $s=0$，检查第三个分量得 $t=0$，因此它们线性无关。它们构成 $\Nul(A)$ 的一组基，解空间是 $x_1+x_2=0$ 的二维平面，尽管这些解都用三个分量记录。
+
+把全部解用任意参数一次写出的表达式，称为\term{general-solution}。参数必须遍历相应的全部实数值，不能只代入几个值，便把所得几个向量当成全部解。
+
+\begin{definition}[基础解系]
+齐次方程组 $A\boldsymbol x=\boldsymbol0$ 的解空间 $\Nul(A)$ 的一组基，称为该方程组的\term{fundamental-solutions}。它必须同时满足两个条件：各解向量线性无关，而且能够线性表示全部齐次解。
+\end{definition}
+
+\FiveHead{每个自由变量，贡献一个独立的解方向}
+一般地，设自由变量为 $x_{j_1},\ldots,x_{j_k}$。把第 $i$ 个自由变量取1，其余自由变量取0，再由主元方程确定其他分量，得到解向量 $\boldsymbol\xi_i$。由于齐次方程的主元变量都是自由变量的线性组合，任意解都能写成
+\begin{equation}
+ \boldsymbol x=c_1\boldsymbol\xi_1+\cdots+c_k\boldsymbol\xi_k,
+ \qquad c_1,\ldots,c_k\in\mathbb R.
+ \label{eq:five-homogeneous-general}
+\end{equation}
+在第 $j_i$ 个分量上，$\boldsymbol\xi_i$ 为1，其余构造出的解向量为0。因此，若上述组合为零，在这些自由分量上依次检查，便得到 $c_1=\cdots=c_k=0$。这同时证明了\textbf{生成全部解}与\textbf{线性无关}，两项条件缺一不可。
+
+\begin{theorem}[基础解系的向量个数]
+设 $A$ 有 $n$ 列，$r(A)=r$。齐次方程组的解空间维数为
+\begin{equation}
+ \dim\Nul(A)=n-r.
+\end{equation}
+当 $r<n$ 时，任意基础解系含 $n-r$ 个向量；当 $r=n$ 时，只有零解，没有非零基础解向量，零空间维数为0。
+\end{theorem}
+\begin{proof}
+第四章的秩与零度定理给出 $n=\dim\Nul(A)+r(A)$。上一段的参数构造又说明，每个自由变量对应一支基向量。因此基向量个数、自由变量个数与 $n-r$ 是同一个数字的三种解释。
+\end{proof}
+
+\FiveFigure{一维解空间：全部解沿一条过原点的直线变化。}{fig:five-null-line}{%
+\begin{tikzpicture}[x={(.95cm,-.25cm)},y={(.65cm,.35cm)},z={(0cm,.85cm)},font=\small]
+ \draw[fiveax] (0,0,0)--(3,0,0) node[right] {$x_1$};
+ \draw[fiveax] (0,0,0)--(0,3,0) node[above right] {$x_2$};
+ \draw[fiveax] (0,0,0)--(0,0,2) node[above] {$x_3$};
+ \draw[FiveG,line width=1.4pt] (-1,-1,0)--(2.3,2.3,0);
+ \draw[fiveg] (0,0,0)--(1.4,1.4,0) node[above] {$t(1,1,0)^{\mathrm T}$};
+ \fill[FiveG] (0,0,0) circle(1.6pt) node[below left] {$O$};
+\end{tikzpicture}}
+{示例方程为 $x_1-x_2=0,x_3=0$，只剩一个自由参数。画的是 $\mathbb R^3$ 中的一条直线，而非整张坐标平面。}
+
+\FiveFigure{二维解空间：两支独立解向量张成过原点的平面。}{fig:five-null-plane}{%
+\begin{tikzpicture}[x={(.95cm,-.25cm)},y={(.65cm,.35cm)},z={(0cm,.85cm)},font=\small]
+ \fill[FiveG!12] (-1,-1,0)--(3,-1,0)--(3,2.5,0)--(-1,2.5,0)--cycle;
+ \draw[FiveG!50] (-1,-1,0)--(3,-1,0)--(3,2.5,0)--(-1,2.5,0)--cycle;
+ \draw[fiveax] (0,0,0)--(3.5,0,0) node[right] {$x_1$};
+ \draw[fiveax] (0,0,0)--(0,3,0) node[above right] {$x_2$};
+ \draw[fiveax] (0,0,0)--(0,0,2) node[above] {$x_3$};
+ \draw[fiveg] (0,0,0)--(2,0,0);
+ \draw[fiveg] (0,0,0)--(0,2,0);
+ \node[text=FiveG] at (2,1.5,0) {$x_3=0$};
+ \fill[FiveG] (0,0,0) circle(1.6pt) node[below left] {$O$};
+\end{tikzpicture}}
+{示例方程为 $x_3=0$，$x_1,x_2$ 自由。淡色区域只画平面的一部分，平面向所有方向无限延伸。}
+
+\FiveFigure{三维解空间：零映射的全部输入都是解。}{fig:five-null-whole}{%
+\begin{tikzpicture}[x={(.95cm,-.25cm)},y={(.65cm,.35cm)},z={(0cm,.85cm)},font=\small]
+ \fill[FiveG!8] (0,0,0)--(2,0,0)--(2,0,2)--(0,0,2)--cycle;
+ \fill[FiveG!12] (2,0,0)--(2,2,0)--(2,2,2)--(2,0,2)--cycle;
+ \fill[FiveG!18] (0,0,2)--(2,0,2)--(2,2,2)--(0,2,2)--cycle;
+ \draw[FiveG!50] (0,0,0)--(2,0,0)--(2,2,0)--(0,2,0)--cycle;
+ \draw[FiveG!50] (0,0,2)--(2,0,2)--(2,2,2)--(0,2,2)--cycle;
+ \draw[FiveG!50] (0,0,0)--(0,0,2) (2,0,0)--(2,0,2)
+  (0,2,0)--(0,2,2) (2,2,0)--(2,2,2);
+ \draw[fiveax] (0,0,0)--(3,0,0) node[right] {$x_1$};
+ \draw[fiveax] (0,0,0)--(0,3,0) node[above right] {$x_2$};
+ \draw[fiveax] (0,0,0)--(0,0,3) node[above] {$x_3$};
+ \node[text=FiveG,anchor=west] at (2.3,2,1.6) {$\Nul(0)=\mathbb R^3$};
+\end{tikzpicture}}
+{示例为三元零系数方程组。立方体只帮助辨认三个独立方向；解空间是整个 $\mathbb R^3$，并不被立方体边界限制。}
+
+\FiveHead{基础解系可以改变，解空间不会改变}
+在例题\ref{ex:five-running-null}中，$\boldsymbol\xi_1,\boldsymbol\xi_2$ 是一组基；$\boldsymbol\eta_1=\boldsymbol\xi_1+\boldsymbol\xi_2$、$\boldsymbol\eta_2=\boldsymbol\xi_1-\boldsymbol\xi_2$ 也是一组基，因为原来的两支向量可以由它们反向表示。更熟悉的例子是 $\mathbb R^2$：$(1,0)^{\mathrm T},(0,1)^{\mathrm T}$ 与 $(1,1)^{\mathrm T},(1,-1)^{\mathrm T}$ 都是基。改变的是描述方向的方式，所有能够表示的向量没有改变。
+
+\FiveFigure{同一个二维空间，可以由不同的两支独立向量描述。}{fig:five-basis-choice}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \foreach \xx in {0,6.5}{\begin{scope}[shift={(\xx,0)}]
+  \fill[FiveG!6] (-1.8,-1.4) rectangle(2.2,2.1);
+  \draw[fiveax] (-1.8,0)--(2.2,0);\draw[fiveax] (0,-1.4)--(0,2.1);
+  \fill[FiveK] (0,0) circle(1.5pt);
+ \end{scope}}
+ \draw[fiveg] (0,0)--(1.4,0) node[below] {$(1,0)^{\mathrm T}$};
+ \draw[fiveg] (0,0)--(0,1.4) node[left] {$(0,1)^{\mathrm T}$};
+ \draw[fiveg] (6.5,0)--(7.9,1.4) node[above] {$(1,1)^{\mathrm T}$};
+ \draw[fiveg] (6.5,0)--(7.9,-1.4) node[right] {$(1,-1)^{\mathrm T}$};
+\end{tikzpicture}}
+{图中的两组向量都张成整个平面。基础解系的不唯一性来自空间可以选不同的基；固定变量顺序时，行最简形唯一，按自由变量标准取值构造出的基也随之确定。}
+
+还应分清：系数列的极大线性无关组，是从原列向量中选出的列空间的基，含 $r(A)$ 个向量；基础解系是零空间的基，含 $n-r(A)$ 个向量。前者解释输出能够张成多大范围，后者解释输入还留下多少自由方向。极大无关组这一概念并不限于系数列；若从全部齐次解中选出一组能够生成解空间的独立向量，它本身就是基础解系。
+
+齐次方程把这些自由方向都放在原点处。若右端项不再为零，方向还会存在吗？下一节将说明：它们仍然存在，只是全部解从一个特解出发。
+
+\section{非齐次方程组：一个特解与全部解}
+\label{sec:five-nonhomogeneous}
+
+仍使用式\eqref{eq:five-running-A}中的矩阵，把右端项改为 $\boldsymbol b=(3,6,-3)^{\mathrm T}$。独立方程变为 $x_1+x_2=3$，$\boldsymbol x_p=(3,0,0)^{\mathrm T}$ 显然是一个\term{particular}。但它只给出一个点：$x_2,x_3$ 还可以自由变化。我们需要说明这些变化怎样生成全部解。
+
+\begin{theorem}[两个解的差与解的叠加]
+若 $A\boldsymbol x_1=A\boldsymbol x_2=\boldsymbol b$，则 $\boldsymbol x_1-\boldsymbol x_2\in\Nul(A)$。反之，若 $A\boldsymbol x_p=\boldsymbol b$ 且 $\boldsymbol z\in\Nul(A)$，则 $\boldsymbol x_p+\boldsymbol z$ 仍是 $A\boldsymbol x=\boldsymbol b$ 的解。
+\end{theorem}
+\begin{proof}
+两个输入产生相同输出，它们之间的差别必被映射消去。代数上，
+\begin{align}
+ A(\boldsymbol x_1-\boldsymbol x_2)&=\boldsymbol b-\boldsymbol b=\boldsymbol0,\\
+ A(\boldsymbol x_p+\boldsymbol z)&=\boldsymbol b+\boldsymbol0=\boldsymbol b.
+\end{align}
+后一式说明，沿任何零空间方向改变已有解，都不会改变它的输出。
+\end{proof}
+
+\begin{theorem}[非齐次方程组的通解结构]
+\FiveBoxLabel{thm:five-affine-solutions}
+设 $A\boldsymbol x=\boldsymbol b$ 有解，$\boldsymbol x_p$ 为任意一个特解，$\boldsymbol\xi_1,\ldots,\boldsymbol\xi_k$ 是相应齐次方程组的基础解系，则全部解为
+\begin{equation}
+ \boldsymbol x=\boldsymbol x_p+c_1\boldsymbol\xi_1+\cdots+c_k\boldsymbol\xi_k,
+ \qquad c_1,\ldots,c_k\in\mathbb R.
+ \label{eq:five-affine-general}
+\end{equation}
+用集合表示，即
+\begin{equation}
+ \{\boldsymbol x:A\boldsymbol x=\boldsymbol b\}
+ =\boldsymbol x_p+\Nul(A)
+ =\{\boldsymbol x_p+\boldsymbol z:\boldsymbol z\in\Nul(A)\}.
+\end{equation}
+\end{theorem}
+\begin{proof}
+任意解 $\boldsymbol x$ 与特解之差都在零空间中，所以能写成式\eqref{eq:five-affine-general}。反过来，该式的每个向量都是特解与齐次解之和，因而满足原方程。两个方向都成立，才说明公式没有遗漏解，也没有加入不满足方程的向量。
+\end{proof}
+
+\begin{example}[同一矩阵，改变右端项]
+对式\eqref{eq:five-running-A}中的 $A$，写出 $A\boldsymbol x=(3,6,-3)^{\mathrm T}$ 的通解。
+\end{example}
+\textbf{解}\quad 由例题\ref{ex:five-running-null}的基础解系，直接得到
+\begin{equation}
+ \boldsymbol x=(3,0,0)^{\mathrm T}
+ +s(-1,1,0)^{\mathrm T}+t(0,0,1)^{\mathrm T},\qquad s,t\in\mathbb R.
+\end{equation}
+特解也可以选成 $(2,1,0)^{\mathrm T}$。两支特解相差 $(-1,1,0)^{\mathrm T}$，恰在零空间中，所以换一个特解并不会改变解集。\textbf{特解给出一个出发点，基础解系给出全部可移动方向。}
+
+\FiveFigure{特解加零空间：过原点的方向，生成平移后的解直线。}{fig:five-affine-line}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fiveax] (-2.8,0)--(3.3,0) node[right] {$x_1$};
+ \draw[fiveax] (0,-.6)--(0,2.9) node[above] {$x_2$};
+ \draw[FiveG,line width=1.3pt] (-2.5,0)--(2.8,0);
+ \draw[FiveG,line width=1.3pt] (-2.5,2)--(2.8,2);
+ \draw[fiver] (0,0)--(0,2) node[midway,right] {$\boldsymbol x_p$};
+ \fill[FiveR] (0,2) circle(2pt);
+ \draw[fiveg] (0,2)--(2,2) node[midway,above] {$\boldsymbol z$};
+ \draw[fivedash] (2,0)--(2,2);
+ \node[text=FiveG,anchor=east] at (-2.5,0) {$\Nul(A)$};
+ \node[text=FiveG,anchor=east] at (-2.5,2) {$\boldsymbol x_p+\Nul(A)$};
+ \node[above right] at (2,2) {$\boldsymbol x_p+\boldsymbol z$};
+\end{tikzpicture}}
+{用二维方程 $x_2=2$ 示意。齐次方向为横轴，特解可取 $(0,2)^{\mathrm T}$；任意解都位于与横轴平行的上方直线。}
+
+\begin{definition}[仿射子空间]
+设 $W\subseteq\mathbb R^n$ 是子空间，$\boldsymbol p\in\mathbb R^n$。集合 $\boldsymbol p+W$ 称为\term{affine-subspace}，它是 $W$ 的一次平移，其维数定义为 $\dim W$。
+\end{definition}
+若 $\boldsymbol p\in W$，平移后仍是 $W$；若 $\boldsymbol p\notin W$，平移后的集合不含零向量，因而不是子空间。特别地，\textbf{非齐次方程组在 $\boldsymbol b\ne\boldsymbol0$ 且有解时，其解集不经过原点，是一个仿射子空间。}无解时则是空集，不能用“特解加零空间”表示。
+
+\FiveHead{自由度决定解集的几何形状}
+有解时，设 $k=\dim\Nul(A)=n-r(A)$。当 $k=0$，没有可改变的方向，解集是一个点；当 $k=1$，是直线；当 $k=2$，是平面；一般是 $k$ 维仿射子空间。维数描述的是解集内部独立的变化方向，并不是记录一个解所需的分量个数。
+
+\FiveFigure{解集的四种形态：点、直线、平面与空集。}{fig:five-solution-shapes}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \foreach \xx/\yy in {0/4.4,7/4.4,0/0,7/0}{\draw[fivebox] (\xx,\yy) rectangle ++(6.4,3.7);}
+ \begin{scope}[shift={(0,4.4)}]
+  \node[font=\bfseries] at (3.2,3.2) {有解，$k=0$：一个点};
+  \draw[fiveax] (1,1)--(5.6,1);\draw[fiveax] (1,1)--(1,2.6);
+  \fill[FiveG] (3.4,1.9) circle(3pt) node[right] {$\boldsymbol x_p$};
+ \end{scope}
+ \begin{scope}[shift={(7,4.4)}]
+  \node[font=\bfseries] at (3.2,3.2) {有解，$k=1$：一条直线};
+  \draw[fivedash] (.8,.7)--(5.3,1.6);
+  \draw[FiveG,line width=1.3pt] (.8,1.6)--(5.3,2.5);
+  \fill[FiveR] (2.5,1.94) circle(2pt) node[above] {$\boldsymbol x_p$};
+ \end{scope}
+ \begin{scope}[shift={(0,0)}]
+  \node[font=\bfseries] at (3.2,3.2) {有解，$k=2$：一个平面};
+  \filldraw[fill=FiveG!12,draw=FiveG!70] (1,1)--(4.4,.7)--(5.4,2)--(2,2.3)--cycle;
+  \fill[FiveR] (3.2,1.5) circle(2pt) node[above] {$\boldsymbol x_p$};
+  \draw[fivedash] (1,.4)--(4.4,.1)--(5.4,1.4);
+ \end{scope}
+ \begin{scope}[shift={(7,0)}]
+  \node[font=\bfseries] at (3.2,3.2) {无解：空集};
+  \draw[FiveK] (1.1,1)--(5.3,1);\draw[FiveK] (1.1,2)--(5.3,2);
+  \node[fill=white,text=FiveR,font=\Large] at (3.2,1.5) {$\varnothing$};
+  \node[font=\footnotesize] at (3.2,.4) {两个互相矛盾的平行约束};
+ \end{scope}
+\end{tikzpicture}}
+{图形只示意解集的维数。右下可由 $x_2=1,x_2=2$ 理解：两个约束无法同时满足，解集为空。灰色虚线表示平移之前的方向。}
+
+\begin{definition}[超平面]
+在 $\mathbb R^n$ 中，维数为 $n-1$ 的仿射子空间称为\term{hyperplane}。例如 $a_1x_1+\cdots+a_nx_n=c$，其中系数不全为零，给出一个超平面。
+\end{definition}
+因此，$\mathbb R^3$ 中的平面是超平面，但一条直线不是；$\mathbb R^5$ 中二维解集也不能称为超平面。一个非零线性约束留出 $n-1$ 个自由方向，多个独立约束则可能进一步降低维数。
+
+独立自由参数的个数也称为解集的\term{degrees-freedom}。有解时，它就是齐次解空间的维数；改变特解只改变位置，不改变这个数字。
+
+我们已经看见了原方程的全部解。计算时却总会把原方程改写成更简单的方程，下一节就解释：为什么这些改写仍能保留同一解集。
+
+\section{行变换与原像：为什么消元保持解集}
+\label{sec:five-row-preimage}
+
+第二章把三种初等行变换称为同解变换，第三章又把它们写成左乘初等矩阵。现在可以把两种认识接起来：每个操作都可逆，所以它不仅保留已知解，还保留“哪些输入产生指定输出”这一完整关系。
+
+设 $G$ 是若干初等矩阵的乘积，它可逆。对系数矩阵与常数列同步变换，就是
+\begin{equation}
+ [\,A\mid\boldsymbol b\,]\longmapsto[\,GA\mid G\boldsymbol b\,].
+\end{equation}
+\begin{theorem}[可逆的输出变换保持原像关系]
+\FiveBoxLabel{thm:five-row-equivalence}
+若 $G$ 可逆，则
+\begin{equation}
+ A\boldsymbol x=\boldsymbol b
+ \quad\Longleftrightarrow\quad
+ GA\boldsymbol x=G\boldsymbol b.
+\end{equation}
+因而两个方程组的解集完全相同。
+\end{theorem}
+\begin{proof}
+正向在等式两边左乘 $G$；反向在等式两边左乘 $G^{-1}$。从映射看，$G$ 不会合并不同输出，所以同时变换实际输出与指定目标，不会改变哪些输入满足方程。这里被保持的是目标的\term{preimage}。
+\end{proof}
+
+\FiveHead{固定坐标下的复合，与更换输出坐标}
+固定输入、输出的坐标时，$T(\boldsymbol x)=A\boldsymbol x$ 与 $T'(\boldsymbol x)=GA\boldsymbol x$ 是两个不同的映射，后者是 $G\circ T$。不能把左乘一个矩阵简单说成“映射没有变”。
+
+若改用坐标表示的观点，则可以让 $G$ 把旧输出坐标换成新输出坐标。设旧输出基为 $B$、新输出基为 $C$，规定 $P_{B\leftarrow C}=G^{-1}$。由第四章的坐标公式，
+\begin{equation}
+ [\boldsymbol y]_C=G[\boldsymbol y]_B,
+ \qquad [T(\boldsymbol x)]_C=GA\boldsymbol x.
+\end{equation}
+这时 $A$ 与 $GA$ 记录的是同一个抽象映射在两组\emph{输出基}下的表示，目标也必须从 $\boldsymbol b$ 改记为 $G\boldsymbol b$。输入坐标始终不变。这是换基的解释，而非断言两个固定坐标中的函数相同。
+
+\FiveFigure{输入端保持不变，输出与目标同时经过可逆变换。}{fig:five-row-output}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \foreach \xx in {0,5.2,10.4}{\draw[fivebox] (\xx,0) rectangle ++(4.3,4.1);}
+ \node[font=\bfseries] at (2.15,3.65) {输入：同一条解直线};
+ \draw[fiveax] (.6,.7)--(3.8,.7);\draw[fiveax] (.6,.7)--(.6,2.9);
+ \draw[FiveG,line width=1.2pt] (.8,2.9)--(3.3,.4);
+ \fill[FiveR] (1.5,2.2) circle(2pt) node[right,font=\footnotesize] {$\boldsymbol x$};
+ \node[font=\footnotesize] at (2.1,.15) {$x_1+x_2=3$};
+ \node[font=\bfseries] at (7.35,3.65) {原输出坐标};
+ \draw[fiveax] (5.8,.7)--(9.4,.7);\draw[fiveax] (5.8,.7)--(5.8,3.1);
+ \draw[FiveB,line width=1.2pt] (5.6,.3)--(7.0,3.1);
+ \fill[FiveR] (6.8,2.7) circle(2pt) node[right,font=\footnotesize] {$\boldsymbol b=(3,6)^{\mathrm T}$};
+ \node[font=\footnotesize] at (7.4,.15) {$\Col(D)$：$y_2=2y_1$};
+ \node[font=\bfseries] at (12.55,3.65) {变换后的输出坐标};
+ \draw[fiveax] (11,.7)--(14.4,.7);\draw[fiveax] (11,.7)--(11,3.1);
+ \draw[FiveB,line width=1.4pt] (10.8,.7)--(14.2,.7);
+ \fill[FiveR] (13,.7) circle(2pt) node[above,font=\footnotesize] {$G\boldsymbol b=(3,0)^{\mathrm T}$};
+ \node[font=\footnotesize] at (12.55,.15) {$\Col(GD)$：横轴};
+ \draw[fiveb] (4.35,2)--(5.15,2) node[midway,above] {$D$};
+ \draw[fiver] (9.55,2)--(10.35,2) node[midway,above] {$G$};
+\end{tikzpicture}}
+{取 $D=\FiveMat{rr}{1&1\\2&2}$，$G=\FiveMat{rr}{1&0\\-2&1}$。解直线不变，列空间的坐标图像从斜线变成横轴；零空间仍是 $x_1+x_2=0$。每幅小图的缩放只用于排版。}
+
+\FiveHead{哪些空间不变，哪些空间改变位置}
+对于任意可逆 $G$，有
+\begin{align}
+ \Nul(GA)&=\Nul(A),\\
+ \Row(GA)&=\Row(A),\\
+ \Col(GA)&=G\Col(A).
+ \label{eq:five-row-spaces}
+\end{align}
+第一式由 $GA\boldsymbol x=\boldsymbol0\iff A\boldsymbol x=\boldsymbol0$ 得到。第二式来自双向的行组合：新行都是旧行的组合，旧行又能经 $G^{-1}$ 由新行表示。第三式把每个输出 $A\boldsymbol x$ 送成 $GA\boldsymbol x$；列空间的维数不变，但在固定坐标中的集合通常改变了。
+
+\textbf{注意：可逆不意味着保持长度和夹角。}例如 $G=\operatorname{diag}(2,1)$ 把原来正交的 $(1,1)^{\mathrm T}$、$(1,-1)^{\mathrm T}$ 变成 $(2,1)^{\mathrm T}$、$(2,-1)^{\mathrm T}$，它们的点积为3。换到一般新基后，直接对坐标数组使用标准点积，也未必仍记录原物理向量的夹角。本章下面的正交关系，均针对给定矩阵在标准坐标中的四个子空间。
+
+行变换因此能帮助我们计算原空间的结构，却不能把化简后的列空间原样当成原列空间。带着这一分别看行、看列的习惯，我们把矩阵两端的四个空间一起列出来。
+
+\section{一个矩阵，四个基本子空间}
+\label{sec:five-four-spaces}
+
+只看 $A\boldsymbol x=\boldsymbol b$，容易把注意力集中在一组未知数上。换一个问题：矩阵允许哪些输出？哪些输入不起作用？各行又在检查哪些方向？转置矩阵检测哪些输出端约束？这四个问题分别落在输入与输出两端，不能混成一个空间。
+
+\subsection{四个子空间的定义与维数}
+
+设 $A$ 为 $m\times n$ 矩阵，列记为 $\boldsymbol a_j\in\mathbb R^m$，第 $i$ 行记为 $\boldsymbol r_i^{\mathrm T}$，其中 $\boldsymbol r_i\in\mathbb R^n$。沿用本书的列向量习惯，我们把各行竖排后讨论它们张成的空间。
+
+\begin{definition}[四个基本子空间]
+矩阵 $A$ 的\term{fundamental-subspaces}为
+\begin{align}
+ \Col(A)&=\operatorname{Span}\{\boldsymbol a_1,\ldots,\boldsymbol a_n\}
+ =\{A\boldsymbol x:\boldsymbol x\in\mathbb R^n\},\\
+ \Nul(A)&=\{\boldsymbol x\in\mathbb R^n:A\boldsymbol x=\boldsymbol0\},\\
+ \Row(A)&=\operatorname{Span}\{\boldsymbol r_1,\ldots,\boldsymbol r_m\}
+ =\Col(A^{\mathrm T}),\\
+ \Nul(A^{\mathrm T})&=\{\boldsymbol y\in\mathbb R^m:A^{\mathrm T}\boldsymbol y=\boldsymbol0\}.
+\end{align}
+其中列空间与左零空间位于输出端 $\mathbb R^m$，行空间与零空间位于输入端 $\mathbb R^n$。
+\end{definition}
+
+列空间就是第四章的值域；零空间就是第5.1节的齐次解空间；行空间由转置的列组织；左零空间则是转置的齐次解空间。它们不是四套无关的新定义，而是对同一矩阵同时采用列组合、行约束和转置观察。
+
+\begin{theorem}[四个子空间的维数]
+若 $r(A)=r$，则
+\begin{align}
+ \dim\Col(A)&=r,&\dim\Nul(A)&=n-r,\\
+ \dim\Row(A)&=r,&\dim\Nul(A^{\mathrm T})&=m-r.
+ \label{eq:five-four-dimensions}
+\end{align}
+\end{theorem}
+\begin{proof}
+列空间维数是矩阵秩的定义，零空间维数由秩与零度定理给出。第四章已证明行秩等于列秩，因而 $r(A^{\mathrm T})=r(A)=r$；把秩与零度定理用于 $A^{\mathrm T}:\mathbb R^m\to\mathbb R^n$，就得到左零空间维数 $m-r$。注意，两次计数所用的输入维数分别为 $n$ 与 $m$。
+\end{proof}
+
+\FiveFigure{四个空间各有位置：两块属于输入端，两块属于输出端。}{fig:five-four-dimensions}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fivebox] (0,0) rectangle(6.1,5.2);\draw[fivebox] (8.4,0) rectangle(14.5,5.2);
+ \node[font=\large\bfseries] at (3.05,4.65) {输入空间 $\mathbb R^n$};
+ \node[font=\large\bfseries] at (11.45,4.65) {输出空间 $\mathbb R^m$};
+ \fill[FiveB!10] (.4,2.7) rectangle(5.7,4);
+ \fill[FiveG!10] (.4,.9) rectangle(5.7,2.2);
+ \fill[FiveB!10] (8.8,2.7) rectangle(14.1,4);
+ \fill[FiveG!10] (8.8,.9) rectangle(14.1,2.2);
+ \node[text=FiveB,align=center] at (3.05,3.35) {$\Row(A)$\\维数 $r$};
+ \node[text=FiveG,align=center] at (3.05,1.55) {$\Nul(A)$\\维数 $n-r$};
+ \node[text=FiveB,align=center] at (11.45,3.35) {$\Col(A)$\\维数 $r$};
+ \node[text=FiveG,align=center] at (11.45,1.55) {$\Nul(A^{\mathrm T})$\\维数 $m-r$};
+ \draw[fiveb] (6.25,3.35)--(8.25,3.35) node[midway,above] {$A$};
+ \node[font=\footnotesize,align=center] at (7.25,1.6) {位置不同\\维数配合};
+\end{tikzpicture}}
+{色块表示空间的角色和维数，不是把向量集合切成互不接触的区域。两端可以有不同维数；下一小节将证明每端的两块空间确实构成正交的直和。}
+
+\begin{example}[贯穿矩阵的四个空间]
+求式\eqref{eq:five-running-A}中的矩阵 $A$ 的四个基本子空间及其维数。
+\end{example}
+\textbf{解}\quad 各列都是 $(1,2,-1)^{\mathrm T}$ 的倍数，各行都是 $(1,1,0)$ 的倍数，因此 $r(A)=1$。结合已经求出的齐次解，得到
+\begin{align}
+ \Col(A)&=\operatorname{Span}\{(1,2,-1)^{\mathrm T}\},\\
+ \Row(A)&=\operatorname{Span}\{(1,1,0)^{\mathrm T}\},\\
+ \Nul(A)&=\operatorname{Span}\{(-1,1,0)^{\mathrm T},(0,0,1)^{\mathrm T}\},\\
+ \Nul(A^{\mathrm T})&=\{\boldsymbol y:y_1+2y_2-y_3=0\}
+ =\operatorname{Span}\{(-2,1,0)^{\mathrm T},(1,0,1)^{\mathrm T}\}.
+\end{align}
+两个张成空间各为一维直线，两个零空间各为二维平面，维数分别配成 $1+2=3$。左右两端虽都用三个分量，这两条直线却不是同一条，两个平面也不是同一个。
+
+\FiveHead{怎样从消元结果提取基}
+列空间的基要取\textbf{原矩阵中对应主元列号的列}；行空间的基可以取阶梯形的非零行，因为行变换不改变行空间。零空间的基由自由参数构造；左零空间的基对 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$ 使用同一构造。这样四种基仍由第二章的算法求得，只是读结果时所面对的空间不同。
+
+\subsection{正交与直和：拆开输入与输出}
+
+维数能够相加，还不足以说明两个空间不重叠。我们需要进一步辨认它们的方向关系。这里只使用第0章的标准点积：称两个子空间\term{orthogonal-subspaces}，是指其中任取两支向量的点积都为零。这个表述包括零向量；只有在用夹角解释时，才要求参与夹角的向量非零。
+
+\begin{theorem}[四个基本子空间的正交直和]
+\FiveBoxLabel{thm:five-orthogonal-sums}
+对任意实矩阵 $A$，有
+\begin{align}
+ \Row(A)&\perp\Nul(A),&
+ \mathbb R^n&=\Row(A)\oplus\Nul(A),\\
+ \Col(A)&\perp\Nul(A^{\mathrm T}),&
+ \mathbb R^m&=\Col(A)\oplus\Nul(A^{\mathrm T}).
+ \label{eq:five-orthogonal-sums}
+\end{align}
+这两项分解是\term{orthogonal-direct-sum}：每端任意向量都可以唯一分成两个互相正交的分量。
+\end{theorem}
+\begin{proof}
+\textbf{先证输入端的正交。}若 $\boldsymbol z\in\Nul(A)$，则 $A\boldsymbol z=\boldsymbol0$。逐行看，就是每个 $\boldsymbol r_i\cdot\boldsymbol z=0$。任意行空间向量 $\boldsymbol w=\sum_i c_i\boldsymbol r_i$ 因而满足
+\begin{equation}
+ \boldsymbol w\cdot\boldsymbol z=\sum_i c_i(\boldsymbol r_i\cdot\boldsymbol z)=0.
+\end{equation}
+\textbf{再证交为零。}若 $\boldsymbol v$ 同时属于行空间与零空间，便可以把它分别放在上式的两个位置，于是 $\boldsymbol v\cdot\boldsymbol v=0$。点积与自身相乘是各分量平方和，故 $\boldsymbol v=\boldsymbol0$。
+
+\textbf{最后证铺满输入空间。}由第1章的子空间维数公式和交为零，
+\begin{equation}
+ \dim(\Row(A)+\Nul(A))=r+(n-r)=n.
+\end{equation}
+它是 $\mathbb R^n$ 中的 $n$ 维子空间，因而等于整个空间；交为零又保证和的分解唯一。这就得到输入端的直和。
+
+输出端的论证完全平行：$A^{\mathrm T}\boldsymbol y=\boldsymbol0$ 表示 $\boldsymbol y$ 与每一列正交，因而与整个列空间正交；同时属于列空间与左零空间的向量只能为零。维数之和为 $r+(m-r)=m$，所以两者直和等于 $\mathbb R^m$，分解也唯一。
+\end{proof}
+
+\textbf{注意：正交只说明方向互不重叠，维数计数才保证没有遗漏方向。}例如 $\mathbb R^3$ 中 $x$ 轴与 $y$ 轴正交，合起来却只是一个平面。证明中“正交、交为零、维数足够”这三环不可省去任何一环。
+
+\FiveFigure{输入端的正交直和：行空间分量与零空间分量唯一相加。}{fig:five-input-direct-sum}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fiveax] (-2.8,0)--(3.4,0) node[right] {$x_1$};
+ \draw[fiveax] (0,-2.4)--(0,3.1) node[above] {$x_2$};
+ \draw[FiveB,line width=1.1pt] (-2,-2)--(2.5,2.5);
+ \draw[FiveG,line width=1.1pt] (-2.5,2.5)--(2.2,-2.2);
+ \draw[fiveb] (0,0)--(1.5,1.5) node[above left] {$\boldsymbol x_R$};
+ \draw[fiveg] (1.5,1.5)--(3,0) node[midway,above right] {$\boldsymbol x_N$};
+ \draw[fiver] (0,0)--(3,0) node[below] {$\boldsymbol x$};
+ \draw[fivedash] (0,0)--(1.5,-1.5)--(3,0);
+ \draw[FiveK] (.2,.2)--(0,.4)--(-.2,.2);
+ \node[text=FiveB,anchor=west] at (2.5,2.5) {$\Row(D)$};
+ \node[text=FiveG,anchor=east] at (-2.5,2.5) {$\Nul(D)$};
+\end{tikzpicture}}
+{为便于画在平面，取 $D=\FiveMat{rr}{1&1\\2&2}$。示意 $\boldsymbol x=(2,0)^{\mathrm T}=(1,1)^{\mathrm T}+(1,-1)^{\mathrm T}$；整幅图采用统一放大比例。蓝色与绿色两条直线正交，合起来覆盖整个输入平面。}
+
+\FiveFigure{输出端的正交直和：可产生的部分与左零空间部分分别记录。}{fig:five-output-direct-sum}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fiveax] (-2.8,0)--(4,0) node[right] {$y_1$};
+ \draw[fiveax] (0,-2.1)--(0,3.1) node[above] {$y_2$};
+ \draw[FiveB,line width=1.1pt] (-1,-2)--(1.5,3);
+ \draw[FiveG,line width=1.1pt] (-2.5,1.25)--(3,-1.5);
+ \draw[fiveb] (0,0)--(1,2) node[above left] {$\boldsymbol b_C$};
+ \draw[fiveg] (1,2)--(3,1) node[midway,above right] {$\boldsymbol b_L$};
+ \draw[fiver] (0,0)--(3,1) node[right] {$\boldsymbol b$};
+ \draw[fivedash] (0,0)--(2,-1)--(3,1);
+ \draw[FiveK] (.1,.2)--(-.1,.3)--(-.2,.1);
+ \node[text=FiveB,anchor=west] at (1.5,3) {$\Col(D)$};
+ \node[text=FiveG,anchor=east] at (-2.5,1.25) {$\Nul(D^{\mathrm T})$};
+\end{tikzpicture}}
+{仍取上一图的 $D$。这里 $\boldsymbol b=(3,1)^{\mathrm T}=(1,2)^{\mathrm T}+(2,-1)^{\mathrm T}$，第二部分非零，故整个 $\boldsymbol b$ 不在列空间中。分解只说明结构，本节不讨论投影算法或近似解。}
+
+于是任意输入唯一写成 $\boldsymbol x=\boldsymbol x_R+\boldsymbol x_N$，其中 $\boldsymbol x_R\in\Row(A)$、$\boldsymbol x_N\in\Nul(A)$，并且 $A\boldsymbol x=A\boldsymbol x_R$。零空间分量不影响输出。输出端同样唯一写成 $\boldsymbol b=\boldsymbol b_C+\boldsymbol b_L$；只有列空间中的向量能由 $A$ 产生，非零的左零空间分量则使整个目标不可达。
+
+四个空间现在各有维数，也各有相对方向。下一节把这幅分解图重新放回 $A\boldsymbol x=\boldsymbol b$，回答解的存在性和自由度。
+
+\section{四个子空间怎样共同决定解}
+\label{sec:five-spaces-solutions}
+
+有了解集的平移结构与两端的正交直和，我们可以把两个看似分开的判断合起来：右端项能否达到，由输出端的结构回答；到达之后能否继续改变输入，由输入端的结构回答。
+
+\begin{theorem}[存在性与唯一性的空间判定]
+\FiveBoxLabel{thm:five-compatibility}
+方程组 $A\boldsymbol x=\boldsymbol b$ 有解，当且仅当
+\begin{equation}
+ \boldsymbol b\in\Col(A)
+ \quad\Longleftrightarrow\quad
+ \boldsymbol b\perp\Nul(A^{\mathrm T}).
+\end{equation}
+这里后一条件是指 $\boldsymbol b$ 与左零空间中的\emph{每一支}向量正交。若方程组有解，则解唯一当且仅当 $\Nul(A)=\{\boldsymbol0\}$。
+\end{theorem}
+\begin{proof}
+存在性与属于列空间等价，是向量线性表示的定义。若 $\boldsymbol b$ 在列空间中，前节的正交关系保证它与左零空间正交。反过来，把它唯一分解为 $\boldsymbol b_C+\boldsymbol b_L$。若 $\boldsymbol b$ 与左零空间中所有向量正交，特别取 $\boldsymbol b_L$，则
+\begin{equation}
+ 0=\boldsymbol b\cdot\boldsymbol b_L
+ =\boldsymbol b_C\cdot\boldsymbol b_L+\boldsymbol b_L\cdot\boldsymbol b_L
+ =\boldsymbol b_L\cdot\boldsymbol b_L.
+\end{equation}
+故 $\boldsymbol b_L=\boldsymbol0$，即 $\boldsymbol b$ 属于列空间。
+
+有解时，全部解为 $\boldsymbol x_p+\Nul(A)$。零空间只有零向量时，这个集合只含一个点；含有非零向量时，沿它的所有实数倍改变特解，便得到无穷多个不同的解。
+\end{proof}
+
+左零空间也提供一种简短的\textbf{无解证据}：若找到 $\boldsymbol y$ 满足 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$ 而 $\boldsymbol y\cdot\boldsymbol b\ne0$，目标就不可能由 $A$ 产生。因为对所有 $\boldsymbol x$，有 $\boldsymbol y\cdot(A\boldsymbol x)=(A^{\mathrm T}\boldsymbol y)\cdot\boldsymbol x=0$。这与消元中出现的矛盾行是同一类约束的不同表达。
+
+\begin{example}[不用重复消元，辨认一个不可达目标]
+式\eqref{eq:five-running-A}中的矩阵 $A$，能否产生 $\boldsymbol b=(3,6,-2)^{\mathrm T}$？
+\end{example}
+\textbf{解}\quad 其列空间是 $(1,2,-1)^{\mathrm T}$ 张成的直线，给定目标不在直线上。也可以取左零空间向量 $\boldsymbol y=(1,0,1)^{\mathrm T}$，直接算得 $\boldsymbol y\cdot\boldsymbol b=1\ne0$，故无解。左零空间中的这支向量正在检查约束 $b_1+b_3=0$。
+
+\FiveHead{产生输出的部分，是否也会有重复}
+整个输入空间中可能有多个解，但这些重复来自零空间。如果把输入限制在行空间，零空间的方向已经被排除，是否还会出现重复？下面的结论把这项直观说成严格的一一对应。
+
+\begin{theorem}[行空间到列空间的一一对应]
+\FiveBoxLabel{thm:five-row-col-bijection}
+映射 $\boldsymbol x\mapsto A\boldsymbol x$ 限制在 $\Row(A)$ 上，是从 $\Row(A)$ 到 $\Col(A)$ 的一一对应线性映射。因此，每个可达的目标 $\boldsymbol b$ 在行空间中恰好有一个解。
+\end{theorem}
+\begin{proof}
+\textbf{不合并不同的行空间输入。}若 $\boldsymbol u,\boldsymbol v\in\Row(A)$ 且 $A\boldsymbol u=A\boldsymbol v$，则差 $\boldsymbol u-\boldsymbol v$ 同时属于行空间和零空间。两者交为零，故 $\boldsymbol u=\boldsymbol v$，这就证明单射。
+
+\textbf{覆盖全部列空间输出。}任取 $\boldsymbol b\in\Col(A)$，存在 $\boldsymbol x$ 使 $A\boldsymbol x=\boldsymbol b$。将输入分解成 $\boldsymbol x_R+\boldsymbol x_N$，得到
+\begin{equation}
+ \boldsymbol b=A\boldsymbol x_R+A\boldsymbol x_N=A\boldsymbol x_R.
+\end{equation}
+因此每个列空间输出都有行空间中的原像，这就证明满射。限制后的映射仍保持线性组合，所以它是一一对应的线性映射。
+\end{proof}
+
+\FiveFigure{四个子空间共同决定解：行空间一一对应列空间，零空间送到零。}{fig:five-total-map}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fivebox] (0,.2) rectangle(6,5.7);\draw[fivebox] (8.7,.2) rectangle(14.7,5.7);
+ \node[font=\bfseries] at (3,5.25) {输入端 $\mathbb R^2$};
+ \node[font=\bfseries] at (11.7,5.25) {输出端 $\mathbb R^2$};
+ \draw[FiveB,line width=1.2pt] (1.5,1)--(4.5,4);
+ \draw[FiveG,line width=1.2pt] (1.5,4)--(4.5,1);
+ \node[text=FiveB,above] at (4.5,4) {$\Row(D)$};
+ \node[text=FiveG,above] at (1.5,4) {$\Nul(D)$};
+ \draw[FiveB,line width=1.2pt] (10.95,1)--(12.45,4);
+ \draw[FiveG,line width=1.2pt] (9.7,3.5)--(13.7,1.5);
+ \node[text=FiveB,above] at (12.45,4) {$\Col(D)$};
+ \node[text=FiveG,align=center,font=\footnotesize] at (10,4.35) {$\Nul(D^{\mathrm T})$\\非零向量不可达};
+ \fill[FiveK] (3,2.5) circle(1.7pt);\fill[FiveK] (11.7,2.5) circle(1.7pt);
+ \draw[fiveb] (6.1,4.2)--(8.6,4.2) node[midway,above] {$D$：一一对应};
+ \draw[fiveg] (4.1,1.4) to[out=-25,in=210] (11.7,2.5);
+ \node[fill=white,text=FiveG,font=\footnotesize] at (7.35,1.05) {$D\boldsymbol z=\boldsymbol0$};
+ \node[font=\footnotesize] at (3,.55) {同一输出的输入沿绿色方向改变};
+ \node[font=\footnotesize] at (11.7,.55) {目标必须落在蓝色直线上};
+\end{tikzpicture}}
+{取 $D=\FiveMat{rr}{1&1\\2&2}$，两端均可画在平面。蓝色对应是映射限制后的作用，绿色弧线表示零空间中的所有输入都送到右端原点；它不是输入经过零空间再产生输出的流程。}
+
+对贯穿例子的目标 $\boldsymbol b=(3,6,-3)^{\mathrm T}$，行空间中的输入形如 $(q,q,0)^{\mathrm T}$，代入 $A\boldsymbol x=\boldsymbol b$ 得 $2q=3$，故这一唯一的行空间解为
+\begin{equation}
+ \boldsymbol x_R=(\tfrac32,\tfrac32,0)^{\mathrm T},\qquad
+ \boldsymbol x=\boldsymbol x_R+s(-1,1,0)^{\mathrm T}+t(0,0,1)^{\mathrm T}.
+\end{equation}
+之前选择的特解 $(3,0,0)^{\mathrm T}$ 只是这个集合中的另一个点。这里没有为它们比较“优劣”，只辨认其中哪一个属于行空间。
+
+把结论回扣到章首电网络：可实现的节点注入位于关联矩阵的列空间，左零空间检查全网必须满足的收支条件；已实现的节点平衡允许沿零空间增加循环自由度。线路电势差由节点电势的转置作用组织在行空间中。真实线路电流还需服从元件关系，但这些关系所在的位置，已经由四个子空间明确区分。
+
+我们现在能够同时解释“无解”与“多解”。下一节把这些空间变化放进含参数方程组，看看一个主元消失时，整幅结构图怎样改变。
+
+\section{解的判定：参数分类与结构反推}
+\label{sec:five-parameter}
+
+参数题容易让人忙于约分，却忘记约掉的表达式可能为零。本节不再增加消元技巧，而是用已建立的结构逐项判断：列空间是否接纳目标，零空间是否留下自由方向，行与列的维数有没有发生变化。
+
+\begin{theorem}[秩判定的结构汇总]
+设 $A$ 为 $m\times n$ 矩阵，$\bar A=[\,A\mid\boldsymbol b\,]$。方程组的三种情形为
+\begin{align}
+ r(A)<r(\bar A)&\quad\Longleftrightarrow\quad\text{无解},\\
+ r(A)=r(\bar A)=n&\quad\Longleftrightarrow\quad\text{有解且解唯一},\\
+ r(A)=r(\bar A)<n&\quad\Longleftrightarrow\quad\text{有无穷多解}.
+\end{align}
+有解时，自由参数个数为 $n-r(A)$；齐次方程组必有零解，且有非零解当且仅当 $r(A)<n$。
+\end{theorem}
+\begin{proof}
+添加一列 $\boldsymbol b$，若秩增加，说明该列不在原列空间中，目标不可达；若秩不增加，说明它能由原列表示。可达之后，再用 $\dim\Nul(A)=n-r(A)$ 判断是否留下自由方向。齐次方程的目标为零，始终在列空间中，所以只需判断零空间是否非平凡。
+\end{proof}
+
+\begin{example}[一个参数，三种解的形态]
+\FiveBoxLabel{ex:five-parameter}
+讨论实参数 $\lambda$ 下方程组
+\begin{equation}
+ \begin{cases}
+ x_1+x_2=2,\\
+ \lambda(\lambda-1)x_2=\lambda
+ \end{cases}
+\end{equation}
+的解，并说明四个子空间怎样随参数改变。
+\end{example}
+\textbf{解}\quad 其系数矩阵与增广矩阵已经处于便于观察主元的形式：
+\begin{equation}
+ A_\lambda=\FiveMat{rr}{1&1\\0&\lambda(\lambda-1)},\qquad
+ \bar A_\lambda=\left[\begin{array}{rr|r}1&1&2\\0&\lambda(\lambda-1)&\lambda\end{array}\right].
+\end{equation}
+先保留第二个主元中的表达式，不能提前除以 $\lambda(\lambda-1)$。
+
+当 $\lambda\ne0,1$ 时，两主元均非零，$r(A_\lambda)=r(\bar A_\lambda)=2$。行空间与列空间都是 $\mathbb R^2$，两端零空间都只有零向量，目标可达且没有自由方向。唯一解为
+\begin{equation}
+ \boldsymbol x=\left(2-\frac1{\lambda-1},\ \frac1{\lambda-1}\right)^{\mathrm T}.
+\end{equation}
+当 $\lambda=0$ 时，第二行变为 $0=0$，两种秩均为1。此时
+\begin{align}
+ \Row(A_0)&=\operatorname{Span}\{(1,1)^{\mathrm T}\},&
+ \Nul(A_0)&=\operatorname{Span}\{(-1,1)^{\mathrm T}\},\\
+ \Col(A_0)&=\operatorname{Span}\{(1,0)^{\mathrm T}\},&
+ \Nul(A_0^{\mathrm T})&=\operatorname{Span}\{(0,1)^{\mathrm T}\}.
+\end{align}
+目标 $(2,0)^{\mathrm T}$ 仍在列空间中，但零空间扩大为一条直线，故有无穷多解：$\boldsymbol x=(2,0)^{\mathrm T}+t(-1,1)^{\mathrm T}$。
+
+当 $\lambda=1$ 时，系数矩阵与 $A_0$ 相同，四个基本子空间也相同，右端项却变为 $(2,1)^{\mathrm T}$。第二行是 $0=1$，于是 $r(A_1)=1<r(\bar A_1)=2$，无解。目标沿左零空间多出非零分量，已经离开可达的列空间。
+
+\FiveFigure{主元消失之后，还必须检查目标：秩下降可以带来多解，也可以带来无解。}{fig:five-parameter-cases}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \foreach \xx in {0,5,10}{\draw[fivebox] (\xx,0) rectangle ++(4.5,4.3);}
+ \node[font=\bfseries] at (2.25,3.75) {$\lambda\ne0,1$};
+ \node[font=\bfseries] at (7.25,3.75) {$\lambda=0$};
+ \node[font=\bfseries] at (12.25,3.75) {$\lambda=1$};
+ \fill[FiveB!10] (.7,1.25) rectangle(3.8,3.15);
+ \fill[FiveR] (2.2,2.2) circle(2pt);
+ \node[text=FiveB,font=\footnotesize] at (2.25,2.8) {列空间为整个平面};
+ \draw[FiveB,line width=1.3pt] (5.5,1.65)--(9,1.65);
+ \fill[FiveR] (7.25,1.65) circle(2pt) node[above] {$\boldsymbol b$};
+ \draw[FiveB,line width=1.3pt] (10.5,1.65)--(14,1.65);
+ \fill[FiveR] (12.25,2.65) circle(2pt) node[right] {$\boldsymbol b$};
+ \draw[fivedash] (12.25,1.65)--(12.25,2.65);
+ \node[align=center] at (2.25,.65) {$r=2,\ \dim\Nul=0$\\唯一解};
+ \node[align=center,text=FiveG] at (7.25,.65) {$r=1,\ \dim\Nul=1$\\目标可达，无穷多解};
+ \node[align=center,text=FiveR] at (12.25,.65) {$r=1,\ \dim\Nul=1$\\目标不可达，无解};
+\end{tikzpicture}}
+{后两幅的系数矩阵相同，区别仅在右端项。零空间有自由方向，不能保证非齐次方程一定有解；存在性仍要由列空间判断。}
+
+\FiveHead{从已知解反推零空间}
+若题目给出若干非齐次解，先取它们的差，才能得到齐次解。只有进一步确认差向量线性无关，且数量达到 $n-r(A)$，才足以构造基础解系。知道几个解，不自动意味着知道了全部解。
+
+\begin{example}[由三个已知解恢复通解]
+三元非齐次方程组 $A\boldsymbol x=\boldsymbol b$ 的系数矩阵秩为1，已知
+\begin{equation}
+ \boldsymbol p=(2,0,0)^{\mathrm T},\quad
+ \boldsymbol q=(1,1,0)^{\mathrm T},\quad
+ \boldsymbol h=(1,0,1)^{\mathrm T}
+\end{equation}
+都是解。写出其通解。
+\end{example}
+\textbf{解}\quad 差向量 $\boldsymbol q-\boldsymbol p=(-1,1,0)^{\mathrm T}$、$\boldsymbol h-\boldsymbol p=(-1,0,1)^{\mathrm T}$ 都在零空间中。分别检查第二、第三分量，证明它们线性无关。又因零空间维数为 $3-1=2$，这两支向量已经构成基础解系，故
+\begin{equation}
+ \boldsymbol x=\boldsymbol p+s(\boldsymbol q-\boldsymbol p)+t(\boldsymbol h-\boldsymbol p)
+ =(1-s-t)\boldsymbol p+s\boldsymbol q+t\boldsymbol h.
+\end{equation}
+这里最后一式的系数之和为1。对任意非齐次解的组合，映射后得到的是系数和乘以 $\boldsymbol b$；当 $\boldsymbol b\ne\boldsymbol0$ 时，只有系数和为1才仍产生原目标。因此，不能像齐次解那样任意相加、数乘非齐次解。
+
+\textbf{易错点：}讨论参数先查可能消失的主元；判断唯一性必须先确认有解；由已知解恢复通解，要同时核对“差向量属于零空间、彼此无关、数量足够”。这三项分别对应解的性质、基的性质和维数的性质。
+
+至此，本章主线已经回答了静态方程的全部解怎样组织。后面的两节为选读：同一个系统在连续时刻出现时，线性关系又怎样联系前后状态？
+
+\section{【选读】从斐波那契到状态递推：\mbox{离散系统中的线性代数}}
+\label{sec:five-discrete}
+
+\textbf{本节为拓展内容，不做考核要求。}一个库存记录或递推数列，不只问“现在等于多少”，还问“下一次怎样由这次得到”。若更新规则是线性的，就可以让矩阵反复作用，把静态的向量关系扩展到一串状态。
+
+\FiveHead{把两项记忆，装进一个状态向量}
+取斐波那契数列 $F_0=0,F_1=1$，满足 $F_{k+2}=F_{k+1}+F_k$。计算下一项，需要同时记住当前两项，所以定义状态 $\boldsymbol s_k=(F_{k+1},F_k)^{\mathrm T}$。更新规则便成为
+\begin{equation}
+ \boldsymbol s_{k+1}=M\boldsymbol s_k,\qquad
+ M=\FiveMat{rr}{1&1\\1&0},\qquad \boldsymbol s_0=(1,0)^{\mathrm T}.
+\end{equation}
+\Needspace{4\baselineskip}
+第一行把两项相加，第二行把原第一项移到第二个位置。它是一条\term{recurrence-relation}的矩阵表示。反复应用矩阵乘法，得到
+\begin{equation}
+ \boldsymbol s_1=M\boldsymbol s_0,\quad
+ \boldsymbol s_2=M^2\boldsymbol s_0,\quad
+ \boldsymbol s_k=M^k\boldsymbol s_0.
+\end{equation}
+第三章的矩阵的幂在这里有了直接含义：$M^k$ 记录 $k$ 次更新的复合，并不需要先寻找一个新的运算规则。
+
+\FiveFigure{斐波那契递推：每一步用同一个矩阵更新两项记忆。}{fig:five-fibonacci}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \foreach \xx/\kk/\aa/\bb in {0/0/1/0,3.8/1/1/1,7.6/2/2/1,11.4/3/3/2}{
+  \draw[fivebox] (\xx,0) rectangle ++(3,2.4);
+  \node at (\xx+1.5,1.9) {$\boldsymbol s_{\kk}$};
+  \node[text=FiveB] at (\xx+1.5,1) {$\FiveMat{r}{\aa\\\bb}$};}
+ \foreach \xx in {3.05,6.85,10.65}{\draw[fiveb] (\xx,1.2)--(\xx+.7,1.2) node[midway,above] {$M$};}
+\end{tikzpicture}}
+{状态中两项的顺序固定为“后一项、前一项”。矩阵相乘既计算新项，也把旧项移到下一次更新所需的位置。}
+
+\FiveHead{有外部输入时，平衡状态要解哪一个方程}
+有进货、消耗或调拨的系统，通常需要加一个输入。先考察输入固定的教学模型
+\begin{equation}
+ \boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u.
+ \label{eq:five-forced-discrete}
+\end{equation}
+若某个状态在更新后不改变，就称为\term{equilibrium-state}，记作 $\boldsymbol x_*$。令更新前后都等于它，得到
+\begin{equation}
+ \boldsymbol x_*=F\boldsymbol x_*+\boldsymbol u
+ \quad\Longleftrightarrow\quad
+ (E-F)\boldsymbol x_*=\boldsymbol u.
+ \label{eq:five-discrete-equilibrium}
+\end{equation}
+所以平衡状态是否存在，由 $\Col(E-F)$ 决定；存在时，其集合是一个特解加 $\Nul(E-F)$。\textbf{这里决定平衡自由度的是 $E-F$，不是更新矩阵 $F$ 的零空间。}
+
+若平衡状态存在，令 $\boldsymbol z_k=\boldsymbol x_k-\boldsymbol x_*$，减去平衡关系就得到
+\begin{align}
+ \boldsymbol z_{k+1}&=F\boldsymbol z_k,\\
+ \boldsymbol x_k&=\boldsymbol x_*+F^k(\boldsymbol x_0-\boldsymbol x_*),\qquad k\geq0.
+ \label{eq:five-discrete-shift}
+\end{align}
+这正是“平衡状态加随时间演化的偏离”。偏离可能缩小、保持，也可能增大，例如一维更新 $z_{k+1}=2z_k$ 会使非零偏离按 $2^k$ 增长。不能只凭叠加形式，就断言系统会回到平衡状态。
+
+\Needspace{10\baselineskip}
+\begin{example}[两个仓库的逐月更新]
+设某教学库存模型每月更新一次：一仓现有库存的一半留在一仓，四分之一转入二仓，其余出库；二仓现有库存的一半留存，其余出库；每次更新另向一仓补入10单位。以 $\boldsymbol x_k$ 记录第 $k$ 次更新后的两仓库存，初始状态为零。写出前三次记录及平衡状态。
+\end{example}
+\textbf{解}\quad 规则直接给出
+\begin{equation}
+ F=\FiveMat{rr}{\tfrac12&0\\\tfrac14&\tfrac12},\qquad
+ \boldsymbol u=(10,0)^{\mathrm T},\qquad \boldsymbol x_0=(0,0)^{\mathrm T}.
+\end{equation}
+依次更新三次，而不是求一张新的消元表：
+\begin{align}
+ \boldsymbol x_1&=(10,0)^{\mathrm T},\\
+ \boldsymbol x_2&=(15,\tfrac52)^{\mathrm T},\\
+ \boldsymbol x_3&=(\tfrac{35}{2},5)^{\mathrm T}.
+\end{align}
+平衡状态满足 $\tfrac12x_{*,1}=10$、$-\tfrac14x_{*,1}+\tfrac12x_{*,2}=0$，解得 $\boldsymbol x_*=(20,10)^{\mathrm T}$。$E-F$ 的两个主元非零，故这个平衡状态唯一。把它代入原更新规则，仍得到 $(20,10)^{\mathrm T}$，验证了“更新后不变”。
+
+\FiveFigure{库存记录与平衡状态：同一更新规则联系一串状态。}{fig:five-inventory}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fivebox] (0,1.3) rectangle(2.2,3.1);\node at (1.1,2.6) {一仓};
+ \node[font=\footnotesize] at (1.1,1.85) {留存 $\tfrac12$};
+ \draw[fivebox] (4.2,1.3) rectangle(6.4,3.1);\node at (5.3,2.6) {二仓};
+ \node[font=\footnotesize] at (5.3,1.85) {留存 $\tfrac12$};
+ \draw[fiveb] (2.3,2.2)--(4.1,2.2) node[midway,above] {调拨 $\tfrac14$};
+ \draw[fiver] (1.1,.3)--(1.1,1.2) node[midway,right,font=\footnotesize] {补入10};
+ \draw[fiveax] (8,.7)--(13.3,.7) node[right,font=\footnotesize] {一仓};
+ \draw[fiveax] (8,.7)--(8,3.4) node[above,font=\footnotesize] {二仓};
+ \draw[fiveg] (8,.7)--(10.2,.7);\draw[fiveg] (10.2,.7)--(11.3,1.15);
+ \draw[fiveg] (11.3,1.15)--(11.85,1.6);
+ \foreach \xx/\yy/\kk in {8/.7/0,10.2/.7/1,11.3/1.15/2,11.85/1.6/3}
+  \fill[FiveG] (\xx,\yy) circle(2pt);
+ \node[below left,font=\footnotesize] at (8,.7) {$\boldsymbol x_0$};
+ \node[below,font=\footnotesize] at (10.2,.7) {$\boldsymbol x_1$};
+ \node[right,font=\footnotesize] at (11.3,1.15) {$\boldsymbol x_2$};
+ \node[right,font=\footnotesize] at (11.85,1.6) {$\boldsymbol x_3$};
+ \fill[FiveR] (12.4,2.5) circle(2.5pt) node[above right] {$\boldsymbol x_*=(20,10)^{\mathrm T}$};
+\end{tikzpicture}}
+{所有比例与库存数量均为自拟教学数据。右图只连出前三次离散更新，红点标出更新后不变的状态；绿色折线不代表两次记录之间的连续运动。}
+
+若输入改为随时刻变化的 $\boldsymbol u_k$，固定平衡状态未必存在，但叠加结构仍保留：两条满足同一输入序列的解序列之差满足 $\boldsymbol z_{k+1}=F\boldsymbol z_k$；一个特解序列加任意齐次解序列，仍是原递推的解。这里变化的是\emph{整串记录}，不能把某一时刻的 $\Nul(F)$ 当成全部齐次序列。
+
+离散更新把“当前状态”送到“下一状态”。如果时间不再按月或按步记录，而是连续变化，矩阵又会记录什么？下一节只建立这幅连续变化的图景。
+
+\Needspace{11\baselineskip}
+\section{【选读】从逐步更新到连续变化：微分方程与矢量场}
+\label{sec:five-continuous}
+
+\textbf{本节为拓展内容，不做考核要求。}连续变化中的 $\boldsymbol y(t)$ 表示状态，$\dot{\boldsymbol y}(t)$ 表示各分量的瞬时变化率。若变化率由当前状态线性决定，就得到\term{linear-differential-system}
+\begin{equation}
+ \dot{\boldsymbol y}=A\boldsymbol y.
+ \label{eq:five-continuous-homogeneous}
+\end{equation}
+这里 $A\boldsymbol y$ 不是下一时刻的状态，而是当前状态怎样开始变化的记录。只要保持这一分别，矩阵运算仍然是熟悉的“输入一个向量，输出一个向量”。
+
+\begin{definition}[矢量场与平衡状态]
+在状态空间的每个点 $\boldsymbol y$ 上，放一支向量 $A\boldsymbol y$，就得到一个\term{vector-field}。若 $A\boldsymbol y=\boldsymbol0$，该状态没有变化率，保持不变，称为平衡状态。对式\eqref{eq:five-continuous-homogeneous}，平衡状态全体正是 $\Nul(A)$。
+\end{definition}
+
+\begin{example}[一条平衡直线，许多变化轨线]
+考察二维连续系统
+\begin{equation}
+ \dot{\boldsymbol y}=\FiveMat{rr}{-1&0\\0&0}\boldsymbol y,
+ \quad\text{即}\quad \dot y_1=-y_1,\ \dot y_2=0.
+\end{equation}
+不求解函数表达式，说明每个状态点的变化方向、平衡状态和所有可能的变化率。
+\end{example}
+\textbf{解}\quad 每个点被送成 $(-y_1,0)^{\mathrm T}$。第一分量为正时，箭头向左；第一分量为负时，箭头向右；第二分量不变，所以状态在固定高度的水平线上变化。纵轴上 $y_1=0$，箭头为零，整条纵轴都是平衡状态。由此读出
+\begin{equation}
+ \Nul(A)=\operatorname{Span}\{(0,1)^{\mathrm T}\},\qquad
+ \Col(A)=\operatorname{Span}\{(1,0)^{\mathrm T}\}.
+\end{equation}
+零空间回答“哪些状态不动”，列空间回答“哪些变化率可能出现”。这两类向量的物理含义不同，即使都由两个分量记录，也不能互换。
+
+\FiveFigure{矢量场：箭头表示变化率，绿色纵轴上的全部状态保持不变。}{fig:five-vector-field}{%
+\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[fiveax] (-3.7,0)--(3.7,0) node[right] {$y_1$};
+ \draw[FiveG,line width=1.6pt,-{Stealth[length=1.8mm]}] (0,-2.7)--(0,2.9) node[above] {$y_2$};
+ \foreach \xx in {-3,-2,-1,1,2,3}{\foreach \yy in {-2,-1,0,1,2}{
+  \fill[FiveK!45] (\xx,\yy) circle(.8pt);
+  \draw[fiveb] (\xx,\yy)--({.65*\xx},\yy);}}
+ \foreach \yy in {-2,-1,0,1,2}{\fill[FiveG] (0,\yy) circle(2pt);}
+ \draw[fivedash] (-3.5,1)--(3.5,1);
+ \node[text=FiveG,anchor=west] at (.25,2.65) {$\Nul(A)$：平衡直线};
+ \node[text=FiveR,anchor=west] at (4,.7) {不同高度的状态};
+ \node[text=FiveR,anchor=west] at (4,.2) {沿各自的水平线变化};
+\end{tikzpicture}}
+{箭头均由 $(-y_1,0)^{\mathrm T}$ 按统一比例画出。箭头长度表示变化率的大小，不表示一步后的完整位移；轴上零箭头用绿色点标记。灰色虚线示意一条保持第二分量不变的轨线。}
+
+\FiveHead{动态方程的解，是函数而非静止的点}
+平衡状态只是特殊的、不随时间变化的解。其他初始状态可以生成变化的函数 $\boldsymbol y(t)$；这些函数即使满足齐次动态方程，也不必在每一时刻属于 $\Nul(A)$。\textbf{“齐次动态解”与“零空间中的平衡点”不是同一概念。}
+
+为了观察特解加齐次解，先写有外部变化率输入的非齐次系统
+\begin{equation}
+ \dot{\boldsymbol y}=A\boldsymbol y+\boldsymbol g(t).
+\end{equation}
+若 $\boldsymbol y_1(t),\boldsymbol y_2(t)$ 都满足它，在同一个时间区间相减，便得到
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}(\boldsymbol y_1-\boldsymbol y_2)
+ =A(\boldsymbol y_1-\boldsymbol y_2).
+\end{equation}
+反过来，一个特解函数 $\boldsymbol y_p(t)$ 加任意齐次解函数 $\boldsymbol h(t)$，满足
+\begin{equation}
+ \frac{\mathrm d}{\mathrm dt}(\boldsymbol y_p+\boldsymbol h)
+ =A\boldsymbol y_p+\boldsymbol g+A\boldsymbol h
+ =A(\boldsymbol y_p+\boldsymbol h)+\boldsymbol g.
+\end{equation}
+因此，不附加初值时，全部解函数仍具有“一个特解函数加全部齐次解函数”的叠加结构。这只是本章结构在函数对象上的选读观察，不等于直接使用代数方程 $A\boldsymbol x=\boldsymbol0$ 的基础解系来求动态解。怎样真正解出函数，属于后续动态系统的学习。
+
+从按步更新到瞬时变化，我们始终先分清对象：静态方程求一个向量，递推求一串向量，微分方程求随时间变化的函数。形式中相似的线性结构值得观察，但每一项的角色和条件也必须随对象重新核对。带着这一习惯，再回望本章主线，就能把计算和结构同时看清。
+
+\FiveHead{本章小结}
+第二章中，一次消元通常结束于几个未知数的数值，或一组带参数的表达式。本章从那个终点继续向前：参数不仅表示尚未确定的数，也表示解空间中可以独立改变的方向。把自由变量依次取1、取0，便能把这些方向收集成基础解系；向量个数由秩与零度决定，所有齐次解则在它们张成的空间里展开。算法给出的结果，由此获得了基与维数的解释。
+
+右端项改变之后，自由方向并没有消失。只要目标可以到达，一个特解便给出解集的出发点，零空间中的所有变化再把全部解补齐。因此非齐次解集有自己的位置，却保留齐次解空间的方向与维数。解集可以是点、直线、平面，也可以是高维仿射子空间；若目标不在列空间中，则没有任何输入能到达它。存在、唯一与自由度，分别成为可以看见的空间关系。
+
+为了算清这些关系，我们仍然需要消元。可逆的行变换同时调整输出与目标，保持它们的原像关系；它保留零空间和行空间，却可能改变列空间的坐标位置。这份区分让我们能够信任算法，也知道该从原矩阵还是从化简矩阵中取出某一空间的基。矩阵不再只是计算过程中可以随手替换的数表，每次变换都有明确的对象与可逆的理由。
+
+全章的中段把四个空间同时展开。输入端的行空间与零空间正交，且以直和铺满整个定义域；输出端的列空间与左零空间也如此。正交说明两块方向没有重叠，维数说明它们没有遗漏。更进一步，行空间上的作用与列空间一一对应：每个可达目标在那里恰好有一个输入，全部其他解则由零空间的自由方向补出。于是，\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度}，成为各项定理共同指向的结论。
+
+章首的电网让这幅结构有了工程上的落点。节点方程必须共同满足，内部循环可以保留局部收支，转置把节点电势组织成线路电势差。百余年来，供电网络从街区走向区域互联，工程师面对的联系越来越多，计算机处理的方程越来越大。理解所有解的结构，并不能替代完整的设备模型，却能帮助人们辨认哪些目标本来就不可实现、哪些条件彼此重复、哪些自由度还需要其他物理规律来确定。
+
+选读的递推和矢量场又把同样的思想带到时间中。状态更新是矩阵作用的反复复合，平衡状态则需要重新列出它自己的方程；静态向量、离散序列与连续函数各有不同对象，却都能够体现线性的叠加结构。从手算出一个答案，到理解一整族答案，再到组织状态随时间的变化，人类对线性系统的处理逐步形成了可以分析、验证和复用的语言。
+
+下一章将引入行列式，从体积变化的角度重新理解线性相关与可逆性。本章已经从解的方向和维数辨认了这些结构；接下来，我们将看见它们怎样通过空间的压缩、展开与方向变化获得另一种几何表达。
+
+\par\clearpage
+\endgroup
+% CHAPTER 5 BODY END
 
 % --- 第 6 章 ---
 \chapter{行列式：从体积到可逆性}

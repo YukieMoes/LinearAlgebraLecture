@@ -8,6 +8,7 @@
 \GlossaryEntry{相反向量}{Additive Inverse}{与原向量相加得到零向量的向量，记为 $-\boldsymbol v$。}
 \GlossaryEntry{可加性}{Additivity}{映射保持向量加法的性质，即 $T(\boldsymbol x+\boldsymbol y)=T(\boldsymbol x)+T(\boldsymbol y)$。}
 \GlossaryEntry{仿射映射}{Affine Map}{由线性作用与固定平移组成的映射 $\boldsymbol x\mapsto A\boldsymbol x+\boldsymbol a$；在原向量空间中，只有 $\boldsymbol a=\boldsymbol 0$ 时才是线性映射。}
+\GlossaryEntry{仿射子空间}{Affine Subspace}{子空间的一次平移 $\boldsymbol p+W$；其维数为 $\dim W$，当 $\boldsymbol p\notin W$ 时不经过原点。}
 \GlossaryEntry{交替最小二乘法}{Alternating Least Squares}{交替固定一组参数、对另一组参数求解最小二乘问题的方法；第3章以它说明推荐教学模型中的矩阵求解。}
 \GlossaryEntry{向量夹角}{Angle Between Vectors}{两个非零实向量的夹角，取值在 $[0,\pi ]$；余弦等于点积除以两向量长度之积。}
 \GlossaryEntry{辐角}{Argument}{从正实轴转向非零复数所对应向量的有向角，相差 $2k\pi $ 的角表示同一方向。}
@@ -55,6 +56,7 @@
 \GlossaryEntry{余弦相似度}{Cosine Similarity}{两个非零实向量的标准内积除以各自长度的乘积，用于比较方向的接近程度。}
 \GlossaryLetter{D}
 \GlossaryEntry{棣莫弗定理}{De Moivre's Theorem}{对整数 $n$，$(\cos \theta +i\sin \theta )^n=\cos (n\theta )+i\sin (n\theta )$。}
+\GlossaryEntry{自由度}{Degrees of Freedom}{表示全部解所需的独立自由参数个数；线性方程组有解时等于相应零空间的维数。}
 \GlossaryEntry{行列式}{Determinant}{与方阵对应的标量，用来刻画有向体积缩放及可逆性；第5章展开。}
 \GlossaryEntry{对角矩阵}{Diagonal Matrix}{主对角线以外的元素全为零的方阵，对应各坐标分量分别缩放。}
 \GlossaryEntry{矩阵对角化}{Diagonalization}{选择适当的基，使某个线性变换的矩阵表示成为对角矩阵；并非所有方阵都能对角化。第9章展开。}
@@ -77,6 +79,7 @@
 \GlossaryEntry{消元乘数}{Elimination Multiplier}{也称消元倍数；行消元 $r_i\leftarrow r_i-\ell _{i,k}r_k$ 中的系数 $\ell _{i,k}$；无换行的标准LU消元将它记录在 $L$ 的第 $(i,k)$ 位置。}
 \GlossaryEntry{向量嵌入}{Embedding}{把对象或特征表示为供模型计算的向量，其分量不必对应人为命名的现实属性。}
 \GlossaryEntry{嵌入表}{Embedding Table}{按对象或特征ID索引向量参数的数据组织方式；数学上可将有限表理解为每个ID对应一行的矩阵。}
+\GlossaryEntry{平衡状态}{Equilibrium State}{更新后或随时间不改变的状态；离散系统满足 $(E-F)\boldsymbol x_*=\boldsymbol u$，齐次连续系统满足 $A\boldsymbol y_*=\boldsymbol 0$。}
 \GlossaryEntry{同解方程组}{Equivalent Linear Systems}{解集相同的两个线性方程组。}
 \GlossaryEntry{等价向量组}{Equivalent Sets of Vectors}{能够相互线性表示的向量组；其张成空间相同，但向量个数可以不同。}
 \GlossaryEntry{模长}{Euclidean Length}{实向量各分量平方和的平方根，等于向量与自身点积的平方根；也称向量的长度。}
@@ -99,15 +102,18 @@
 \GlossaryEntry{列满秩}{Full Column Rank}{矩阵的列向量全部线性无关，即其列向量组的秩等于列数。}
 \GlossaryEntry{行满秩}{Full Row Rank}{矩阵的行向量全部线性无关，即其行向量组的秩等于行数。}
 \GlossaryEntry{函数}{Function}{为定义域中的每个元素指定唯一输出的对应规则；函数与映射是同一种概念，输入和输出可以是数，也可以是向量等对象。}
+\GlossaryEntry{基础解系}{Fundamental Set of Solutions}{齐次线性方程组零空间的一组基；每个齐次解均可唯一表示为这些基向量的线性组合，向量个数为未知数个数减系数矩阵的秩。}
 \GlossaryEntry{平面向量基本定理}{Fundamental Theorem of Plane Vectors}{同一平面内任意向量可唯一表示为两个不共线向量的线性组合。}
 \GlossaryEntry{空间向量基本定理}{Fundamental Theorem of Space Vectors}{空间中任意向量可唯一表示为三个不共面向量的线性组合。}
 \GlossaryLetter{G}
 \GlossaryEntry{高斯--若尔当消元法}{Gauss-Jordan Elimination}{继续把主元化为1并消去主元列其余元素，得到行最简形的方法。}
 \GlossaryEntry{高斯消元法}{Gaussian Elimination}{通过同解初等变换化为行阶梯形，再指定自由变量并回代求解的方法。}
+\GlossaryEntry{通解}{General Solution}{以任意参数或自由的齐次解完整表示全部解的表达式；不是一个特解或有限几个解。}
 \GlossaryLetter{H}
 \GlossaryEntry{齐次性}{Homogeneity}{映射保持数乘的性质，即对所有实数 $c$ 和允许的向量 $\boldsymbol x$ 有 $T(c\boldsymbol x)=cT(\boldsymbol x)$。}
 \GlossaryEntry{齐次坐标}{Homogeneous Coordinates}{用增加一个分量的方式表示几何点；本章把二维点记为 $(x,y,1)^{\mathrm T}$，以三阶矩阵统一表示平移与线性作用。}
 \GlossaryEntry{齐次线性方程组}{Homogeneous Linear System}{常数项全为0的线性方程组 $A\boldsymbol x=\boldsymbol 0$，必有零解。}
+\GlossaryEntry{超平面}{Hyperplane}{$\mathbb R^n$ 中维数为 $n-1$ 的仿射子空间；可由一条系数不全为零的线性方程描述。}
 \GlossaryLetter{I}
 \GlossaryEntry{恒等映射}{Identity Map}{把每个输入原样输出的映射，$I(\boldsymbol x)=\boldsymbol x$，其标准基矩阵为单位矩阵。}
 \GlossaryEntry{单位矩阵}{Identity Matrix}{主对角线全为1、其余元素全为0的方阵，本书统一记为 $E_n$ 或 $E$。}
@@ -142,6 +148,7 @@
 \GlossaryEntry{线性表示}{Linear Representation}{给定向量可写成某向量组的线性组合这一关系。}
 \GlossaryEntry{线性结构}{Linear Structure}{由向量加法、数乘及其线性表示关系构成的结构；其研究不要求预先给定长度与夹角。}
 \GlossaryEntry{线性方程组}{Linear System}{要求同一组未知数同时满足的若干线性方程。}
+\GlossaryEntry{线性微分方程组}{Linear System of Differential Equations}{以状态分量的导数为未知变化率的线性关系，如 $\dot {\boldsymbol y}=A\boldsymbol y+\boldsymbol g(t)$；其解是随时间变化的函数。}
 \GlossaryEntry{线性变换}{Linear Transformation}{保持加法和数乘的向量映射，即 $T(\boldsymbol u+\boldsymbol v)=T\boldsymbol u+T\boldsymbol v$、$T(c\boldsymbol u)=cT\boldsymbol u$。}
 \GlossaryEntry{线性相关}{Linearly Dependent}{存在不全为零的系数，使给定向量组的线性组合等于零向量。}
 \GlossaryEntry{线性无关}{Linearly Independent}{只有全部系数为零，给定向量组的线性组合才等于零向量。}
@@ -173,8 +180,10 @@
 \GlossaryEntry{斜投影}{Oblique Projection}{沿与目标子空间不垂直的互补方向投到该子空间、并保持其上的向量不动的线性映射；本章以沿 $(1,1,1)^{\mathrm T}$ 投到 $xy$ 平面为例。}
 \GlossaryEntry{一一对应}{One-to-One Correspondence}{两类对象之间互相唯一确定、没有遗漏的配对关系；固定标准基后，$\mathbb R^n$ 到 $\mathbb R^m$ 的线性映射与 $m\times n$ 矩阵一一对应。}
 \GlossaryEntry{有序基}{Ordered Basis}{指定了基向量先后次序的一组基，坐标必须按该次序排列。}
+\GlossaryEntry{正交直和}{Orthogonal Direct Sum}{互相正交的子空间所构成的直和；其中每个向量的分量分解唯一。}
 \GlossaryEntry{正交矩阵}{Orthogonal Matrix}{满足 $Q^{\mathrm T}Q=E$ 的实方阵；列向量单位且两两垂直，逆矩阵等于转置，保持标准点积；不一定表示旋转，也可能包含反射。}
 \GlossaryEntry{正交投影}{Orthogonal Projection}{沿垂直于目标直线或平面的方向得到投影的对应规则；向 $xy$ 平面投影得到 $(x,y,0)^{\mathrm T}$，用平面坐标记录则为 $(x,y)^{\mathrm T}$。}
+\GlossaryEntry{子空间正交}{Orthogonal Subspaces}{两个子空间中任取一支向量配对，标准点积均为零的关系；仅有正交并不保证二者之和为整个空间。}
 \GlossaryEntry{正交性}{Orthogonality}{内积为0所刻画的关系，是几何垂直的推广；第7章展开。}
 \GlossaryEntry{外积}{Outer Product}{列向量与行向量的矩阵乘积 $\boldsymbol u\boldsymbol v^{\mathrm T}$；第 $(i,j)$ 个元素为 $u_iv_j$，两向量均非零时秩为1。}
 \GlossaryLetter{P}
@@ -209,6 +218,7 @@
 \GlossaryEntry{实轴}{Real Axis}{复平面中虚部为0的点组成的坐标轴。}
 \GlossaryEntry{实部}{Real Part}{复数 $a+bi$ 中的实数 $a$。}
 \GlossaryEntry{实向量空间}{Real Vector Space}{以实数作为数乘系数的向量空间。}
+\GlossaryEntry{递推关系}{Recurrence Relation}{用已有项或当前状态确定后续项或状态的关系；线性状态更新可写为 $\boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u_k$。}
 \GlossaryEntry{行最简形矩阵}{Reduced Row Echelon Form}{主元为1且主元列其他元素均为0的行阶梯形矩阵，也称简化行阶梯形矩阵。}
 \GlossaryEntry{反射变换}{Reflection}{关于过原点直线或平面作镜像的线性变换；反射两次恢复原向量。}
 \GlossaryEntry{反身性}{Reflexivity}{某种关系对每个对象与其自身都成立；如向量组与自身等价。}
@@ -278,6 +288,7 @@
 \GlossaryEntry{向量}{Vector}{向量空间中的元素；在本书主线中主要表现为有序实数组，低维时可画成箭头。}
 \GlossaryEntry{向量加法}{Vector Addition}{在 $\mathbb R^n$ 中将相同位置的分量分别相加的运算。}
 \GlossaryEntry{向量方程}{Vector Equation}{两端为向量表达式的等式；本章重点为 $x_1\boldsymbol a_1+\cdots +x_n\boldsymbol a_n=\boldsymbol b$。}
+\GlossaryEntry{矢量场}{Vector Field}{为状态空间的每个点指定一支向量的对应；连续系统的 $A\boldsymbol y$ 在该点表示瞬时变化率。}
 \GlossaryEntry{向量组}{Vector List}{按次序列出的有限个向量，允许出现重复向量和零向量。}
 \GlossaryEntry{向量空间}{Vector Space}{配有封闭的加法与数乘并满足相应八条运算公理的非空集合。}
 \GlossaryEntry{向量减法}{Vector Subtraction}{加上相反向量的运算，$\boldsymbol u-\boldsymbol v=\boldsymbol u+(-\boldsymbol v)$。}
