@@ -12,6 +12,11 @@
 \DeclareLectureTerm{linear-differential-system}{线性微分方程组}{Linear System of Differential Equations}{以状态分量的导数为未知变化率的线性关系，如 $\dot{\boldsymbol y}=A\boldsymbol y+\boldsymbol g(t)$；其解是随时间变化的函数。}
 \DeclareLectureTerm{vector-field}{矢量场}{Vector Field}{为状态空间的每个点指定一支向量的对应；连续系统的 $A\boldsymbol y$ 在该点表示瞬时变化率。}
 
+% 第5.7节：无解时的最优近似。
+\DeclareLectureTerm{least-squares-solution}{最小二乘解}{Least-Squares Solution}{使 $\|\boldsymbol b-A\boldsymbol x\|^2$ 最小的输入；等价于正规方程的解，最优输出唯一，输入是否唯一取决于 $A$ 的零空间。}
+\DeclareLectureTerm{residual-vector}{残差向量}{Residual Vector}{目标与实际输出之差 $\boldsymbol b-A\boldsymbol x$；最小二乘解的残差属于 $\operatorname{Null}(A^{\mathrm T})$，与列空间正交。}
+\DeclareLectureTerm{normal-equations}{正规方程}{Normal Equations}{最小二乘问题对应的线性方程组 $A^{\mathrm T}A\boldsymbol x=A^{\mathrm T}\boldsymbol b$；它始终有解，全部解构成原矩阵零空间的一次平移。}
+
 % 第5章章首导入：网络结构与状态更新（正式理论在后续正文展开）。
 \DeclareLectureTerm{incidence-matrix}{关联矩阵}{Incidence Matrix}{记录网络节点与线路连接的矩阵；本书取节点为行、定向线路为列，每列在流出节点记$+1$、流入节点记$-1$，其余为$0$。}
 \DeclareLectureTerm{state-vector}{状态向量}{State Vector}{把模型中足以描述当前状态、并结合更新规则与输入确定后续演化的量有序排成的向量；其分量与所选模型有关。}
@@ -58,7 +63,7 @@
 \DeclareLectureTerm{sigmoid-function}{Sigmoid函数}{Sigmoid Function}{本书指函数 $\sigma(t)=1/(1+e^{-t})$，把实数映入0与1之间；数值处于该区间不自动保证概率预测准确。}
 \DeclareLectureTerm{cosine-similarity}{余弦相似度}{Cosine Similarity}{两个非零实向量的标准内积除以各自长度的乘积，用于比较方向的接近程度。}
 \DeclareLectureTerm{alternating-least-squares}{交替最小二乘法}{Alternating Least Squares}{交替固定一组参数、对另一组参数求解最小二乘问题的方法；第3章以它说明推荐教学模型中的矩阵求解。}
-\DeclareLectureTerm{least-squares}{最小二乘法}{Least Squares}{通过使误差平方和尽可能小来确定参数的方法；第3章先应用其线性方程形式，后续再研究其原理。}
+\DeclareLectureTerm{least-squares}{最小二乘法}{Least Squares}{通过使误差平方和尽可能小来确定参数的方法；第3章先应用其线性方程形式，第5.7节用正交直和说明最优近似与解的结构。}
 \DeclareLectureTerm{regularization}{正则化}{Regularization}{在拟合目标中加入对参数等对象的约束或惩罚，以改善模型的稳定性与泛化；本章示例采用参数平方和惩罚。}
 \DeclareLectureTerm{embedding-table}{嵌入表}{Embedding Table}{按对象或特征ID索引向量参数的数据组织方式；数学上可将有限表理解为每个ID对应一行的矩阵。}
 \DeclareLectureTerm{elimination-multiplier}{消元乘数}{Elimination Multiplier}{也称消元倍数；行消元 $r_i\leftarrow r_i-\ell_{i,k}r_k$ 中的系数 $\ell_{i,k}$；无换行的标准LU消元将它记录在 $L$ 的第 $(i,k)$ 位置。}

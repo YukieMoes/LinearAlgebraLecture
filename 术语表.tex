@@ -138,7 +138,8 @@
 \GlossaryLetter{L}
 \GlossaryEntry{隐因子}{Latent Factor}{模型用于表示潜在联系的向量分量；本章以少量隐因子展示用户与内容的匹配。}
 \GlossaryEntry{余弦定理}{Law of Cosines}{三角形一边的平方等于另两边的平方和减去这两边与其夹角余弦乘积的两倍；将勾股定理推广到任意三角形。}
-\GlossaryEntry{最小二乘法}{Least Squares}{通过使误差平方和尽可能小来确定参数的方法；第3章先应用其线性方程形式，后续再研究其原理。}
+\GlossaryEntry{最小二乘法}{Least Squares}{通过使误差平方和尽可能小来确定参数的方法；第3章先应用其线性方程形式，第5.7节用正交直和说明最优近似与解的结构。}
+\GlossaryEntry{最小二乘解}{Least-Squares Solution}{使 $\|\boldsymbol b-A\boldsymbol x\|^2$ 最小的输入；等价于正规方程的解，最优输出唯一，输入是否唯一取决于 $A$ 的零空间。}
 \GlossaryEntry{左零空间}{Left Null Space}{转置矩阵的零空间，即满足 $A^{\mathrm T}\boldsymbol y=\boldsymbol 0$ 的全部向量；等价地有 $\boldsymbol y^{\mathrm T}A=\boldsymbol 0^{\mathrm T}$。若 $A$ 为 $m\times n$，它是 $\mathbb R^m$ 的子空间。}
 \GlossaryEntry{线性代数}{Linear Algebra}{研究向量的线性关系、向量空间与线性映射及其代数表示的数学分支。}
 \GlossaryEntry{线性组合}{Linear Combination}{对给定向量分别作数乘后相加得到的向量。}
@@ -172,6 +173,7 @@
 \GlossaryEntry{负矩阵}{Negative Matrix}{将原矩阵各元素变号所得的矩阵，表示把原映射的每个输出取相反向量。}
 \GlossaryEntry{非齐次线性方程组}{Nonhomogeneous Linear System}{至少有一个常数项不为0的线性方程组 $A\boldsymbol x=\boldsymbol b$。}
 \GlossaryEntry{非零解}{Nontrivial Solution}{分量不全为0的解向量；不要求每个分量都非零。}
+\GlossaryEntry{正规方程}{Normal Equations}{最小二乘问题对应的线性方程组 $A^{\mathrm T}A\boldsymbol x=A^{\mathrm T}\boldsymbol b$；它始终有解，全部解构成原矩阵零空间的一次平移。}
 \GlossaryEntry{复数的 $n$ 次根}{nth Root of a Complex Number}{满足 $w^n=z$ 的复数 $w$；非零复数有 $n$ 个互异的 $n$ 次根。}
 \GlossaryEntry{零空间}{Null Space}{线性映射把它映为零向量的全部输入所成的子空间，记为 $\operatorname {null}T$；矩阵的零空间就是齐次方程组的解空间。}
 \GlossaryEntry{零度}{Nullity}{线性映射或矩阵的零空间的维数；等于相应齐次方程组自由变量的个数。}
@@ -225,6 +227,7 @@
 \GlossaryEntry{反身性}{Reflexivity}{某种关系对每个对象与其自身都成立；如向量组与自身等价。}
 \GlossaryEntry{正则化}{Regularization}{在拟合目标中加入对参数等对象的约束或惩罚，以改善模型的稳定性与泛化；本章示例采用参数平方和惩罚。}
 \GlossaryEntry{余项}{Remainder}{原函数与截断多项式之间的差，如 $R_n(t)=f(t)-T_n(t)$。}
+\GlossaryEntry{残差向量}{Residual Vector}{目标与实际输出之差 $\boldsymbol b-A\boldsymbol x$；最小二乘解的残差属于 $\operatorname {Null}(A^{\mathrm T})$，与列空间正交。}
 \GlossaryEntry{右手法则}{Right-Hand Rule}{右手拇指指向转轴正向，四指弯曲方向规定为正向旋转；用于统一三维旋转的正负约定。}
 \GlossaryEntry{单位根}{Roots of Unity}{方程 $w^n=1$ 的解，均在单位圆上，辐角相邻间隔为 $2\pi /n$。}
 \GlossaryEntry{旋转}{Rotation}{绕原点转过固定有向角的变换；复平面上乘 $e^{i\theta }$ 表示旋转 $\theta $。}

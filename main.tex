@@ -11666,7 +11666,7 @@ n=\dim\FNull A+\FRank(A).
 \FiveHead{从一个答案，到全部答案}
 第二章教我们把方程组化简，第四章教我们辨认映射的零空间和值域。现在的问题是：消元得到的几个自由变量，怎样组织成一个完整的空间？一个非齐次方程组的所有解，又怎样与这个空间联系起来？本章沿这两个问题前进，逐渐把矩阵两端的四个基本子空间放进同一幅图。计算仍使用第二章的方法，新的重点在于解释计算结果。
 
-\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}这句话将贯穿全章。第5.1至5.6节为主线；第5.7、5.8节为选读，把同样的线性结构放到随时间更新的状态中观察。
+\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}这句话将贯穿全章。第5.1至5.7节为主线，其中第5.7节把解的结构延伸到无解时的最优近似；第5.8、5.9节为选读，把同样的线性结构放到随时间更新的状态中观察。
 
 \section{齐次方程组：从自由变量到基础解系}
 \label{sec:five-homogeneous}
@@ -12413,7 +12413,275 @@ n=\dim\FNull A+\FRank(A).
 
 \textbf{易错点：}讨论参数先查可能消失的主元；判断唯一性必须先确认有解；由已知解恢复通解，要同时核对“差向量属于零空间、彼此无关、数量足够”。这三项分别对应解的性质、基的性质和维数的性质。
 
-至此，本章主线已经回答了静态方程的全部解怎样组织。后面的两节为选读：同一个系统在连续时刻出现时，线性关系又怎样联系前后状态？
+参数分类告诉我们目标能否到达、到达后有多少自由方向。若目标确实到不了，是否还能给出一个最接近它的输出？下一节用已经建立的直和分解回答这个问题。
+
+% CHAPTER 5 LEAST SQUARES BEGIN
+\clearpage
+\section{无解时的最优近似：最小二乘解与正规方程}
+\label{sec:five-least-squares}
+\begingroup
+\setlength{\parskip}{2pt}
+\setlength{\abovedisplayskip}{5pt}\setlength{\belowdisplayskip}{5pt}
+% 本节的七幅图采用节号加字母，不占用正文插图的整数序号。
+\newcommand{\FiveLSFigure}[4]{%
+ \par\addvspace{5pt}\noindent\begin{minipage}{\linewidth}
+ \begingroup\edef\FiveLSSavedFigure{\arabic{figure}}%
+ \renewcommand{\thefigure}{\thechapter.7#1}%
+ \renewcommand{\theHfigure}{\thechapter.leastsquares.#1}%
+ \centering #4\par\captionof{figure}{#2}\label{#3}%
+ \setcounter{figure}{\FiveLSSavedFigure}\endgroup
+ \end{minipage}\par\addvspace{5pt}}
+
+\FiveHead{目标够不到，还能给出有意义的答案吗？}
+第5.5节说明，$A\boldsymbol x=\boldsymbol b$ 有解当且仅当 $\boldsymbol b\in\operatorname{Col}(A)$。目标在列空间外时，解集是空集。但带有测量误差的工程数据、统计数据常常如此。我们可以退一步：在所有可能的输入中，哪个 $A\boldsymbol x$ 最接近 $\boldsymbol b$？这就是\term{least-squares}要解决的问题。本节只用第0章的点积、长度，以及第5.4.2节的正交直和。
+
+\FiveHead{没有精确解时，用什么替代原目标？}
+设 $A$ 是实 $m\times n$ 矩阵。第5.4.2节已经给出
+\begin{equation}
+ \mathbb R^m=\operatorname{Col}(A)\oplus\operatorname{Null}(A^{\mathrm T}),\qquad
+ \boldsymbol b=\widehat{\boldsymbol b}+\boldsymbol e,
+ \quad\widehat{\boldsymbol b}\in\operatorname{Col}(A),\quad
+ \boldsymbol e\in\operatorname{Null}(A^{\mathrm T}).
+ \label{eq:five-ls-split}
+\end{equation}
+也就是说，任意目标都能唯一拆成“$A$ 能产生的部分”与“和列空间垂直的部分”。
+
+\FiveLSFigure{a}{绿色点是列空间中离目标最近的点，红色线段记录剩下的误差。}{fig:five-ls-nearest}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[fiveax] (0,-.45)--(0,2.3) node[above] {$\mathbb R^2$};
+ \draw[FiveB,line width=1.1pt] (-1,0)--(5,0);
+ \node[text=FiveB,below] at (4,0) {$\operatorname{Col}(A)$};
+ \node[below left] at (0,0) {$\boldsymbol0$};
+ \draw[fiver] (0,0)--(2.5,1.7);
+ \draw[fiveg] (0,0)--(2.5,0);
+ \draw[fiver] (2.5,0)--(2.5,1.7) node[midway,right] {$\boldsymbol e$};
+ \draw[FiveK,line width=.55pt] (2.25,0)--(2.25,.25)--(2.5,.25);
+ \fill[FiveR] (2.5,1.7) circle(2pt) node[above] {$\boldsymbol b$};
+ \fill[FiveG] (2.5,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}$};
+ \node[align=left,anchor=west,text width=6.4cm] at (6,.9)
+  {$\widehat{\boldsymbol b}$ 是列空间中离 $\boldsymbol b$ 最近的点。\\[5pt]
+   $\boldsymbol e\perp\operatorname{Col}(A)$。};
+\end{tikzpicture}}
+
+为什么垂直的偏离最短？任取列空间中的另一点 $\boldsymbol c$，则 $\widehat{\boldsymbol b}-\boldsymbol c$ 仍在列空间中，与 $\boldsymbol e$ 正交。用第0章的点积展开长度平方，交叉项为零，得到
+\begin{align}
+ \|\boldsymbol b-\boldsymbol c\|^2
+ &=\|\boldsymbol e+(\widehat{\boldsymbol b}-\boldsymbol c)\|^2\notag\\
+ &=\|\boldsymbol e\|^2+2\boldsymbol e\cdot(\widehat{\boldsymbol b}-\boldsymbol c)
+   +\|\widehat{\boldsymbol b}-\boldsymbol c\|^2\notag\\
+ &=\|\boldsymbol e\|^2+\|\widehat{\boldsymbol b}-\boldsymbol c\|^2
+ \geq\|\boldsymbol e\|^2.
+ \label{eq:five-ls-shortest}
+\end{align}
+换一个列空间中的点，就会多出一项非负的平方；只有 $\boldsymbol c=\widehat{\boldsymbol b}$ 时取等号。因此最近的输出存在，并且唯一。
+
+怎样把这个输出变成一个解？$\widehat{\boldsymbol b}$ 属于列空间，所以一定有输入满足 $A\widehat{\boldsymbol x}=\widehat{\boldsymbol b}$。这样的输入称为\term{least-squares-solution}：
+\begin{equation}
+ \|\boldsymbol b-A\widehat{\boldsymbol x}\|^2
+ \leq\|\boldsymbol b-A\boldsymbol x\|^2
+ \quad\text{对所有 }\boldsymbol x\in\mathbb R^n.
+\end{equation}
+这句话就是“所有方程的误差平方和最小”。若原目标可达，$\boldsymbol e=\boldsymbol0$，它就是精确解；若不可达，$\boldsymbol e\ne\boldsymbol0$，它则是\textbf{用列空间分量代替原目标后得到的精确解}。
+
+\newpage
+\FiveHead{怎样把“误差垂直”写成一个能解的方程组？}
+把最小二乘解产生的误差 $\boldsymbol e=\boldsymbol b-A\widehat{\boldsymbol x}$ 叫作\term{residual-vector}。它属于左零空间，与 $A$ 的每一列 $\boldsymbol a_j$ 都正交。这些逐列条件合在一起，正是转置矩阵的一次作用：
+\begin{align}
+ \boldsymbol a_j\cdot(\boldsymbol b-A\widehat{\boldsymbol x})&=0
+ \quad(j=1,\ldots,n),\\
+ A^{\mathrm T}(\boldsymbol b-A\widehat{\boldsymbol x})&=\boldsymbol0\notag\\
+ A^{\mathrm T}\boldsymbol b-A^{\mathrm T}A\widehat{\boldsymbol x}&=\boldsymbol0
+ \quad\Longleftrightarrow\quad
+ A^{\mathrm T}A\widehat{\boldsymbol x}=A^{\mathrm T}\boldsymbol b.
+ \label{eq:five-normal-equations}
+\end{align}
+后一式叫作\term{normal-equations}。白话说，误差和每一列都垂直，把这句话写成矩阵形式，就得到正规方程。
+
+\FiveLSFigure{b}{每一列都沿着蓝色直线；最优输出到目标的误差，与这些列全部垂直。}{fig:five-ls-residual}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[fiveax] (0,-.9)--(0,2.1);
+ \draw[FiveB,line width=1.1pt] (-.8,0)--(5,0);
+ \node[text=FiveB,below] at (4.1,0) {$\operatorname{Col}(A)$};
+ \foreach \xx/\jj/\yy in {.8/1/-.35,1.6/2/-.75,3.6/3/-.75}{
+  \draw[fivedash,-{Stealth[length=1.8mm]}] (0,0)--(\xx,0);
+  \node[text=FiveK] at (\xx,\yy) {$\boldsymbol a_{\jj}$};}
+ \draw[fiveg] (0,0)--(2.6,0);
+ \draw[fiver] (0,0)--(2.6,1.6);
+ \draw[fiver] (2.6,0)--(2.6,1.6) node[midway,right] {$\boldsymbol e$};
+ \draw[FiveK] (2.35,0)--(2.35,.25)--(2.6,.25);
+ \fill[FiveR] (2.6,1.6) circle(2pt) node[above] {$\boldsymbol b$};
+ \fill[FiveG] (2.6,0) circle(2pt) node[below] {$A\widehat{\boldsymbol x}$};
+ \node[anchor=west,align=left,text width=6.6cm] at (6,.75)
+  {$\boldsymbol e$ 与 $A$ 的每一列正交。\\[5pt]
+   这里画出列空间为一维的情形；列向量用灰色虚线表示。};
+\end{tikzpicture}}
+
+\begin{theorem}[最小二乘解的等价条件]
+\FiveBoxLabel{thm:five-least-squares}
+对任意实矩阵 $A$ 和目标 $\boldsymbol b$，最小二乘解总存在。一个输入 $\widehat{\boldsymbol x}$ 是最小二乘解，当且仅当它满足正规方程 $A^{\mathrm T}A\widehat{\boldsymbol x}=A^{\mathrm T}\boldsymbol b$。
+\end{theorem}
+\begin{proof}
+先看存在性：式\eqref{eq:five-ls-split}给出列空间中的 $\widehat{\boldsymbol b}$，它一定有原像，所以最小二乘解总能找到。若输入最优，最近输出的唯一性说明 $A\widehat{\boldsymbol x}=\widehat{\boldsymbol b}$；误差便属于左零空间，上面的逐列推导给出正规方程。反过来，若满足正规方程，则 $\boldsymbol b-A\widehat{\boldsymbol x}\in\operatorname{Null}(A^{\mathrm T})$，而 $A\widehat{\boldsymbol x}\in\operatorname{Col}(A)$。直和分解唯一，所以这两部分必定就是 $\boldsymbol e$ 和 $\widehat{\boldsymbol b}$；再由式\eqref{eq:five-ls-shortest}，这个输入确实最优。两个方向都已说明。
+\end{proof}
+
+\FiveLSFigure{c}{正规方程把 $m$ 条方程整理为 $n$ 条条件；是否唯一，仍要看 $A$ 的列是否线性无关。}{fig:five-ls-normal-blocks}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \foreach \yy in {1.05,-.15}{
+  \filldraw[fill=FiveB!12,draw=FiveB!65] (0,\yy) rectangle ++(1.9,.85);
+  \node[align=center] at (.95,\yy+.425) {$A^{\mathrm T}$\\$n\times m$};
+  \node at (2.35,\yy+.425) {$\times$};
+  \draw[fiveax] (4.8,\yy+.425)--(5.8,\yy+.425);}
+ \filldraw[fill=FiveB!8,draw=FiveB!65] (2.8,1.05) rectangle ++(1.9,.85);
+ \node[align=center] at (3.75,1.475) {$A$\\$m\times n$};
+ \filldraw[fill=FiveR!9,draw=FiveR!65] (2.8,-.15) rectangle ++(1.9,.85);
+ \node[align=center] at (3.75,.275) {$\boldsymbol b$\\$m$ 维};
+ \filldraw[fill=FiveB!16,draw=FiveB!65] (6.05,1.05) rectangle ++(2.3,.85);
+ \node at (7.2,1.475) {$A^{\mathrm T}A$};
+ \filldraw[fill=FiveR!13,draw=FiveR!65] (6.05,-.15) rectangle ++(2.3,.85);
+ \node at (7.2,.275) {$A^{\mathrm T}\boldsymbol b$};
+ \node[anchor=west] at (8.7,1.475) {$n\times n$ 方阵};
+ \node[anchor=west] at (8.7,.275) {$n$ 维向量};
+ \node[font=\small] at (6,-.8)
+  {$\textcolor{FiveB}{A^{\mathrm T}A}\,\widehat{\boldsymbol x}=\textcolor{FiveR}{A^{\mathrm T}\boldsymbol b}$};
+\end{tikzpicture}}
+原来的 $m$ 条等式可能无法同时成立；新的 $n$ 条条件要求误差逐列垂直。未知量仍有 $n$ 个，正规方程始终有解，但还没有保证解唯一。
+
+\newpage
+\FiveHead{正规方程有一个答案，还是有一整族答案？}
+问题落在 $n\times n$ 的系数矩阵 $A^{\mathrm T}A$ 上。它会不会比 $A$ 多出一些被送到零的输入？下面的事实把新方程重新接回原来的零空间。
+
+\begin{theorem}[正规方程保留原来的自由方向]
+\FiveBoxLabel{thm:five-normal-null}
+对任意实矩阵 $A$，有
+\begin{equation}
+ \operatorname{Null}(A^{\mathrm T}A)=\operatorname{Null}(A).
+ \label{eq:five-normal-null}
+\end{equation}
+也就是说，$A$ 与 $A^{\mathrm T}A$ 把同一批输入送到零。
+\end{theorem}
+\begin{proof}
+若 $A\boldsymbol z=\boldsymbol0$，再乘 $A^{\mathrm T}$，便有 $A^{\mathrm T}A\boldsymbol z=\boldsymbol0$，所以原零空间包含在新零空间中。反过来，若 $A^{\mathrm T}A\boldsymbol z=\boldsymbol0$，两边左乘 $\boldsymbol z^{\mathrm T}$：
+\begin{equation}
+ 0=\boldsymbol z^{\mathrm T}A^{\mathrm T}A\boldsymbol z
+  =(A\boldsymbol z)^{\mathrm T}(A\boldsymbol z)=\|A\boldsymbol z\|^2.
+\end{equation}
+最后一项是各分量的平方和；它为零，每个分量就都为零，所以 $A\boldsymbol z=\boldsymbol0$。新零空间也包含在原零空间中，两者因此相等。
+\end{proof}
+
+如果 $A$ 的列线性无关，零空间只有零向量，$A^{\mathrm T}A$ 就可逆，正规方程有唯一解：
+\begin{equation}
+ \widehat{\boldsymbol x}=(A^{\mathrm T}A)^{-1}A^{\mathrm T}\boldsymbol b.
+\end{equation}
+这个公式写出唯一解；实际计算也可以直接解正规方程。若列线性相关，零空间含有非零方向，正规方程已经有解，所以沿这些方向可以得到无穷多个解。
+
+\FiveLSFigure{d}{左边只有一个最优输入；右边有一条解直线，但线上所有输入都产生同一个最优输出。}{fig:five-ls-unique}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \node at (2.8,2.2) {$A$ 的列线性无关};
+ \node at (10,2.2) {$A$ 的列线性相关：示意一维零空间};
+ \draw[fiveax] (.2,0)--(5.8,0);\draw[fiveax] (1,-.4)--(1,1.8);
+ \draw[FiveG,line width=1.2pt] (2.8,.9) circle(3pt);
+ \fill[FiveR] (2.8,.9) circle(1.6pt) node[above right] {$\widehat{\boldsymbol x}$};
+ \node[text=FiveG] at (3,-.55) {解集只有这个点};
+ \draw[fiveax] (7.3,0)--(13.4,0);
+ \draw[fivedash] (8,-.4)--(8,1.8);
+ \node[text=FiveK,anchor=east] at (7.9,1.3) {零空间方向};
+ \draw[FiveG,line width=1.2pt] (10.9,-.4)--(10.9,1.8);
+ \fill[FiveR] (10.9,.6) circle(2pt) node[right] {$\widehat{\boldsymbol x}_p$};
+ \node[text=FiveG] at (10.9,-.65) {所有点都满足 $A\boldsymbol x=\widehat{\boldsymbol b}$};
+\end{tikzpicture}}
+
+若最优输入不止一个，它们相差什么？任选一个最小二乘解 $\widehat{\boldsymbol x}_p$，由第5.1、5.2节和式\eqref{eq:five-normal-null}，全部最小二乘解为
+\begin{equation}
+ \widehat{\boldsymbol x}_p+\operatorname{Null}(A)
+ =\{\widehat{\boldsymbol x}_p+\boldsymbol z:\boldsymbol z\in\operatorname{Null}(A)\},
+ \qquad A\widehat{\boldsymbol x}_p=\widehat{\boldsymbol b}.
+ \label{eq:five-ls-all}
+\end{equation}
+因此解集仍是零空间的平移，维数为 $n-\operatorname{rank}(A)$。输入可以不同，输出却始终是唯一的 $\widehat{\boldsymbol b}$；这正是本章反复出现的解结构。
+
+\FiveLSFigure{e}{原方程无解，正规方程仍有解；绿色直线表示一个最优输入加上零空间中的变化。}{fig:five-ls-solution-sets}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \node at (2.8,2.05) {原方程：在输出端看目标};
+ \node at (10.2,2.05) {正规方程：在输入端看解集};
+ \draw[fiveax] (0,-.35)--(0,1.65);
+ \draw[FiveB,line width=1.1pt] (-.5,0)--(5.7,0);
+ \node[text=FiveB,below] at (4.2,0) {$\operatorname{Col}(A)$};
+ \fill[FiveR] (2,1.3) circle(2pt) node[above] {$\boldsymbol b$};
+ \draw[fivedash] (2,0)--(2,1.3);
+ \fill[FiveG] (2,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}$};
+ \node[text=FiveR] at (2.6,-.65) {$A\boldsymbol x=\boldsymbol b$ 的解集为 $\varnothing$};
+ \draw[fiveax] (7.4,0)--(13.8,0);\draw[fiveax] (8,-.35)--(8,1.6);
+ \draw[fivedash] (8,-.35)--(8,1.6);
+ \draw[FiveG,line width=1.2pt] (10.7,-.35)--(10.7,1.6);
+ \fill[FiveR] (10.7,0) circle(2pt) node[below right] {$\widehat{\boldsymbol x}_p$};
+ \node[text=FiveG,anchor=west] at (10.9,1.05) {$\widehat{\boldsymbol x}_p+\operatorname{Null}(A)$};
+ \node at (10.4,-.65) {$A\boldsymbol x=\widehat{\boldsymbol b}$ 对整条解直线成立};
+\end{tikzpicture}}
+
+\FiveHead{为什么不能随便挑一个方向拆开目标？}
+同一个目标，也能沿斜方向接近列空间，但那样留下的误差更长。本章的直和分解给出右图的分解方式；第7章将从投影的角度系统解释这种最短距离关系。
+
+\FiveLSFigure{h}{本章的直和分解给出右图：沿与列空间垂直的方向拆开目标，误差最短。这种最短距离关系将在第7章系统讨论。}{fig:five-ls-two-directions}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \foreach \xx in {0,7.4}{
+  \draw[fiveax] (\xx,-.45)--(\xx,2.15);
+  \draw[FiveB,line width=1.1pt] (\xx-.5,0)--(\xx+5.3,0);
+  \node[text=FiveB,below] at (\xx+4.1,0) {$\operatorname{Col}(A)$};
+  \fill[FiveR] (\xx+2.5,1.5) circle(2pt) node[above] {$\boldsymbol b$};}
+ \node at (2.7,2.45) {沿非正交方向分解};
+ \node at (10.1,2.45) {沿正交方向分解};
+ \draw[fivedash] ({.8-1.7*.35/1.5},-.35)--({.8+1.7*1.85/1.5},1.85);
+ \draw[fiver] (.8,0)--(2.5,1.5) node[midway,above left] {$\boldsymbol e_1$};
+ \fill[FiveG] (.8,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}_1$};
+ \node[text=FiveR] at (2.5,-.65) {误差 $\boldsymbol e_1$ 更长};
+ \draw[fivedash] (9.9,-.35)--(9.9,1.85);
+ \draw[fiver] (9.9,0)--(9.9,1.5) node[midway,right] {$\boldsymbol e_2$};
+ \draw[FiveK] (9.65,0)--(9.65,.25)--(9.9,.25);
+ \fill[FiveG] (9.9,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}_2$};
+ \node[text=FiveR] at (10,-.65) {误差 $\boldsymbol e_2$ 最短};
+\end{tikzpicture}}
+
+\FiveHead{怎样用这套结构拟合三个数据点？}
+给定 $(1,1),(2,2),(3,4)$，找一条过原点的直线 $y=kx$。三条方程要求 $k$ 分别等于 $1,1,4/3$，无法同时成立。把它们排成矩阵，正规方程就直接给出最优斜率：
+\begin{align}
+ A&=\begin{pmatrix}1\\2\\3\end{pmatrix},\quad
+ \boldsymbol b=\begin{pmatrix}1\\2\\4\end{pmatrix},\qquad
+ A^{\mathrm T}A=1^2+2^2+3^2=14,\\
+ A^{\mathrm T}\boldsymbol b&=1\cdot1+2\cdot2+3\cdot4=17,
+ \qquad14k=17,\qquad k=\frac{17}{14}.
+\end{align}
+三个点不在同一条过原点的直线上，但 $k=17/14$ 让三条方程的误差平方和最小。这也回答了第0章用点积拟合数据时留下的问题。
+
+\FiveLSFigure{f}{这条直线使纵向误差的平方和最小，三个误差却没有全部变成零。灰色竖线记录纵向差，不是点到直线的垂直距离。}{fig:five-ls-fit}{%
+\begin{tikzpicture}[x=1cm,y=.72cm,font=\footnotesize]
+ \draw[fiveax] (-.3,0)--(5.1,0) node[right] {$x$};
+ \draw[fiveax] (0,-.35)--(0,5.3) node[above] {$y$};
+ \draw[FiveB,line width=1.1pt] (0,0)--(4,4.857142857);
+ \foreach \xx/\yy in {1/1,2/2,3/4}{
+  \draw[fivedash] (\xx,\yy)--(\xx,{17*\xx/14});
+  \fill[FiveR] (\xx,\yy) circle(2pt) node[below right] {$(\xx,\yy)$};
+  \fill[FiveG] (\xx,{17*\xx/14}) circle(1.5pt);}
+ \node[text=FiveB,above,rotate=0] at (3.5,4.9) {$y=\frac{17}{14}x$};
+ \node[anchor=west,align=left,text width=6.8cm] at (6.1,3.7)
+  {$k=17/14$ 使误差平方和最小。\\[6pt]
+   $\boldsymbol e=(-3,-6,5)^{\mathrm T}/14$\\[6pt]
+   $e_1+2e_2+3e_3=0$，\\误差与 $A$ 的列向量正交。\\[6pt]
+   残差之和 $=-2/7$，并不为零；\\残差平方和 $=5/14>0$。};
+\end{tikzpicture}}
+
+这里的最优输出与残差为
+\begin{equation}
+ \widehat{\boldsymbol b}=\frac1{14}(17,34,51)^{\mathrm T},\qquad
+ \boldsymbol e=\frac1{14}(-3,-6,5)^{\mathrm T},\qquad
+ \|\boldsymbol e\|^2=\frac{5}{14}.
+\end{equation}
+误差向量与 $(1,2,3)^{\mathrm T}$ 的点积为零，这才是正规方程要求的条件；过原点拟合不保证残差之和为零。由于 $A$ 只有一列且该列非零，本例的最小二乘解唯一。
+
+\FiveHead{这条路线怎样走向第7章？}
+最小二乘解把“有解时的全部解”延伸到“无解时的最优近似”：先用唯一的列空间分量替代原目标，再求它的全部原像。正规方程把这项任务变成已有的线性方程组问题。我们用点积验证了最短距离，却还没有建立任意子空间中分解与计算的一般方法；第7章的正交投影将系统回答这些问题。
+\endgroup
+\clearpage
+% CHAPTER 5 LEAST SQUARES END
 
 \section{【选读】从斐波那契到状态递推：\mbox{离散系统中的线性代数}}
 \label{sec:five-discrete}
@@ -12586,6 +12854,8 @@ n=\dim\FNull A+\FRank(A).
 为了算清这些关系，我们仍然需要消元。可逆的行变换同时调整输出与目标，保持它们的原像关系；它保留零空间和行空间，却可能改变列空间的坐标位置。这份区分让我们能够信任算法，也知道该从原矩阵还是从化简矩阵中取出某一空间的基。矩阵不再只是计算过程中可以随手替换的数表，每次变换都有明确的对象与可逆的理由。
 
 全章的中段把四个空间同时展开。输入端的行空间与零空间正交，且以直和铺满整个定义域；输出端的列空间与左零空间也如此。正交说明两块方向没有重叠，维数说明它们没有遗漏。更进一步，行空间上的作用与列空间一一对应：每个可达目标在那里恰好有一个输入，全部其他解则由零空间的自由方向补出。于是，\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度}，成为各项定理共同指向的结论。
+
+目标在列空间外时，精确解不存在，但并不意味着结构消失。正交直和仍给出唯一的最近输出，正规方程再求出它的全部原像；最小二乘解仍是一个特解加原矩阵的零空间。因此，从精确求解到最优近似，改变的是目标，保留下来的仍是同一套自由方向。
 
 章首的电网让这幅结构有了工程上的落点。节点方程必须共同满足，内部循环可以保留局部收支，转置把节点电势组织成线路电势差。百余年来，供电网络从街区走向区域互联，工程师面对的联系越来越多，计算机处理的方程越来越大。理解所有解的结构，并不能替代完整的设备模型，却能帮助人们辨认哪些目标本来就不可实现、哪些条件彼此重复、哪些自由度还需要其他物理规律来确定。
 
