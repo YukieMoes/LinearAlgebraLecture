@@ -11406,6 +11406,8 @@ n=\dim\FNull A+\FRank(A).
 % --- 第 5 章 ---
 \chapter{线性方程组的再研究：解的结构}
 \label{chap:solution-structure}
+第二章已经教会我们消元和判断解的三种情形，为什么还要再研究方程组？因为会算出答案，还不等于理解全部答案怎样组成。第四章建立了线性映射、零空间与值域的语言，本章就把计算与结构接起来：\textbf{列空间决定目标能不能到达，零空间决定到达同一目标的全部自由度。}下面先从一张电网看见这些问题，再用解空间、通解和四个基本子空间逐步解释它们。
+
 % CHAPTER 5 INTRODUCTION BEGIN
 % 章首实例不编号；导入插图使用5.0a--5.0d，正文插图以后从5.1开始。
 \begingroup
@@ -11664,14 +11666,69 @@ n=\dim\FNull A+\FRank(A).
  fivebox/.style={draw=FiveK!35,rounded corners=2pt,fill=FiveK!3}}
 
 \FiveHead{从一个答案，到全部答案}
-第二章教我们把方程组化简，第四章教我们辨认映射的零空间和值域。现在的问题是：消元得到的几个自由变量，怎样组织成一个完整的空间？一个非齐次方程组的所有解，又怎样与这个空间联系起来？本章沿这两个问题前进，逐渐把矩阵两端的四个基本子空间放进同一幅图。计算仍使用第二章的方法，新的重点在于解释计算结果。
+为什么已经会解方程组，还要再研究一次？第二章中，我们学会了消元、辨认主元和自由变量，也会判断无解、唯一解与无穷多解；那时，方程组主要是一项计算任务。第四章中，我们又从线性映射出发，认识了零空间、值域以及秩与零度，开始看见矩阵内部的结构。两条线索现在可以合起来：消元得到的参数不只是待填写的数字，而是解集能够变化的方向；一个右端项也不只是常数列，而是映射需要到达的目标。
+
+本章的任务，就是用映射的语言重新理解全部解。为什么若干自由变量能组成解空间的一组基？为什么非齐次解可以沿某些方向改变而输出不变？为什么行变换改了方程，却没有改解集？我们将先从熟悉的计算中找出这些问题，再用几何图像和四个基本子空间把答案组织起来。第2章的方法仍然是计算依据；这里的“再研究”，是把计算结果提升为对结构的认识。
 
 \textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}这句话将贯穿全章。第5.1至5.7节为主线，其中第5.7节把解的结构延伸到无解时的最优近似；第5.8、5.9节为选读，把同样的线性结构放到随时间更新的状态中观察。
 
 \section{齐次方程组：从自由变量到基础解系}
 \label{sec:five-homogeneous}
 
-解出一个齐次方程组后，我们常把自由变量记成 $s,t$，然后写出各未知数的表达式。这已经给出了全部解，但还没有回答一个结构性问题：这些参数究竟对应哪些独立方向？第四章已经初步构造过零空间的基，本节把这一方法整理成求\textbf{基础解系}的标准语言。
+第2章我们已经会解齐次方程组了。今天仍从行最简形、主元和自由变量出发，但换一个角度看结果：每个自由变量在变化时，整个解向量沿什么方向移动？把所有这些方向放在一起，能否得到全部解？先看一个四元例子，把从方程到空间的每一环接起来。
+
+\begin{example}[从四个未知数中找出两个自由方向]
+\FiveBoxLabel{ex:five-four-variable}
+求齐次方程组
+\begin{equation}
+ \begin{cases}
+ x_1+x_2+x_3=0,\\
+ 2x_1+2x_2+3x_3+x_4=0,\\
+ x_1+x_2+2x_3+x_4=0
+ \end{cases}
+ \label{eq:five-four-variable-system}
+\end{equation}
+的通解，并找出描述全部解的独立方向。
+\end{example}
+\textbf{解}\quad 用第2章的行变换方法，把系数与零常数列一起排列。先消去第一列，再消去重复的第三行，得到行阶梯形：
+\begin{align}
+ \left[\begin{array}{rrrr|r}
+ 1&1&1&0&0\\2&2&3&1&0\\1&1&2&1&0
+ \end{array}\right]
+ &\xrightarrow{\substack{r_2\leftarrow r_2-2r_1\\r_3\leftarrow r_3-r_1}}
+ \left[\begin{array}{rrrr|r}
+ 1&1&1&0&0\\0&0&1&1&0\\0&0&1&1&0
+ \end{array}\right]\\
+ &\xrightarrow{r_3\leftarrow r_3-r_2}
+ \left[\begin{array}{rrrr|r}
+ 1&1&1&0&0\\0&0&1&1&0\\0&0&0&0&0
+ \end{array}\right].
+\end{align}
+最后用 $r_1\leftarrow r_1-r_2$，得到行最简形
+\begin{equation}
+ \left[\begin{array}{rrrr|r}
+ 1&1&0&-1&0\\0&0&1&1&0\\0&0&0&0&0
+ \end{array}\right].
+ \label{eq:five-four-variable-rref}
+\end{equation}
+主元在第1、3列，所以 $x_1,x_3$ 是主元变量，$x_2,x_4$ 是自由变量。行最简形直接给出 $x_1=-x_2+x_4$、$x_3=-x_4$。令 $x_2=s$、$x_4=t$，逐项写出并整理：
+\begin{align}
+ \boldsymbol x
+ &=(-s+t,\ s,\ -t,\ t)^{\mathrm T}\\
+ &=s(-1,1,0,0)^{\mathrm T}+t(1,0,-1,1)^{\mathrm T},
+ \qquad s,t\in\mathbb R.
+ \label{eq:five-four-variable-general}
+\end{align}
+先不要急着给这两支向量命名。我们已经看见，\textbf{所有解都能由它们线性组合出来}：$s$ 控制第一个方向，$t$ 控制第二个方向。取 $(s,t)=(1,0)$、$(0,1)$，得到的两支向量各自就是齐次解；取任意 $(s,t)$，就得到任意一个解。
+
+还要排除“两个方向其实重复”的可能。若
+\begin{equation}
+ c_1(-1,1,0,0)^{\mathrm T}+c_2(1,0,-1,1)^{\mathrm T}
+ =\boldsymbol0,
+\end{equation}
+检查第2个分量得到 $c_1=0$，检查第4个分量得到 $c_2=0$，所以两支向量线性无关。它们既生成全部解，又没有多余方向，因而构成零空间的一组基。四个分量说明输入记录在 $\mathbb R^4$ 中，两个自由参数说明解空间只有二维；\textbf{分量个数与解空间维数不是同一个概念}。
+
+这个例子把三个观察连在了一起：行最简形给出自由变量，自由变量给出解向量，独立的解向量张成整个零空间。为了在后面的几何图中把同样的结构画出来，我们再保留一个三维的贯穿例子。
 
 \begin{example}[把参数解写成向量组合]
 \FiveBoxLabel{ex:five-running-null}
@@ -11698,6 +11755,8 @@ n=\dim\FNull A+\FRank(A).
 齐次方程组 $A\boldsymbol x=\boldsymbol0$ 的解空间 $\Nul(A)$ 的一组基，称为该方程组的\term{fundamental-solutions}。它必须同时满足两个条件：各解向量线性无关，而且能够线性表示全部齐次解。
 \end{definition}
 
+定义之所以放在这里，是因为例题已经替它说明了两项要求的来源。只找几支满足方程的向量还不够，它们可能漏掉某些解；只要求能够表示所有解也不够，其中可能有多余向量。基础解系把这两项要求同时满足。
+
 \FiveHead{每个自由变量，贡献一个独立的解方向}
 一般地，设自由变量为 $x_{j_1},\ldots,x_{j_k}$。把第 $i$ 个自由变量取1，其余自由变量取0，再由主元方程确定其他分量，得到解向量 $\boldsymbol\xi_i$。由于齐次方程的主元变量都是自由变量的线性组合，任意解都能写成
 \begin{equation}
@@ -11718,30 +11777,44 @@ n=\dim\FNull A+\FRank(A).
 第四章的秩与零度定理给出 $n=\dim\Nul(A)+r(A)$。上一段的参数构造又说明，每个自由变量对应一支基向量。因此基向量个数、自由变量个数与 $n-r$ 是同一个数字的三种解释。
 \end{proof}
 
-\FiveFigure{一维解空间：全部解沿一条过原点的直线变化。}{fig:five-null-line}{%
-\begin{tikzpicture}[x={(.95cm,-.25cm)},y={(.65cm,.35cm)},z={(0cm,.85cm)},font=\small]
- \draw[fiveax] (0,0,0)--(3,0,0) node[right] {$x_1$};
- \draw[fiveax] (0,0,0)--(0,3,0) node[above right] {$x_2$};
- \draw[fiveax] (0,0,0)--(0,0,2) node[above] {$x_3$};
- \draw[FiveG,line width=1.4pt] (-1,-1,0)--(2.3,2.3,0);
- \draw[fiveg] (0,0,0)--(1.4,1.4,0) node[above] {$t(1,1,0)^{\mathrm T}$};
- \fill[FiveG] (0,0,0) circle(1.6pt) node[below left] {$O$};
-\end{tikzpicture}}
-{示例方程为 $x_1-x_2=0,x_3=0$，只剩一个自由参数。画的是 $\mathbb R^3$ 中的一条直线，而非整张坐标平面。}
+把这个计数重新放回消元过程：$n$ 个变量中，$r$ 个由主元方程确定，其余 $n-r$ 个自由选择；每个自由选择对应一个独立方向。因此
+\begin{equation}
+ \text{基础解系向量个数}
+ =\text{自由变量个数}
+ =\dim\Nul(A)=n-r(A).
+\end{equation}
+这不是三个碰巧相等的答案，而是同一结构的算法、基与维数三种读法。在电网络的节点平衡模型中，这些自由方向对应不改变节点收支的线路变化；增加这样的变化，方程的右端项仍是零。
 
-\FiveFigure{二维解空间：两支独立解向量张成过原点的平面。}{fig:five-null-plane}{%
-\begin{tikzpicture}[x={(.95cm,-.25cm)},y={(.65cm,.35cm)},z={(0cm,.85cm)},font=\small]
- \fill[FiveG!12] (-1,-1,0)--(3,-1,0)--(3,2.5,0)--(-1,2.5,0)--cycle;
- \draw[FiveG!50] (-1,-1,0)--(3,-1,0)--(3,2.5,0)--(-1,2.5,0)--cycle;
- \draw[fiveax] (0,0,0)--(3.5,0,0) node[right] {$x_1$};
- \draw[fiveax] (0,0,0)--(0,3,0) node[above right] {$x_2$};
- \draw[fiveax] (0,0,0)--(0,0,2) node[above] {$x_3$};
- \draw[fiveg] (0,0,0)--(2,0,0);
- \draw[fiveg] (0,0,0)--(0,2,0);
- \node[text=FiveG] at (2,1.5,0) {$x_3=0$};
- \fill[FiveG] (0,0,0) circle(1.6pt) node[below left] {$O$};
+\FiveFigure{齐次解空间从原点开始：零维是一个点，一维是直线，二维是平面。}{fig:five-null-line}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \foreach \xx in {0,5,10}{\draw[fivebox] (\xx,0) rectangle ++(4.6,4.6);}
+ \foreach \xx in {0,5,10}{\begin{scope}[shift={(\xx+.85,1.9)},
+   x={(.65cm,-.18cm)},y={(.43cm,.25cm)},z={(0cm,.7cm)}]
+  \draw[fiveax] (0,0,0)--(3,0,0) node[right] {$x_1$};
+  \draw[fiveax] (0,0,0)--(0,3,0) node[above right] {$x_2$};
+  \draw[fiveax] (0,0,0)--(0,0,2.3) node[above] {$x_3$};
+ \end{scope}}
+ \fill[FiveG] (.85,1.9) circle(3pt) node[below left] {$O$};
+ \node[font=\bfseries] at (2.3,4.12) {零维：只有零解};
+ \node[align=center] at (2.3,.52) {$r(A)=3$\\$\Nul(A)=\{\boldsymbol0\}$};
+ \begin{scope}[shift={(5.85,1.9)},x={(.65cm,-.18cm)},y={(.43cm,.25cm)},z={(0cm,.7cm)}]
+  \draw[FiveG,line width=1.5pt] (-.6,-.6,0)--(2.8,2.8,0);
+  \draw[fiveg] (0,0,0)--(1.6,1.6,0);
+  \fill[FiveG] (0,0,0) circle(1.7pt) node[below left] {$O$};
+ \end{scope}
+ \node[font=\bfseries] at (7.3,4.12) {一维：过原点直线};
+ \node[align=center] at (7.3,.52) {$r(A)=2$\\一个自由方向};
+ \begin{scope}[shift={(10.85,1.9)},x={(.65cm,-.18cm)},y={(.43cm,.25cm)},z={(0cm,.7cm)}]
+  \filldraw[fill=FiveG!12,draw=FiveG!55]
+   (-.5,-.5,0)--(3,-.5,0)--(3,2.8,0)--(-.5,2.8,0)--cycle;
+  \draw[fiveg] (0,0,0)--(2.3,0,0);
+  \draw[fiveg] (0,0,0)--(0,2.3,0);
+  \fill[FiveG] (0,0,0) circle(1.7pt) node[below left] {$O$};
+ \end{scope}
+ \node[font=\bfseries] at (12.3,4.12) {二维：过原点平面};
+ \node[align=center] at (12.3,.52) {$r(A)=1$\\两个独立自由方向};
 \end{tikzpicture}}
-{示例方程为 $x_3=0$，$x_1,x_2$ 自由。淡色区域只画平面的一部分，平面向所有方向无限延伸。}
+{三幅均在 $\mathbb R^3$ 中示意。左图可取单位矩阵；中图可取约束 $x_1-x_2=0,x_3=0$；右图可取约束 $x_3=0$。图中的绿色集合只显示局部，直线和平面没有画出的部分仍属于解空间。}
 
 \FiveFigure{三维解空间：零映射的全部输入都是解。}{fig:five-null-whole}{%
 \begin{tikzpicture}[x={(.95cm,-.25cm)},y={(.65cm,.35cm)},z={(0cm,.85cm)},font=\small]
@@ -11776,6 +11849,15 @@ n=\dim\FNull A+\FRank(A).
 \end{tikzpicture}}
 {图中的两组向量都张成整个平面。基础解系的不唯一性来自空间可以选不同的基；固定变量顺序时，行最简形唯一，按自由变量标准取值构造出的基也随之确定。}
 
+例如，贯穿例子中的新基可以具体写为
+\begin{align}
+ \boldsymbol\eta_1&=(-1,1,1)^{\mathrm T},&
+ \boldsymbol\eta_2&=(-1,1,-1)^{\mathrm T},\\
+ \boldsymbol\xi_1&=\tfrac12(\boldsymbol\eta_1+\boldsymbol\eta_2),&
+ \boldsymbol\xi_2&=\tfrac12(\boldsymbol\eta_1-\boldsymbol\eta_2).
+\end{align}
+两组方向互相线性表示，张成同一个平面。如果用 $\boldsymbol\eta_1,\boldsymbol\eta_2$ 来写通解，参数的数值会改变，解的集合却不变。我们选择基，是为了描述这个空间，不是为了创造另一个空间。
+
 还应分清：系数列的极大线性无关组，是从原列向量中选出的列空间的基，含 $r(A)$ 个向量；基础解系是零空间的基，含 $n-r(A)$ 个向量。前者解释输出能够张成多大范围，后者解释输入还留下多少自由方向。极大无关组这一概念并不限于系数列；若从全部齐次解中选出一组能够生成解空间的独立向量，它本身就是基础解系。
 
 齐次方程把这些自由方向都放在原点处。若右端项不再为零，方向还会存在吗？下一节将说明：它们仍然存在，只是全部解从一个特解出发。
@@ -11791,11 +11873,19 @@ n=\dim\FNull A+\FRank(A).
 \begin{proof}
 两个输入产生相同输出，它们之间的差别必被映射消去。代数上，
 \begin{align}
- A(\boldsymbol x_1-\boldsymbol x_2)&=\boldsymbol b-\boldsymbol b=\boldsymbol0,\\
- A(\boldsymbol x_p+\boldsymbol z)&=\boldsymbol b+\boldsymbol0=\boldsymbol b.
+ A(\boldsymbol x_1-\boldsymbol x_2)
+ &=A\boldsymbol x_1-A\boldsymbol x_2
+ =\boldsymbol b-\boldsymbol b=\boldsymbol0,\\
+ A(\boldsymbol x_p+\boldsymbol z)
+ &=A\boldsymbol x_p+A\boldsymbol z
+ =\boldsymbol b+\boldsymbol0=\boldsymbol b.
 \end{align}
 后一式说明，沿任何零空间方向改变已有解，都不会改变它的输出。
 \end{proof}
+
+现在固定一个特解 $\boldsymbol x_p$，再任取一个解 $\boldsymbol x$。刚证明的结论告诉我们，$\boldsymbol z=\boldsymbol x-\boldsymbol x_p$ 是齐次解。于是把等式移项，就得到 $\boldsymbol x=\boldsymbol x_p+\boldsymbol z$。这条推导的作用，是把“任意一个解”转成“一个已知点加上一种允许的变化”；变化的全部范围，就是上一节已经求出的零空间。
+
+反过来，任何零空间中的 $\boldsymbol z$ 都可以加入特解，而不会改变右端项。这说明两种描述的范围完全相同：每个原方程的解都包含在内，包含在内的每个向量也确实满足原方程。
 
 \begin{theorem}[非齐次方程组的通解结构]
 \FiveBoxLabel{thm:five-affine-solutions}
@@ -11826,26 +11916,35 @@ n=\dim\FNull A+\FRank(A).
 \end{equation}
 特解也可以选成 $(2,1,0)^{\mathrm T}$。两支特解相差 $(-1,1,0)^{\mathrm T}$，恰在零空间中，所以换一个特解并不会改变解集。\textbf{特解给出一个出发点，基础解系给出全部可移动方向。}
 
-\FiveFigure{特解加零空间：过原点的方向，生成平移后的解直线。}{fig:five-affine-line}{%
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \draw[fiveax] (-2.8,0)--(3.3,0) node[right] {$x_1$};
- \draw[fiveax] (0,-.6)--(0,2.9) node[above] {$x_2$};
- \draw[FiveG,line width=1.3pt] (-2.5,0)--(2.8,0);
- \draw[FiveG,line width=1.3pt] (-2.5,2)--(2.8,2);
- \draw[fiver] (0,0)--(0,2) node[midway,right] {$\boldsymbol x_p$};
- \fill[FiveR] (0,2) circle(2pt);
- \draw[fiveg] (0,2)--(2,2) node[midway,above] {$\boldsymbol z$};
- \draw[fivedash] (2,0)--(2,2);
- \node[text=FiveG,anchor=east] at (-2.5,0) {$\Nul(A)$};
- \node[text=FiveG,anchor=east] at (-2.5,2) {$\boldsymbol x_p+\Nul(A)$};
- \node[above right] at (2,2) {$\boldsymbol x_p+\boldsymbol z$};
+\FiveFigure{零空间的平移：绿色平面给出方向，蓝色平面给出全部非齐次解。}{fig:five-affine-line}{%
+\begin{tikzpicture}[x={(.95cm,-.25cm)},y={(.65cm,.35cm)},z={(0cm,.95cm)},font=\small]
+ \filldraw[fill=FiveG!12,draw=FiveG!60]
+  (-1,-1,0)--(3.3,-1,0)--(3.3,2.5,0)--(-1,2.5,0)--cycle;
+ \filldraw[fill=FiveB!10,draw=FiveB!65]
+  (-1,-1,2)--(3.3,-1,2)--(3.3,2.5,2)--(-1,2.5,2)--cycle;
+ \draw[fiveax] (0,0,0)--(4.1,0,0) node[right] {$x_1$};
+ \draw[fiveax] (0,0,0)--(0,3.2,0) node[above right] {$x_2$};
+ \draw[fiveax] (0,0,0)--(0,0,3.1) node[above] {$x_3$};
+ \draw[fivedash,-{Stealth[length=2mm]}] (2.8,1.5,0)--(2.8,1.5,2)
+  node[midway,right,fill=white,inner sep=1pt] {平移};
+ \draw[fiver] (0,0,0)--(0,0,2);
+ \fill[FiveR] (0,0,2) circle(2.4pt) node[left] {$\boldsymbol x_p$};
+ \fill[FiveK] (0,0,0) circle(1.7pt) node[below left] {$O$};
+ \draw[fiveg] (0,0,2)--(2,1,2) node[midway,above] {$\boldsymbol z$};
+ \fill[FiveB] (2,1,2) circle(1.8pt) node[right] {$\boldsymbol x_p+\boldsymbol z$};
+ \node[text=FiveG,anchor=east] at (-1,-1,0) {$\Nul(A)$};
+ \node[text=FiveB,anchor=east] at (-1,-1,2) {$\boldsymbol x_p+\Nul(A)$};
 \end{tikzpicture}}
-{用二维方程 $x_2=2$ 示意。齐次方向为横轴，特解可取 $(0,2)^{\mathrm T}$；任意解都位于与横轴平行的上方直线。}
+{用三维方程 $x_3=2$ 示意：绿色平面为 $x_3=0$，特解为 $(0,0,2)^{\mathrm T}$，蓝色平面为 $x_3=2$。若改成二维方程 $x_2=2$，同样的平移把横轴变成上方的解直线。这里画的是结构，不是前一例子的坐标重画。}
 
 \begin{definition}[仿射子空间]
 设 $W\subseteq\mathbb R^n$ 是子空间，$\boldsymbol p\in\mathbb R^n$。集合 $\boldsymbol p+W$ 称为\term{affine-subspace}，它是 $W$ 的一次平移，其维数定义为 $\dim W$。
 \end{definition}
 若 $\boldsymbol p\in W$，平移后仍是 $W$；若 $\boldsymbol p\notin W$，平移后的集合不含零向量，因而不是子空间。特别地，\textbf{非齐次方程组在 $\boldsymbol b\ne\boldsymbol0$ 且有解时，其解集不经过原点，是一个仿射子空间。}无解时则是空集，不能用“特解加零空间”表示。
+
+为什么非齐次解集不能当作子空间？以 $x_3=2$ 为例，零向量不满足它；$(0,0,2)^{\mathrm T}$ 是解，数乘2得到的 $(0,0,4)^{\mathrm T}$ 却不是解。一般地，若 $A\boldsymbol x_p=\boldsymbol b\ne\boldsymbol0$，就有 $A(2\boldsymbol x_p)=2\boldsymbol b\ne\boldsymbol b$。它保存的是共同的变化方向，而不是过原点的线性运算封闭性。\textbf{齐次解可以任意线性组合；非齐次解要从一个特解出发，再加齐次解。}
+
+从工程上看，一个已经满足节点收支的线路分配，可以加上不改变收支的循环流；但把整个线路分配扩大两倍，通常也会把节点收支扩大两倍。前一种操作沿零空间移动，后一种操作改变了目标，两者不能混同。
 
 \FiveHead{自由度决定解集的几何形状}
 有解时，设 $k=\dim\Nul(A)=n-r(A)$。当 $k=0$，没有可改变的方向，解集是一个点；当 $k=1$，是直线；当 $k=2$，是平面；一般是 $k$ 维仿射子空间。维数描述的是解集内部独立的变化方向，并不是记录一个解所需的分量个数。
@@ -11884,6 +11983,8 @@ n=\dim\FNull A+\FRank(A).
 \end{definition}
 因此，$\mathbb R^3$ 中的平面是超平面，但一条直线不是；$\mathbb R^5$ 中二维解集也不能称为超平面。一个非零线性约束留出 $n-1$ 个自由方向，多个独立约束则可能进一步降低维数。
 
+以贯穿例子为对照，输入用三个分量记录，但 $r(A)=1$，所以解集有两个自由方向，是平面而非整个三维空间。再取二元方程 $x_1+x_2=3$，秩为1、自由度为1，解集是一条直线；若两条独立约束同时确定两个未知数，自由度降为0，就只剩交点。这些形状都从同一公式 $n-r(A)$ 读出。\textbf{空集这一情形必须先排除：没有特解，就谈不上把零空间平移到哪个位置。}
+
 独立自由参数的个数也称为解集的\term{degrees-freedom}。有解时，它就是齐次解空间的维数；改变特解只改变位置，不改变这个数字。
 
 我们已经看见了原方程的全部解。计算时却总会把原方程改写成更简单的方程，下一节就解释：为什么这些改写仍能保留同一解集。
@@ -11892,6 +11993,13 @@ n=\dim\FNull A+\FRank(A).
 \label{sec:five-row-preimage}
 
 第二章把三种初等行变换称为同解变换，第三章又把它们写成左乘初等矩阵。现在可以把两种认识接起来：每个操作都可逆，所以它不仅保留已知解，还保留“哪些输入产生指定输出”这一完整关系。
+
+例如，先做 $r_2\leftarrow r_2-2r_1$，再做另一项行变换，对应的初等矩阵分别为 $E_1,E_2$，两项合起来左乘 $E_2E_1$，而不是把两个初等矩阵相加。一般地，若依次做 $q$ 次变换，便有
+\begin{equation}
+ G=E_q\cdots E_2E_1,\qquad
+ G^{-1}=E_1^{-1}E_2^{-1}\cdots E_q^{-1}.
+\end{equation}
+每一步都能撤销，整个过程也能撤销。正是这一点让消元可以来回改写方程，而不丢掉任何原来的条件。
 
 设 $G$ 是若干初等矩阵的乘积，它可逆。对系数矩阵与常数列同步变换，就是
 \begin{equation}
@@ -11911,8 +12019,26 @@ n=\dim\FNull A+\FRank(A).
 正向在等式两边左乘 $G$；反向在等式两边左乘 $G^{-1}$。从映射看，$G$ 不会合并不同输出，所以同时变换实际输出与指定目标，不会改变哪些输入满足方程。这里被保持的是目标的\term{preimage}。
 \end{proof}
 
+\begin{example}[把两条方程改写成同一条有效约束]
+\FiveBoxLabel{ex:five-row-numeric}
+设 $D=\FiveMat{rr}{1&1\\2&2}$、$\boldsymbol b=(3,6)^{\mathrm T}$。用 $r_2\leftarrow r_2-2r_1$ 化简，并比较变换前后的解。
+\end{example}
+\textbf{解}\quad 此次行变换对应
+\begin{align}
+ G&=\FiveMat{rr}{1&0\\-2&1},&
+ GD&=\FiveMat{rr}{1&1\\0&0},&
+ G\boldsymbol b&=(3,0)^{\mathrm T}.
+\end{align}
+原方程为 $x_1+x_2=3$、$2x_1+2x_2=6$，变换后为 $x_1+x_2=3$、$0=0$。两者都给出
+\begin{equation}
+ \boldsymbol x=(3,0)^{\mathrm T}+t(-1,1)^{\mathrm T},\qquad t\in\mathbb R.
+\end{equation}
+变换前，所有输出位于 $y_2=2y_1$；变换后，所有输出位于横轴。可是目标也从 $(3,6)^{\mathrm T}$ 同步变成 $(3,0)^{\mathrm T}$，因此到达指定目标的输入一个也没有改变。\textbf{不能只变换 $D$ 而保留旧的 $\boldsymbol b$：那将成为另一个方程组。}
+
 \FiveHead{固定坐标下的复合，与更换输出坐标}
 固定输入、输出的坐标时，$T(\boldsymbol x)=A\boldsymbol x$ 与 $T'(\boldsymbol x)=GA\boldsymbol x$ 是两个不同的映射，后者是 $G\circ T$。不能把左乘一个矩阵简单说成“映射没有变”。
+
+这里可以把输出想成测量记录：原来分别记录两项数值，后来改为“第一项”与“第二项减去第一项的两倍”。因为这种记录可逆，旧记录能完整恢复。计算得到的数值发生变化，不等于输入与目标之间的关系丢失；但若坚持把新数值仍解释成旧坐标中的点，得到的确实就是另一个映射。这两种观察方式必须分清。
 
 若改用坐标表示的观点，则可以让 $G$ 把旧输出坐标换成新输出坐标。设旧输出基为 $B$、新输出基为 $C$，规定 $P_{B\leftarrow C}=G^{-1}$。由第四章的坐标公式，
 \begin{equation}
@@ -11926,6 +12052,8 @@ n=\dim\FNull A+\FRank(A).
  \foreach \xx in {0,5.2,10.4}{\draw[fivebox] (\xx,0) rectangle ++(4.3,4.1);}
  \node[font=\bfseries] at (2.15,3.65) {输入：同一条解直线};
  \draw[fiveax] (.6,.7)--(3.8,.7);\draw[fiveax] (.6,.7)--(.6,2.9);
+ \draw[FiveG!60,line width=1pt,densely dashed] (.1,1.2)--(1.1,.2);
+ \node[text=FiveG,font=\footnotesize,anchor=west] at (.18,1.4) {$\Nul(D)$：不变};
  \draw[FiveG,line width=1.2pt] (.8,2.9)--(3.3,.4);
  \fill[FiveR] (1.5,2.2) circle(2pt) node[right,font=\footnotesize] {$\boldsymbol x$};
  \node[font=\footnotesize] at (2.1,.15) {$x_1+x_2=3$};
@@ -11936,7 +12064,7 @@ n=\dim\FNull A+\FRank(A).
  \node[font=\footnotesize] at (7.4,.15) {$\Col(D)$：$y_2=2y_1$};
  \node[font=\bfseries] at (12.55,3.65) {变换后的输出坐标};
  \draw[fiveax] (11,.7)--(14.4,.7);\draw[fiveax] (11,.7)--(11,3.1);
- \draw[FiveB,line width=1.4pt] (10.8,.7)--(14.2,.7);
+ \draw[FiveB,line width=1.4pt,densely dashed] (10.8,.7)--(14.2,.7);
  \fill[FiveR] (13,.7) circle(2pt) node[above,font=\footnotesize] {$G\boldsymbol b=(3,0)^{\mathrm T}$};
  \node[font=\footnotesize] at (12.55,.15) {$\Col(GD)$：横轴};
  \draw[fiveb] (4.35,2)--(5.15,2) node[midway,above] {$D$};
@@ -11956,7 +12084,7 @@ n=\dim\FNull A+\FRank(A).
 
 \textbf{注意：可逆不意味着保持长度和夹角。}例如 $G=\operatorname{diag}(2,1)$ 把原来正交的 $(1,1)^{\mathrm T}$、$(1,-1)^{\mathrm T}$ 变成 $(2,1)^{\mathrm T}$、$(2,-1)^{\mathrm T}$，它们的点积为3。换到一般新基后，直接对坐标数组使用标准点积，也未必仍记录原物理向量的夹角。本章下面的正交关系，均针对给定矩阵在标准坐标中的四个子空间。
 
-行变换因此能帮助我们计算原空间的结构，却不能把化简后的列空间原样当成原列空间。带着这一分别看行、看列的习惯，我们把矩阵两端的四个空间一起列出来。
+现在可以放心使用行变换了：它把输出端的条件重新组织，并将目标作同样的变换；可逆性保证哪些输入是解始终不变。输入侧的解集、零空间和行空间保留，输出侧的列空间则随 $G$ 重新摆放。消元结果仍能告诉我们原矩阵的秩与自由度，却不能让我们把化简后的列向量原样搬回原坐标。带着这一分别看输入、看输出的习惯，下一节把两端的四个空间放到同一幅结构图中。
 
 \section{一个矩阵，四个基本子空间}
 \label{sec:five-four-spaces}
@@ -11966,6 +12094,12 @@ n=\dim\FNull A+\FRank(A).
 \subsection{四个子空间的定义与维数}
 
 设 $A$ 为 $m\times n$ 矩阵，列记为 $\boldsymbol a_j\in\mathbb R^m$，第 $i$ 行记为 $\boldsymbol r_i^{\mathrm T}$，其中 $\boldsymbol r_i\in\mathbb R^n$。沿用本书的列向量习惯，我们把各行竖排后讨论它们张成的空间。
+
+先站在\textbf{输入侧 $\mathbb R^n$} 看。行空间 $\Row(A)$ 由各行竖排后张成，收集方程能够检查到的方向；零空间 $\Nul(A)$ 则收集经过 $A$ 后全被送到零的输入。前者与独立约束有关，维数为 $r(A)$；后者与自由变量有关，维数为 $n-r(A)$。同一个输入可以同时包含这两类分量。
+
+再站在\textbf{输出侧 $\mathbb R^m$} 看。列空间 $\Col(A)$ 由各列张成，是所有输入实际能够产生的范围，维数为 $r(A)$；左零空间 $\Nul(A^{\mathrm T})$ 由转置齐次方程确定，给出输出必须避开的非零方向，维数为 $m-r(A)$。两侧的分组取决于向量有多少个分量，而不是名称中的“行”或“列”在纸上朝哪个方向。
+
+下面的正式定义把这四种角色写成准确的集合；读每一行时，都先问它属于输入侧还是输出侧。
 
 \begin{definition}[四个基本子空间]
 矩阵 $A$ 的\term{fundamental-subspaces}为
@@ -11994,8 +12128,7 @@ n=\dim\FNull A+\FRank(A).
 列空间维数是矩阵秩的定义，零空间维数由秩与零度定理给出。第四章已证明行秩等于列秩，因而 $r(A^{\mathrm T})=r(A)=r$；把秩与零度定理用于 $A^{\mathrm T}:\mathbb R^m\to\mathbb R^n$，就得到左零空间维数 $m-r$。注意，两次计数所用的输入维数分别为 $n$ 与 $m$。
 \end{proof}
 
-% 原图5.8的单张概览由第5.4.3节的图5.4a--5.4c替换；保留后续既有图号。
-\stepcounter{figure}
+% 四个子空间的总览集中放在第5.4.3节；字母后缀图独立于正文连续图号。
 
 \begin{example}[贯穿矩阵的四个空间]
 求式\eqref{eq:five-running-A}中的矩阵 $A$ 的四个基本子空间及其维数。
@@ -12009,6 +12142,10 @@ n=\dim\FNull A+\FRank(A).
  =\operatorname{Span}\{(-2,1,0)^{\mathrm T},(1,0,1)^{\mathrm T}\}.
 \end{align}
 两个张成空间各为一维直线，两个零空间各为二维平面，维数分别配成 $1+2=3$。左右两端虽都用三个分量，这两条直线却不是同一条，两个平面也不是同一个。
+
+可以逐项核对这个例子，而不只记住四行结果。将行空间的方向 $(1,1,0)^{\mathrm T}$ 输入 $A$，得到 $2(1,2,-1)^{\mathrm T}$，确实沿列空间变化；将零空间的任一基向量输入 $A$，则得到零。输出侧，列空间的方向 $(1,2,-1)^{\mathrm T}$ 与左零空间的两支基向量点积都为零。这说明两端各是一条直线配一个平面，而不是两条直线配对；维数相加为3，但不必平均分成两部分。
+
+在章首的网络模型中，输入端记录线路，输出端记录节点。零空间收集不改变节点收支的循环变化；左零空间则检查全网收支必须满足的限制。四个子空间的分组，让我们不会把“线路还可以怎样改”与“节点目标能否实现”混成同一个问题。
 
 \FiveHead{怎样从消元结果提取基}
 列空间的基要取\textbf{原矩阵中对应主元列号的列}；行空间的基可以取阶梯形的非零行，因为行变换不改变行空间。零空间的基由自由参数构造；左零空间的基对 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$ 使用同一构造。这样四种基仍由第二章的算法求得，只是读结果时所面对的空间不同。
@@ -12047,6 +12184,23 @@ n=\dim\FNull A+\FRank(A).
 
 \textbf{注意：正交只说明方向互不重叠，维数计数才保证没有遗漏方向。}例如 $\mathbb R^3$ 中 $x$ 轴与 $y$ 轴正交，合起来却只是一个平面。证明中“正交、交为零、维数足够”这三环不可省去任何一环。
 
+回顾第1章：交只有零向量，就可以把两个子空间的和写成直和。\textbf{正交能保证这种分解在它们的和空间中唯一，却不能保证和空间就是整个环境空间。}例如 $\mathbb R^3$ 的 $x_1$ 轴与 $x_2$ 轴互相正交，交为零，二者的和也确实是直和；但是维数只有 $1+1=2$，只能铺成 $x_1x_2$ 平面，遗漏了 $x_3$ 方向。我们要得到 $\mathbb R^n$ 本身的分解，还必须用 $r+(n-r)=n$ 补上最后一环。
+
+\FiveFigure{正交保证不重复，维数保证不遗漏：两条坐标轴还没有铺满三维空间。}{fig:five-orthogonal-not-whole}{%
+\begin{tikzpicture}[x={(1cm,-.25cm)},y={(.65cm,.35cm)},z={(0cm,.9cm)},font=\small]
+ \filldraw[fill=FiveB!6,draw=FiveK!35]
+  (-.8,-.8,0)--(3,-.8,0)--(3,2.6,0)--(-.8,2.6,0)--cycle;
+ \draw[fiveb] (-1,0,0)--(3.6,0,0) node[right] {$U$：$x_1$轴};
+ \draw[fiveg] (0,-1,0)--(0,3,0) node[above right] {$V$：$x_2$轴};
+ \draw[fiver] (0,0,0)--(0,0,2.6) node[above] {遗漏的 $x_3$方向};
+ \draw[FiveK,line width=.6pt] (.3,0,0)--(.3,.3,0)--(0,.3,0);
+ \fill[FiveK] (0,0,0) circle(1.8pt) node[below left] {$O$};
+ \node[anchor=west,align=left] at (4,1,1.4)
+  {$U\perp V,\quad U\cap V=\{\boldsymbol0\}$\\[4pt]
+   $\dim(U\oplus V)=2<3$\\[4pt]$U\oplus V\ne\mathbb R^3$};
+\end{tikzpicture}}
+{这幅图区分“和是直和”与“直和等于整个空间”。四个基本子空间的每一对除了正交，还恰好具有足够的维数，才得到对输入端或输出端的完整分解。}
+
 \FiveFigure{输入端的正交直和：行空间分量与零空间分量唯一相加。}{fig:five-input-direct-sum}{%
 \begin{tikzpicture}[font=\small,x=1cm,y=1cm]
  \draw[fiveax] (-2.8,0)--(3.4,0) node[right] {$x_1$};
@@ -12081,7 +12235,7 @@ n=\dim\FNull A+\FRank(A).
 
 于是任意输入唯一写成 $\boldsymbol x=\boldsymbol x_R+\boldsymbol x_N$，其中 $\boldsymbol x_R\in\Row(A)$、$\boldsymbol x_N\in\Nul(A)$，并且 $A\boldsymbol x=A\boldsymbol x_R$。零空间分量不影响输出。输出端同样唯一写成 $\boldsymbol b=\boldsymbol b_C+\boldsymbol b_L$；只有列空间中的向量能由 $A$ 产生，非零的左零空间分量则使整个目标不可达。
 
-四个空间现在各有维数，也各有相对方向。下一节把这幅分解图重新放回 $A\boldsymbol x=\boldsymbol b$，回答解的存在性和自由度。
+四个空间现在各有维数，也各有相对方向。先把这些结论用两端的直观图重新读一遍，再将它们放回方程组，回答解的存在性和自由度。
 
 % FOUR SPACES INTUITIVE BEGIN
 \subsection{直观总结：正交互补的两组子空间}
@@ -12091,12 +12245,12 @@ n=\dim\FNull A+\FRank(A).
 
 先把空间分到两侧：\textbf{行空间与零空间属于输入端，列空间与左零空间属于输出端。}表中的“方向”指非零方向；零向量仍共同属于每一对子空间。“消灭”则指映射后的输出为零，不是输入向量从空间中消失。
 
-\definecolor{FiveDark}{HTML}{172333}
-\definecolor{FiveGold}{HTML}{EAC76B}
-\definecolor{FiveRose}{HTML}{EB8798}
-\definecolor{FiveSky}{HTML}{7FC3EE}
-\definecolor{FiveSilver}{HTML}{BAC5D0}
-\definecolor{FiveWhite}{HTML}{F3F2EC}
+\definecolor{FiveDark}{HTML}{FAFBFC}
+\definecolor{FiveGold}{HTML}{397AA1}
+\definecolor{FiveRose}{HTML}{448678}
+\definecolor{FiveSky}{HTML}{397AA1}
+\definecolor{FiveSilver}{HTML}{68747D}
+\definecolor{FiveWhite}{HTML}{35312D}
 \definecolor{FiveGrid}{HTML}{8F9FB4}
 \newcommand{\FiveLetterFigure}[5]{%
  \begingroup\edef\FiveSavedFigure{\arabic{figure}}%
@@ -12105,10 +12259,10 @@ n=\dim\FNull A+\FRank(A).
  \FiveFigure{#2}{#3}{#4}{#5}%
  \setcounter{figure}{\FiveSavedFigure}\endgroup}
 \tikzset{
- fivedarkax/.style={-{Stealth[length=1.8mm]},FiveSilver!65,line width=.55pt},
- fivedarkdash/.style={FiveSilver!70,densely dashed,line width=.65pt},
- fivedarklabel/.style={fill=FiveDark,inner sep=2pt},
- fivedarkvec/.style={-{Stealth[length=2.3mm]},line width=1.3pt}}
+ fivelightax/.style={-{Stealth[length=1.8mm]},FiveSilver!65,line width=.55pt},
+ fivelightdash/.style={FiveSilver!70,densely dashed,line width=.65pt},
+ fivelightlabel/.style={fill=FiveDark,inner sep=2pt},
+ fivelightvec/.style={-{Stealth[length=2.3mm]},line width=1.3pt}}
 
 \FiveLetterFigure{a}{四个基本子空间总览：输入、输出两侧各有一组正交互补的子空间。}{fig:five-intuitive-overview}{%
 \begin{tikzpicture}[x=1cm,y=1cm,
@@ -12175,26 +12329,26 @@ n=\dim\FNull A+\FRank(A).
  \fill[FiveDark,rounded corners=4pt] (-7.35,-3.7) rectangle(7.35,4.3);
  \node at (0,3.55) {$\mathbb R^n=\Row(A)\oplus\Nul(A)$};
  \draw[step=.5cm,FiveGrid!25!FiveDark,line width=.3pt] (-4,-2.5) grid(4,2.5);
- \draw[fivedarkax] (-4.4,0)--(4.4,0) node[right,text=FiveSilver] {$x_1$};
- \draw[fivedarkax] (0,-2.7)--(0,2.8) node[above,text=FiveSilver] {$x_2$};
+ \draw[fivelightax] (-4.4,0)--(4.4,0) node[right,text=FiveSilver] {$x_1$};
+ \draw[fivelightax] (0,-2.7)--(0,2.8) node[above,text=FiveSilver] {$x_2$};
  \draw[FiveGold,line width=1.3pt] (-2.4,-2.4)--(2.4,2.4);
  \draw[FiveRose,line width=1.3pt] (-2.4,2.4)--(2.4,-2.4);
- \draw[fivedarkdash] (1.8,1.8)--(2.8,.8)--(1,-1);
- \draw[fivedarkvec,FiveGold] (0,0)--(1.8,1.8)
-  node[fivedarklabel,above left] {$\boldsymbol x_{\text{row}}$};
- \draw[fivedarkvec,FiveRose] (0,0)--(1,-1)
-  node[fivedarklabel,below left] {$\boldsymbol x_{\text{null}}$};
- \draw[fivedarkvec,FiveWhite] (0,0)--(2.8,.8)
-  node[fivedarklabel,above right] {$\boldsymbol x$};
+ \draw[fivelightdash] (1.8,1.8)--(2.8,.8)--(1,-1);
+ \draw[fivelightvec,FiveGold] (0,0)--(1.8,1.8)
+  node[fivelightlabel,above left] {$\boldsymbol x_{\text{row}}$};
+ \draw[fivelightvec,FiveRose] (0,0)--(1,-1)
+  node[fivelightlabel,below left] {$\boldsymbol x_{\text{null}}$};
+ \draw[fivelightvec,FiveR] (0,0)--(2.8,.8)
+  node[fivelightlabel,above right] {$\boldsymbol x$};
  \draw[FiveSilver,line width=.6pt] (.18,.18)--(.36,0)--(.18,-.18);
  \fill[FiveWhite] (0,0) circle(1.6pt) node[below left] {$O$};
- \node[text=FiveGold,align=left,anchor=west,fivedarklabel] at (2.65,2.25)
-  {$\Row(A)$\\可存活的输入方向};
- \node[text=FiveRose,align=left,anchor=west,fivedarklabel] at (-6.35,2.25)
-  {$\Nul(A)$\\必消亡的输入方向};
+ \node[text=FiveGold,align=left,anchor=west,fivelightlabel] at (2.65,2.25)
+  {$\Row(A)$\\有效输入方向};
+ \node[text=FiveRose,align=left,anchor=west,fivelightlabel] at (-6.35,2.25)
+  {$\Nul(A)$\\被消去的输入方向};
  \node at (0,-3.05) {$r+(n-r)=n,\qquad r=r(A)$};
 \end{tikzpicture}}
-{图取 $A=\FiveMat{rr}{1&1\\2&2}$，故 $n=2$、$r(A)=1$。两个分量均从原点出发，虚线连接它们与白色向量的端点。高维情形仍有唯一分解，但两部分未必都是直线，维数也未必相等。}
+{图取 $A=\FiveMat{rr}{1&1\\2&2}$，故 $n=2$、$r(A)=1$。这里 $\boldsymbol x=(2.8,.8)^{\mathrm T}=(1.8,1.8)^{\mathrm T}+(1,-1)^{\mathrm T}$。两个分量均从原点出发，灰色虚线表示相加关系。高维情形仍有唯一分解，但两部分未必都是直线，维数也未必相等。}
 
 再看输出端，结构完全对称。整个输出空间 $\mathbb R^m$ 也有两个正交互补的部分：列空间和左零空间。\textbf{列空间是所有能到达的范围}：只要目标在其中，就存在输入能产生它。\textbf{左零空间给出不可到达的方向}：若目标带有非零的左零空间分量，就一定不在列空间中，方程组因而无解。
 
@@ -12213,26 +12367,26 @@ n=\dim\FNull A+\FRank(A).
  \fill[FiveDark,rounded corners=4pt] (-7.35,-3.7) rectangle(7.35,4.3);
  \node at (0,3.55) {$\mathbb R^m=\Col(A)\oplus\Nul(A^{\mathrm T})$};
  \draw[step=.5cm,FiveGrid!25!FiveDark,line width=.3pt] (-4,-2.5) grid(4,2.5);
- \draw[fivedarkax] (-4.4,0)--(4.4,0) node[right,text=FiveSilver] {$y_1$};
- \draw[fivedarkax] (0,-2.7)--(0,2.8) node[above,text=FiveSilver] {$y_2$};
+ \draw[fivelightax] (-4.4,0)--(4.4,0) node[right,text=FiveSilver] {$y_1$};
+ \draw[fivelightax] (0,-2.7)--(0,2.8) node[above,text=FiveSilver] {$y_2$};
  \draw[FiveSky,line width=1.3pt] (-1.2,-2.4)--(1.2,2.4);
  \draw[FiveSilver,line width=1.3pt] (-3,1.5)--(3,-1.5);
- \draw[fivedarkdash] (1,2)--(3,1)--(2,-1);
- \draw[fivedarkvec,FiveSky] (0,0)--(1,2)
-  node[fivedarklabel,above left] {$\boldsymbol b_{\text{col}}$};
- \draw[fivedarkvec,FiveSilver] (0,0)--(2,-1)
-  node[fivedarklabel,below left] {$\boldsymbol b_{\text{left}}$};
- \draw[fivedarkvec,FiveWhite] (0,0)--(3,1)
-  node[fivedarklabel,above right] {$\boldsymbol b$};
+ \draw[fivelightdash] (1,2)--(3,1)--(2,-1);
+ \draw[fivelightvec,FiveSky] (0,0)--(1,2)
+  node[fivelightlabel,above left] {$\boldsymbol b_{\text{col}}$};
+ \draw[fivelightvec,FiveSilver] (0,0)--(2,-1)
+  node[fivelightlabel,below left] {$\boldsymbol b_{\text{left}}$};
+ \draw[fivelightvec,FiveR] (0,0)--(3,1)
+  node[fivelightlabel,above right] {$\boldsymbol b$};
  \draw[FiveSilver,line width=.6pt] (.1,.2)--(.3,.1)--(.2,-.1);
  \fill[FiveWhite] (0,0) circle(1.6pt) node[below left] {$O$};
- \node[text=FiveSky,align=left,anchor=west,fivedarklabel] at (1.55,2.3)
+ \node[text=FiveSky,align=left,anchor=west,fivelightlabel] at (1.55,2.3)
   {$\Col(A)$\\可到达的输出方向};
- \node[text=FiveSilver,align=left,anchor=west,fivedarklabel] at (-6.35,2.25)
+ \node[text=FiveSilver,align=left,anchor=west,fivelightlabel] at (-6.35,2.25)
   {$\Nul(A^{\mathrm T})$\\不可到达的输出方向};
  \node at (0,-3.05) {$r+(m-r)=m,\qquad r=r(A)$};
 \end{tikzpicture}}
-{仍取上一图的 $A$。白色目标为 $(3,1)^{\mathrm T}$，蓝色分量为 $(1,2)^{\mathrm T}$，灰色分量为 $(2,-1)^{\mathrm T}$。灰色分量非零，所以目标不可达；蓝色与灰色方向虽正交，仍共同含有原点。}
+{仍取上一图的 $A$。红色目标为 $(3,1)^{\mathrm T}$，蓝色分量为 $(1,2)^{\mathrm T}$，灰色分量为 $(2,-1)^{\mathrm T}$。灰色分量非零，所以目标不可达；蓝色与灰色方向虽正交，仍共同含有原点。}
 
 回到解的问题。既然零空间分量会被映射消灭，所有输入只要行空间分量相同，输出就完全相同。反过来，只要方程组有解，行空间中就恰好有一个解：它是所有解里不带零空间分量的那一个，这就是这里所说的“干净”。其他解只是在它上面加入不同的零空间向量。\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}下一节将把这幅直观画面完整写成解的判定，并证明行空间与列空间之间的一一对应。
 % FOUR SPACES INTUITIVE END
@@ -12240,7 +12394,20 @@ n=\dim\FNull A+\FRank(A).
 \section{四个子空间怎样共同决定解}
 \label{sec:five-spaces-solutions}
 
-有了解集的平移结构与两端的正交直和，我们可以把两个看似分开的判断合起来：右端项能否达到，由输出端的结构回答；到达之后能否继续改变输入，由输入端的结构回答。
+前面我们分别看过解空间、平移后的解集，以及矩阵两端的四个空间。现在回到求解者最关心的三个问题：目标能达到吗？达到它的输入唯一吗？如果不唯一，还能自由改变多少个方向？四个子空间并没有增加一套求解步骤，而是把这三个问题分配给不同的结构来回答。
+
+\FiveHead{有没有解：先检查输出端}
+方程 $A\boldsymbol x=\boldsymbol b$ 要求输出恰好是 $\boldsymbol b$，所以首先必须有 $\boldsymbol b\in\Col(A)$。左零空间提供同一条件的另一种检查：目标必须与其中每支向量正交。若目标包含非零的左零空间分量，再怎样调整输入也产生不了这一部分。
+
+\FiveHead{解唯一吗：再检查输入端}
+确认有解以后，任意两解之差都在零空间中。如果 $\Nul(A)=\{\boldsymbol0\}$，两解的差只能为零，解就唯一；若零空间有非零方向，已有解便能沿这个方向取任意实数倍，得到无穷多个解。\textbf{唯一性判断以存在性为前提：零空间为零不表示所有右端项都可达。}例如高而窄的矩阵可以没有非零齐次解，却仍不能覆盖整个输出空间。
+
+\FiveHead{自由度多大：数零空间的独立方向}
+有解时，零空间的一组基恰好给出通解中的全部自由参数。它含 $n-r(A)$ 支向量，因此
+\begin{equation}
+ \text{解的自由度}=\dim\Nul(A)=n-r(A).
+\end{equation}
+自由度不是“写出了几个解”，而是“从一个解出发，还可以独立改变几个方向”。在节点平衡模型中，不改变收支的循环变化可以有若干独立方向；它们共同张成的空间，决定了所有线路分配还留下多少自由度。下面把存在性与唯一性的结论严格归在一起。
 
 \begin{theorem}[存在性与唯一性的空间判定]
 \FiveBoxLabel{thm:five-compatibility}
@@ -12274,6 +12441,8 @@ n=\dim\FNull A+\FRank(A).
 \FiveHead{产生输出的部分，是否也会有重复}
 整个输入空间中可能有多个解，但这些重复来自零空间。如果把输入限制在行空间，零空间的方向已经被排除，是否还会出现重复？下面的结论把这项直观说成严格的一一对应。
 
+这并不要求我们先算任何正交分解的算法。只用第5.4节已经证明的唯一分解：每个解都能写成 $\boldsymbol x_R+\boldsymbol x_N$，后一部分不产生输出。因此去掉 $\boldsymbol x_N$，还会得到一个满足相同目标的解，而且它位于行空间中。剩下的问题是：行空间中会不会还藏着两个不同的解？若有，它们的差必须同时属于行空间和零空间；而这两者没有共同的非零方向。这样，存在与唯一两条路线恰好接到一起。
+
 \begin{theorem}[行空间到列空间的一一对应]
 \FiveBoxLabel{thm:five-row-col-bijection}
 映射 $\boldsymbol x\mapsto A\boldsymbol x$ 限制在 $\Row(A)$ 上，是从 $\Row(A)$ 到 $\Col(A)$ 的一一对应线性映射。因此，每个可达的目标 $\boldsymbol b$ 在行空间中恰好有一个解。
@@ -12300,21 +12469,41 @@ n=\dim\FNull A+\FRank(A).
  \draw[FiveB,line width=1.2pt] (10.95,1)--(12.45,4);
  \draw[FiveG,line width=1.2pt] (9.7,3.5)--(13.7,1.5);
  \node[text=FiveB,above] at (12.45,4) {$\Col(D)$};
- \node[text=FiveG,align=center,font=\footnotesize] at (10,4.35) {$\Nul(D^{\mathrm T})$\\非零向量不可达};
+ \node[text=FiveG,align=center,font=\footnotesize] at (10,4.65) {$\Nul(D^{\mathrm T})$\\非零向量不可达};
  \fill[FiveK] (3,2.5) circle(1.7pt);\fill[FiveK] (11.7,2.5) circle(1.7pt);
- \draw[fiveb] (6.1,4.2)--(8.6,4.2) node[midway,above] {$D$：一一对应};
+ \draw[fivedash] (3.1,4.6)--(5.1,2.6);
+ \node[text=FiveK,font=\footnotesize,anchor=west] at (5.15,2.65) {解集};
+ \fill[FiveR] (4.1,3.6) circle(2.3pt);
+ \node[anchor=east,text=FiveR,font=\footnotesize,fill=white,inner sep=1pt]
+  at (3.95,3.65) {唯一的 $\boldsymbol x_R$};
+ \fill[FiveR] (12.25,3.6) circle(2.3pt)
+  node[right,text=FiveR,font=\footnotesize] {$\boldsymbol b$};
+ \draw[fiver] (4.2,3.6) to[out=5,in=175]
+  node[pos=.4,above,align=center,text width=2.25cm,
+   fill=white,inner sep=2pt,font=\footnotesize]
+  {$D$\\一一对应} (12.15,3.6);
  \draw[fiveg] (4.1,1.4) to[out=-25,in=210] (11.7,2.5);
  \node[fill=white,text=FiveG,font=\footnotesize] at (7.35,1.05) {$D\boldsymbol z=\boldsymbol0$};
  \node[font=\footnotesize] at (3,.55) {同一输出的输入沿绿色方向改变};
  \node[font=\footnotesize] at (11.7,.55) {目标必须落在蓝色直线上};
 \end{tikzpicture}}
-{取 $D=\FiveMat{rr}{1&1\\2&2}$，两端均可画在平面。蓝色对应是映射限制后的作用，绿色弧线表示零空间中的所有输入都送到右端原点；它不是输入经过零空间再产生输出的流程。}
+{取 $D=\FiveMat{rr}{1&1\\2&2}$，两端均可画在平面。红色点 $\boldsymbol x_R$ 表示行空间中的唯一解，经过它的灰色虚线表示同一目标的全部解。红色对应是映射限制后的作用，绿色弧线表示零空间中的所有输入都送到右端原点；两条作用并行，不是输入先经过零空间再产生输出的流程。}
 
 对贯穿例子的目标 $\boldsymbol b=(3,6,-3)^{\mathrm T}$，行空间中的输入形如 $(q,q,0)^{\mathrm T}$，代入 $A\boldsymbol x=\boldsymbol b$ 得 $2q=3$，故这一唯一的行空间解为
 \begin{equation}
  \boldsymbol x_R=(\tfrac32,\tfrac32,0)^{\mathrm T},\qquad
  \boldsymbol x=\boldsymbol x_R+s(-1,1,0)^{\mathrm T}+t(0,0,1)^{\mathrm T}.
 \end{equation}
+这里的数值可以跟着走一遍。$A$ 的每一行只检查 $x_1+x_2$，所以任何解都满足 $x_1+x_2=3$；行空间又要求 $x_1=x_2$、$x_3=0$。把这两种条件同时满足，便得到 $x_1=x_2=3/2$。例如，下面两个解看上去不同，却输出同一个目标：
+\begin{align}
+ \boldsymbol p&=(3,0,0)^{\mathrm T}
+ =\boldsymbol x_R-\tfrac32\boldsymbol\xi_1,\\
+ \boldsymbol q&=(0,3,2)^{\mathrm T}
+ =\boldsymbol x_R+\tfrac32\boldsymbol\xi_1+2\boldsymbol\xi_2,\\
+ A\boldsymbol p&=A\boldsymbol q=A\boldsymbol x_R=(3,6,-3)^{\mathrm T}.
+\end{align}
+它们的行空间分量都相同，差别全在零空间方向上。将零空间部分去掉后，留下的不是另一个目标的解，而是\emph{同一目标}在行空间中唯一的解。这就是前节所说“没有多余零空间分量”的准确含义。
+
 之前选择的特解 $(3,0,0)^{\mathrm T}$ 只是这个集合中的另一个点。这里没有为它们比较“优劣”，只辨认其中哪一个属于行空间。
 
 把结论回扣到章首电网络：可实现的节点注入位于关联矩阵的列空间，左零空间检查全网必须满足的收支条件；已实现的节点平衡允许沿零空间增加循环自由度。线路电势差由节点电势的转置作用组织在行空间中。真实线路电流还需服从元件关系，但这些关系所在的位置，已经由四个子空间明确区分。
@@ -12324,7 +12513,9 @@ n=\dim\FNull A+\FRank(A).
 \section{解的判定：参数分类与结构反推}
 \label{sec:five-parameter}
 
-参数题容易让人忙于约分，却忘记约掉的表达式可能为零。本节不再增加消元技巧，而是用已建立的结构逐项判断：列空间是否接纳目标，零空间是否留下自由方向，行与列的维数有没有发生变化。
+本节不重新教消元，而是用刚学到的子空间结构，重新解读含参数方程组的每一种情形。一个主元消失，不只是算式里少了一个非零数：秩可能下降，行空间与列空间的维数随之减少，两个零空间的维数则增加。可是自由方向增加以后，目标仍可能在列空间内，也可能已经离开列空间。我们既要看参数怎样改变约束，也要看右端项能否与剩下的约束一致。
+
+计算仍用第2章的方法。需要补上的，是计算后的解释：为什么出现矛盾，为什么只剩一个解，为什么解能沿某个方向连续变化。
 
 \begin{theorem}[秩判定的结构汇总]
 设 $A$ 为 $m\times n$ 矩阵，$\bar A=[\,A\mid\boldsymbol b\,]$。方程组的三种情形为
@@ -12338,6 +12529,91 @@ n=\dim\FNull A+\FRank(A).
 \begin{proof}
 添加一列 $\boldsymbol b$，若秩增加，说明该列不在原列空间中，目标不可达；若秩不增加，说明它能由原列表示。可达之后，再用 $\dim\Nul(A)=n-r(A)$ 判断是否留下自由方向。齐次方程的目标为零，始终在列空间中，所以只需判断零空间是否非平凡。
 \end{proof}
+
+\begin{example}[三元方程组：主元变化与目标变化]
+\FiveBoxLabel{ex:five-two-parameters}
+讨论实参数 $\lambda,\mu$ 下方程组
+\begin{equation}
+ \begin{cases}
+ x_1+x_2+x_3=3,\\
+ x_1+\lambda x_2+x_3=4,\\
+ x_1+x_2+(\lambda-1)x_3=\mu+2
+ \end{cases}
+ \label{eq:five-two-parameter-system}
+\end{equation}
+的解，并说明秩的变化如何反映输入、输出两端的结构。
+\end{example}
+\textbf{解}\quad 记系数矩阵为 $H_\lambda$，目标为 $\boldsymbol d_\mu=(3,4,\mu+2)^{\mathrm T}$。按第2章方法，做 $r_2\leftarrow r_2-r_1$、$r_3\leftarrow r_3-r_1$，就得到
+\begin{equation}
+ [\,H_\lambda\mid\boldsymbol d_\mu\,]
+ \sim\left[\begin{array}{rrr|r}
+ 1&1&1&3\\
+ 0&\lambda-1&0&1\\
+ 0&0&\lambda-2&\mu-1
+ \end{array}\right].
+ \label{eq:five-two-parameter-echelon}
+\end{equation}
+先保留 $\lambda-1$ 与 $\lambda-2$，不要除去它们；是否为零，正是结构发生变化的分界。
+
+当 $\lambda\ne1,2$ 时，三列都有主元，两个秩均为3，唯一解为
+\begin{equation}
+ \boldsymbol x=
+ \left(3-\frac1{\lambda-1}-\frac{\mu-1}{\lambda-2},\
+       \frac1{\lambda-1},\ \frac{\mu-1}{\lambda-2}\right)^{\mathrm T}.
+\end{equation}
+这里 $\Row(H_\lambda)=\Col(H_\lambda)=\mathbb R^3$，两端零空间都只有零向量。输出端没有不可达的方向，输入端也没有不影响结果的自由方向。这就是三主元所说明的全部结构，而不只是一个求解公式。
+
+当 $\lambda=1$ 时，第二个条件变为 $0=1$。系数矩阵仍有两个独立约束，所以 $r(H_1)=2$，增广矩阵却有秩3；无论 $\mu$ 取什么值，方程组都无解。这个矛盾也能从左零空间读出：
+\begin{equation}
+ \boldsymbol\ell=(-1,1,0)^{\mathrm T},\qquad
+ H_1^{\mathrm T}\boldsymbol\ell=\boldsymbol0,\qquad
+ \boldsymbol\ell\cdot\boldsymbol d_\mu=1.
+\end{equation}
+原矩阵的前两行相同，所以它产生的输出必须满足 $d_1=d_2$，而给定目标的这两项为3与4。目标带有非零的左零空间分量，伸出了列空间。此时输入零空间确实已经扩为一维，但那只是齐次方程的自由方向，\textbf{不能挽救一个不可达的非齐次目标}。
+
+当 $\lambda=2$ 时，第三个条件变为 $0=\mu-1$。若 $\mu\ne1$，仍是无解，两个秩分别为2与3；若 $\mu=1$，则该条件不再增加约束，两个秩都为2，$x_3$ 自由。令 $x_3=t$，得到
+\begin{equation}
+ \boldsymbol x=(2,1,0)^{\mathrm T}+t(-1,0,1)^{\mathrm T},
+ \qquad t\in\mathbb R.
+\end{equation}
+这时四个空间可以直接写成
+\begin{align}
+ \Row(H_2)&=\operatorname{Span}\{(1,1,1)^{\mathrm T},(1,2,1)^{\mathrm T}\},\\
+ \Nul(H_2)&=\operatorname{Span}\{(-1,0,1)^{\mathrm T}\},\\
+ \Col(H_2)&=\operatorname{Span}\{(1,1,1)^{\mathrm T},(1,2,1)^{\mathrm T}\},\\
+ \Nul(H_2^{\mathrm T})&=\operatorname{Span}\{(-1,0,1)^{\mathrm T}\}.
+\end{align}
+这个例子中，输入、输出两侧恰好有相同的数值形状，但它们的角色仍不同：输入端的平面满足 $x_1=x_3$，输出端的平面满足 $d_1=d_3$。$\mu=1$ 时目标为 $(3,4,3)^{\mathrm T}$，恰在输出平面内；$\mu\ne1$ 时目标离开这个平面。前者的解沿零空间直线自由移动，后者根本没有特解。
+
+若 $\lambda=2,\mu=1$，再检查行空间中的解，它必须满足 $x_1=x_3$。由 $x_2=1$、$x_1+x_3=2$，得到唯一的行空间解 $(1,1,1)^{\mathrm T}$。因此同一通解也可以写成
+\begin{equation}
+ \boldsymbol x=(1,1,1)^{\mathrm T}+s(-1,0,1)^{\mathrm T},
+ \qquad s\in\mathbb R.
+\end{equation}
+这一补充把参数分类重新接到第5.5节：解虽然无穷多个，去掉零空间分量后，行空间中的代表仍恰好一个。
+
+\FiveFigure{从满秩到少一个主元：零空间增加一个方向，但目标是否可达仍需另外检查。}{fig:five-three-variable-cases}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \foreach \xx in {0,5,10}{\draw[fivebox] (\xx,0) rectangle ++(4.6,4.8);}
+ \node[font=\bfseries] at (2.3,4.35) {$\lambda\ne1,2$};
+ \node[font=\bfseries] at (7.3,4.35) {$\lambda=1$};
+ \node[font=\bfseries] at (12.3,4.35) {$\lambda=2,\ \mu=1$};
+ \draw[fiveax] (.7,1.7)--(3.9,1.7);\draw[fiveax] (1.5,1)--(1.5,3.55);
+ \fill[FiveG] (1.5,1.7) circle(3pt) node[above right] {$\{\boldsymbol0\}$};
+ \draw[fivedash] (5.6,1.2)--(8.9,2.9);
+ \draw[FiveG,line width=1.3pt] (5.6,1.2)--(8.9,2.9);
+ \fill[FiveG] (7.25,2.05) circle(1.8pt);
+ \node[text=FiveR,font=\footnotesize] at (7.3,3.35) {目标不可达};
+ \draw[FiveG,line width=1.3pt] (10.6,1.2)--(13.9,2.9);
+ \fill[FiveG] (12.25,2.05) circle(1.8pt);
+ \node[text=FiveB,font=\footnotesize] at (12.3,3.35) {目标可达};
+ \node[align=center,font=\footnotesize] at (2.3,.55) {$\dim\Nul=0$\\有解且解唯一};
+ \node[align=center,font=\footnotesize] at (7.3,.55) {$\dim\Nul=1$\\齐次有自由度，非齐次无解};
+ \node[align=center,font=\footnotesize] at (12.3,.55) {$\dim\Nul=1$\\特解加直线，无穷多解};
+\end{tikzpicture}}
+{绿色画的是输入端的零空间，\emph{不是}中间情形的非齐次解集。秩下降使输入多出自由方向，却不能单独判断目标有没有解；还要看输出端的列空间。右图若改为 $\mu\ne1$，同一零空间也会对应无解。}
+
+两种异常情形可以再作对照：$\lambda=1$ 使前两项输出必须相等，$\lambda=2$ 使第一、三项输出必须相等。它们都让秩降为2，但限制的输出方向不同。下面保留一个更短的二元例子，说明同一系数矩阵下，仅改变右端项就可以从多解变为无解。
 
 \begin{example}[一个参数，三种解的形态]
 \FiveBoxLabel{ex:five-parameter}
@@ -12412,6 +12688,8 @@ n=\dim\FNull A+\FRank(A).
 这里最后一式的系数之和为1。对任意非齐次解的组合，映射后得到的是系数和乘以 $\boldsymbol b$；当 $\boldsymbol b\ne\boldsymbol0$ 时，只有系数和为1才仍产生原目标。因此，不能像齐次解那样任意相加、数乘非齐次解。
 
 \textbf{易错点：}讨论参数先查可能消失的主元；判断唯一性必须先确认有解；由已知解恢复通解，要同时核对“差向量属于零空间、彼此无关、数量足够”。这三项分别对应解的性质、基的性质和维数的性质。
+
+这一节所说的“结构反推”，不是看见秩变小就背一句“可能有无穷多解”。我们要说出它具体改变了哪一端：行空间少一个独立方向，零空间就多一个自由方向；列空间少一个可达方向，左零空间就多一项需要满足的限制。再将右端项与这个可达范围比较，才得出存在性。\textbf{主元、秩和解的种类，是同一次结构变化的不同读法。}
 
 参数分类告诉我们目标能否到达、到达后有多少自由方向。若目标确实到不了，是否还能给出一个最接近它的输出？下一节用已经建立的直和分解回答这个问题。
 
