@@ -13582,388 +13582,150 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
  \end{figure}%
  \setcounter{figure}{\FiveRecSavedFigure}\endgroup}
 \tikzset{
- recblue/.style={-{Stealth[length=2.2mm]},FiveB,line width=1.2pt},
- recgreen/.style={-{Stealth[length=2.2mm]},FiveG,line width=1.2pt},
- recgold/.style={-{Stealth[length=2.2mm]},FiveY,line width=1.2pt},
- recgray/.style={-{Stealth[length=1.7mm]},FiveK!65,line width=.75pt},
+ recblue/.style={-{Stealth[length=2.1mm]},FiveB,line width=1pt},
+ recgreen/.style={-{Stealth[length=2.1mm]},FiveG,line width=1pt},
  reccard/.style={draw=FiveK!35,rounded corners=2pt,fill=white},
- recguide/.style={FiveK!55,densely dashed,line width=.65pt}}
+ recguide/.style={FiveK!60,densely dashed,line width=.65pt}}
 
-\FiveHead{回到同一组视频，这一次问全部方案}
-第二章中，我们已经替一位用户反求过视频组合的权重：三条视频可以生成同一个偏好，却不止一种配方。第三章又把视野推向更多用户，讨论了双塔中的向量匹配，以及ALS怎样反复求解参数。现在，我们可以回到那个尚未解释透的问题：\textbf{为什么有时只能得到一个方案，有时有一整族方案，有时一个精确方案也没有？}本章的列空间、零空间和最小二乘，正好把这三种情况放进同一个结构中。
+\textbf{推荐系统常常需要调整内容曝光权重，但又不能改变用户的观看体验。这件事在数学上为什么可能？调整的边界又在哪里？}第二章已经替用户反求过一组视频权重，第三章又介绍了双塔召回与ALS训练。现在回到这组视频，我们不再追问“怎样算出一个答案”，而是追问“保持同一目标，还能怎样调整”。本节把观看体验简化为四项合成特征；这些特征相同，不意味着实际视频质量、观看顺序与用户感受也完全相同。
 
-我们仍按“搞笑、科技、美食、游戏”排列四项特征，沿用第二章的三条视频。视频1兼有搞笑与美食，视频2兼有科技与游戏，视频3是两者的等权混合。把它们排成列，原来的目标记为 $\boldsymbol b_0$：
+\FiveHead{先找到一份基准，再看它怎样调整}
+在教学模型中，按“搞笑、科技、美食、游戏”排列特征。视频1兼有搞笑与美食，视频2兼有科技与游戏，视频3是前两种风格的等权混合。三条视频和原来的用户偏好保持不变：
 \begin{equation}
  A=(\boldsymbol\alpha_1\ \boldsymbol\alpha_2\ \boldsymbol\alpha_3)
  =\begin{bmatrix}1&0&\tfrac12\\0&1&\tfrac12\\1&0&\tfrac12\\0&1&\tfrac12\end{bmatrix},
- \qquad \boldsymbol b_0=\begin{bmatrix}0.35\\0.65\\0.35\\0.65\end{bmatrix}.
+ \qquad\boldsymbol b_0=\begin{bmatrix}0.35\\0.65\\0.35\\0.65\end{bmatrix}.
  \label{eq:five-rec-library}
 \end{equation}
-第二章的消元结果，现在可以直接读成“特解加零空间”：
+把35\%的权重给视频1、65\%给视频2，就得到一份满足偏好的\textbf{基准内容配方}。它就是方程 $A\boldsymbol x=\boldsymbol b_0$ 的一个\textbf{特解}，不是平台唯一可用的方案。
+
+如果视频3现在也需要分配曝光，可以给它40\%的权重，并把视频1、2各削减20个百分点。新配方是15\%、45\%、40\%。由于混合视频的一半来自风格1、另一半来自风格2，两处削减恰好被它补回，最终四项合成特征仍是原来的0.35、0.65、0.35、0.65。图\ref{fig:five-rec-null-freedom}先把这件事画出来，再用数学概括它。
+
+\FiveRecFigure{a}{权重置换不改变本模型的合成口味。左、右两栏采用相同的权重条比例，视频3增加40个百分点，视频1、2各减少20个百分点。下方口味记录相同，但视频组合不同；这正是齐次解作为权重调整方案的作用。}{fig:five-rec-null-freedom}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \foreach \dx/\title in {0/基准配方,7.7/加入混合视频后的配方}{
+  \draw[reccard] (\dx,0) rectangle ++(7.1,4.8);
+  \node[font=\bfseries] at (\dx+3.55,4.4) {\title};
+  \foreach \yy/\vid/\flavor in {3.45/1/搞笑＋美食,2.25/2/科技＋游戏,1.05/3/各取一半}{
+   \draw[reccard,fill=FiveB!3] (\dx+.25,\yy-.43) rectangle ++(2.65,.86);
+   \fill[FiveB!70] (\dx+.5,\yy-.17)--(\dx+.5,\yy+.17)--(\dx+.78,\yy)--cycle;
+   \node[anchor=west,align=left,font=\footnotesize] at (\dx+.95,\yy) {视频\vid\\\flavor};
+   \fill[FiveK!9] (\dx+3.2,\yy-.16) rectangle ++(3.1,.32);
+  }
+ }
+ \foreach \yy/\val/\txt in {3.45/.35/35\%,2.25/.65/65\%,1.05/0/0\%}{
+  \fill[FiveB!75] (3.2,\yy-.16) rectangle ++(3.1*\val,.32);
+  \node[anchor=west] at (6.45,\yy) {\txt};}
+ \foreach \yy/\val/\txt in {3.45/.15/15\%,2.25/.45/45\%,1.05/.40/40\%}{
+  \fill[FiveB!75] (10.9,\yy-.16) rectangle ++(3.1*\val,.32);
+  \node[anchor=west] at (14.15,\yy) {\txt};}
+ \fill[FiveG!85] (10.9,.89) rectangle ++(1.24,.32);
+ \draw[recblue] (3.55,0)--(3.55,-.65);
+ \draw[recgreen] (11.25,0)--(11.25,-.65);
+ \node[reccard,fill=FiveR!4,text width=13.9cm,minimum height=1.15cm,align=center] at (7.4,-1.22)
+  {两套配方，同一份口味记录\\[4pt]
+   搞笑0.35\quad 科技0.65\quad 美食0.35\quad 游戏0.65};
+\end{tikzpicture}}
+\FloatBarrier
+
+第二章求出的通解，现在可以直接读成“基准配方加置换方案”：
 \begin{equation}
  \boldsymbol x=\boldsymbol x_p+t\boldsymbol z,
- \qquad\boldsymbol x_p=\begin{bmatrix}0.35\\0.65\\0\end{bmatrix},
- \quad\boldsymbol z=\begin{bmatrix}-\tfrac12\\-\tfrac12\\1\end{bmatrix},
- \quad t\in\mathbb R.
+ \qquad\boldsymbol x_p=(0.35,0.65,0)^{\mathrm T},
+ \quad\boldsymbol z=(-\tfrac12,-\tfrac12,1)^{\mathrm T}.
  \label{eq:five-rec-family}
 \end{equation}
-增加视频3的权重，同时各减少一半的视频1、2权重，四项合成特征就不变。第三个视频没有增加独立方向，所以 $r(A)=2$，三个权重中保留一个自由度。这是第一章的线性相关关系 $\boldsymbol\alpha_3=\tfrac12\boldsymbol\alpha_1+\tfrac12\boldsymbol\alpha_2$，在第五章中的另一种写法。
+其中 $t\boldsymbol z$ 是\textbf{齐次解}：视频3每增加 $t$，视频1、2各减少 $t/2$，这部分调整被 $A$ 送到零，不改变已有输出。\textbf{零空间}就是所有这样的置换方案组成的空间；它装的是\emph{权重变化量}，而不是某一份完整配方。一般地，全部配方为 $\boldsymbol x_p+\operatorname{Null}(A)$。若曝光权重必须非负且总和为1，本例只能取 $0\leq t\leq0.7$；负的变化量可以表示削减，最终权重却不能随意变成负数。
 
-\textbf{本节的特征、数值与组合规则均为教学简化，不代表抖音线上算法。}抖音公开资料说明，双塔把用户与内容分别表示成向量，用于高效召回；这里抽取其中的向量表示思想，研究组合目标的可达范围。经典ALS与后面的AlphaFuse作为有公开论文依据的工程参照，并不据此认定抖音采用了它们的全部训练方法。\cite{douyin-recommendation,hu-als-2008,alphafuse-2025}
-
-\FiveRecFigure{a}{推荐模型的四个基本子空间。左框是三维权重空间，右框是四维内容特征空间，二者不能混为一谈。蓝色行空间一一映到红色列空间，绿色零空间被送到零；黄色左零空间记录不可达方向。本例四块的维数依次为2、1、2、2，正交符号表示两端各自的互补关系。}{fig:five-rec-four-spaces}{%
-\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
- \draw[reccard] (0,0) rectangle (6.3,4.8);
- \draw[reccard] (8.5,0) rectangle (14.8,4.8);
- \node[font=\bfseries] at (3.15,4.45) {输入：权重空间 $\mathbb R^3$};
- \node[font=\bfseries] at (11.65,4.45) {输出：内容空间 $\mathbb R^4$};
- \fill[FiveB!9] (.2,2.15) rectangle (6.1,4.05);
- \fill[FiveG!9] (.2,.2) rectangle (6.1,1.55);
- \fill[FiveR!9] (8.7,2.15) rectangle (14.6,4.05);
- \fill[FiveY!10] (8.7,.2) rectangle (14.6,1.55);
- \node[align=center,text=FiveB] at (3.15,3.12)
-  {$\operatorname{Row}(A)$，维数 $r=2$\\[5pt]真正决定输出的权重方向};
- \node[align=center,text=FiveG] at (3.15,.88)
-  {$\operatorname{Null}(A)$，维数 $n-r=1$\\[5pt]输出看不见的权重调整};
- \node[align=center,text=FiveR] at (11.65,3.12)
-  {$\operatorname{Col}(A)$，维数 $r=2$\\[5pt]能够组合出的特征目标};
- \node[align=center,text=FiveY] at (11.65,.88)
-  {$\operatorname{Null}(A^{\mathrm T})$，维数 $m-r=2$\\[5pt]现有视频库到不了的方向};
- \node at (3.15,1.85) {$\perp$}; \node at (11.65,1.85) {$\perp$};
- \draw[recblue] (6.1,3.12)--node[above] {$A$} node[below,font=\footnotesize] {一一对应} (8.7,3.12);
- \draw[recguide,-{Stealth[length=2mm]}] (6.1,.88)
-  .. controls (7.3,.88) and (7.6,2.4) .. (8.85,2.4);
- \fill[FiveR] (8.85,2.4) circle(1.7pt);
- \node[anchor=west,font=\footnotesize] at (9,2.4) {$\boldsymbol0$};
- \node[font=\footnotesize,text=FiveK] at (7.35,1.55) {送到零};
- \node[font=\footnotesize] at (3.15,-.5)
-  {$\mathbb R^3=\operatorname{Row}(A)\oplus\operatorname{Null}(A)$};
- \node[font=\footnotesize] at (11.65,-.5)
-  {$\mathbb R^4=\operatorname{Col}(A)\oplus\operatorname{Null}(A^{\mathrm T})$};
-\end{tikzpicture}}
-\FloatBarrier
-
-\FiveHead{先看输出端：哪些口味能够得到？}
-任意视频组合的输出都是 $(s,q,s,q)^{\mathrm T}$。无论怎样调整权重，搞笑与美食总是绑定，科技与游戏也总是绑定。因此，列空间与左零空间分别为
+\FiveHead{内容有多少独立风格，就留下多少调整自由}
+参与组合的是三条视频，但视频3没有增加独立风格。因此 $r(A)=2$，而 $\dim\operatorname{Null}(A)=1$：平台只有一个独立的置换方向，选定视频3的权重，另外两个权重就随之确定。秩--零度定理在这里有一份直接的业务读法：
 \begin{equation}
- \begin{aligned}
- \operatorname{Col}(A)&=\{(s,q,s,q)^{\mathrm T}:s,q\in\mathbb R\},\\
- \operatorname{Null}(A^{\mathrm T})
- &=\operatorname{Span}\{(1,0,-1,0)^{\mathrm T},(0,1,0,-1)^{\mathrm T}\}.
- \end{aligned}
+ \underbrace{r(A)}_{\text{独立风格数}}
+ +\underbrace{\dim\operatorname{Null}(A)}_{\text{权重调整自由度}}
+ =\underbrace{n}_{\text{参与组合的内容数}}.
+ \label{eq:five-rec-rank-nullity}
+\end{equation}
+本例就是 $2+1=3$。“独立风格”指选定特征表示下的独立方向，不是标签数量，也不是视频质量。再加入一条能由旧视频组合出来的内容，可能增加配方选择，却不会扩大口味覆盖；加入新的独立内容方向，才可能把原先满足不了的需求纳入范围。
+
+这也是无穷多解的工程价值：平台可以在同一合成目标下考虑内容供给、作者曝光和重复观看等因素。零空间指出允许调整的方向，非负权重、容量与质量要求进一步限定可执行的部分。它提供\textbf{内部调整自由度}，但不代替真实业务中的评价和约束。
+
+\FiveHead{调权重有边界：当前内容池能满足哪些口味？}
+这三条视频无论怎样组合，输出都具有 $(s,q,s,q)^{\mathrm T}$ 的形式：搞笑与美食绑定，科技与游戏绑定。\textbf{列空间}就是当前内容池能组合出的全部口味范围，位于四维特征空间；数学上允许任意实数权重时，它是
+\begin{equation}
+ \operatorname{Col}(A)=\{(s,q,s,q)^{\mathrm T}:s,q\in\mathbb R\}.
  \label{eq:five-rec-output-spaces}
 \end{equation}
-左零空间的两个方向，恰好检查这两条约束。例如，取 $\boldsymbol y=(1,0,-1,0)^{\mathrm T}$，若目标可达，则 $\boldsymbol y^{\mathrm T}\boldsymbol b=\boldsymbol y^{\mathrm T}A\boldsymbol x=0$，也就是“搞笑分量等于美食分量”。工程上，这提示我们检查内容库与特征设计：现有表示把某些需求捆在一起，权重调整就无法独立满足它们。
+实际推荐若采用非负且总和为1的配方，可满足的范围还会缩小为这两种基础风格之间的混合区间。\emph{落在列空间内}是可表示的必要前提，并不自动保证满足全部业务限制；原偏好 $\boldsymbol b_0$ 则确实有前面的可执行配方。
 
-任何目标都能按第5.4节拆成两部分：
-\begin{equation}
- \boldsymbol b=\widehat{\boldsymbol b}+\boldsymbol e,
- \qquad\widehat{\boldsymbol b}\in\operatorname{Col}(A),
- \quad\boldsymbol e\in\operatorname{Null}(A^{\mathrm T}).
- \label{eq:five-rec-target-split}
-\end{equation}
-可达部分 $\widehat{\boldsymbol b}$ 留在列空间中，不可达部分 $\boldsymbol e$ 指出目标还缺哪些方向。只要 $\boldsymbol e\ne\boldsymbol0$，精确匹配就不存在；第5.7节还告诉我们，可达部分恰好是误差平方和最小的输出。
+如果用户希望更搞笑、少美食，给出新偏好 $\boldsymbol b=(0.6,0.6,0.1,0.7)^{\mathrm T}$，现有组合就无法精确满足。这不是消元不够熟练，而是内容表示把需要分开的特征绑在了一起。\textbf{左零空间}在业务上负责检查这些绑定约束：本例的两个检查方向分别是 $(1,0,-1,0)^{\mathrm T}$ 与 $(0,1,0,-1)^{\mathrm T}$，检查“搞笑减美食”“科技减游戏”是否为零。目标在左零空间上留有非零分量，便伸出了当前内容池的能力边界。
 
-\FiveRecFigure{b}{输出端的可达部分与不可达部分。红色平面表示列空间，蓝色箭头表示目标，黄色箭头表示残差，灰色虚线辅助辨认分解。坐标轴 $\boldsymbol u_1,\boldsymbol u_2$ 沿列空间，$\boldsymbol u_3$ 沿一个左零空间方向，对应式\eqref{eq:five-rec-target-split}。本例输出为四维，左零空间也有二维；图只画 $\operatorname{Span}\{\boldsymbol\alpha_1,\boldsymbol\alpha_2,\boldsymbol e\}$ 的三维截面，未画出的另一个左零方向仍然存在。}{fig:five-rec-output-split}{%
-\begin{tikzpicture}[font=\small]
- \begin{scope}[x={(4cm,0cm)},y={(1.2cm,1.5cm)},z={(0cm,4cm)}]
-  \filldraw[fill=FiveR!9,draw=FiveR!45] (-.18,-.22,0)--(1.25,-.22,0)--(1.25,1.25,0)--(-.18,1.25,0)--cycle;
-  \foreach \v in {0,.3,.6,.9,1.2}{
-   \draw[FiveK!15] (\v,-.22,0)--(\v,1.25,0);
-   \draw[FiveK!15] (-.18,\v,0)--(1.25,\v,0);}
-  \draw[recgray] (0,0,0)--(1.35,0,0) node[right] {$\boldsymbol u_1$};
-  \draw[recgray] (0,0,0)--(0,1.45,0) node[above] {$\boldsymbol u_2$};
-  \draw[recgold] (0,0,-.2)--(0,0,.9) node[above] {$\boldsymbol u_3$};
-  \draw[recblue] (0,0,0)--(.494975,.919239,.360555);
-  \draw[fiver] (0,0,0)--(.494975,.919239,0);
-  \draw[recgold] (.494975,.919239,0)--(.494975,.919239,.360555);
-  \draw[recguide] (.494975,.919239,.360555)--(0,0,.360555);
-  \draw[FiveK] (.434975,.919239,0)--(.434975,.919239,.06)--(.494975,.919239,.06);
-  \fill[FiveR] (.494975,.919239,0) circle(2pt) node[below right] {$\widehat{\boldsymbol b}$};
-  \fill[FiveB] (.494975,.919239,.360555) circle(2pt) node[above right] {$\boldsymbol b$};
-  \node[text=FiveY,right] at (.494975,.919239,.19) {$\boldsymbol e$};
-  \node[text=FiveR] at (.86,.8,0) {$\operatorname{Col}(A)$};
-  \node[below left] at (0,0,0) {$\boldsymbol0$};
- \end{scope}
- \node[anchor=west,align=left,text width=6.5cm] at (7.4,2.6)
-  {$\textcolor{FiveB}{\boldsymbol b}=\textcolor{FiveR}{\widehat{\boldsymbol b}}+\textcolor{FiveY}{\boldsymbol e}$\\[8pt]
-   红：可达部分\\黄：不可达部分\\[6pt]
-   $\boldsymbol e\perp\operatorname{Col}(A)$};
- \node[anchor=west,font=\footnotesize,text width=6.5cm,align=left] at (7.4,.2)
-  {$\boldsymbol u_1=\boldsymbol\alpha_1/\sqrt2$，$\boldsymbol u_2=\boldsymbol\alpha_2/\sqrt2$，\\$\boldsymbol u_3=\boldsymbol e/\|\boldsymbol e\|$；\\本图采用后文数值目标作示意。};
-\end{tikzpicture}}
-
-\FiveHead{再看输入端：哪些调整不会改变结果？}
-零空间只有一个独立方向 $\boldsymbol z$。因为 $A\boldsymbol z=\boldsymbol0$，式\eqref{eq:five-rec-family}中的整条直线都映到 $\boldsymbol b_0$。零空间因而提供一种明确的运营余地：在保持这四项聚合特征不变的前提下，更换视频组合。若额外要求权重非负且总和为1，本例只取 $0\leq t\leq0.7$；代数解直线与可执行的权重区间，要分别辨认。
-
-行空间位于三维\emph{权重空间}，它的基可以取 $(1,0,\tfrac12)^{\mathrm T}$ 与 $(0,1,\tfrac12)^{\mathrm T}$。它描述输入中真正决定输出的分量。按第5.5节，
-\begin{equation}
- \boldsymbol x=\boldsymbol x_{\mathrm R}+\boldsymbol x_{\mathrm N},
- \qquad A\boldsymbol x=A\boldsymbol x_{\mathrm R},
- \quad\boldsymbol x_{\mathrm N}\in\operatorname{Null}(A).
- \label{eq:five-rec-input-split}
-\end{equation}
-对于 $\boldsymbol b_0$，行空间中恰有一个解：
-\begin{equation}
- \boldsymbol x_{\mathrm R}
- =\left(\frac{11}{60},\frac{29}{60},\frac13\right)^{\mathrm T},
- \qquad A\boldsymbol x_{\mathrm R}=\boldsymbol b_0,
- \quad\boldsymbol x_{\mathrm R}\cdot\boldsymbol z=0.
- \label{eq:five-rec-row-solution}
-\end{equation}
-它与其他解的差别全在零空间中。这种“有效分量加隐藏自由度”的分工，比给出一个参数答案更进一步：我们已经知道哪个部分决定目标，哪个部分允许调整。\textbf{相同的 $A\boldsymbol x$ 只保证本模型的四项特征相同，不保证真实观看体验、视频质量或其他指标相同。}
-
-\FiveRecFigure{c}{沿零空间移动，合成特征不变。左图取权重空间的二维截面，横向沿行空间中 $\boldsymbol x_{\mathrm R}$ 的方向，纵向沿绿色零空间方向 $\boldsymbol z$。红点 $\boldsymbol x_p$、绿点 $\boldsymbol x_p+0.7\boldsymbol z$ 与蓝点 $\boldsymbol x_{\mathrm R}$ 都属于式\eqref{eq:five-rec-family}，右侧只得到同一个四维目标。深绿线段满足本例的非负权重限制，灰色延长线属于全部实数解；不变的是合成特征，实际视频配方可以不同。}{fig:five-rec-null-freedom}{%
+\FiveRecFigure{b}{当前内容池的口味覆盖与范围外的新需求。淡蓝平面是列空间的一部分示意，绿色点代表能够满足的原偏好，红色点代表超出范围的新偏好。图是一张覆盖范围示意图，不把四维特征画成二维坐标；非负权重等业务约束还会进一步缩小可执行范围。}{fig:five-rec-output-split}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
- \draw[recgray] (-.3,0)--(5.4,0) node[below,text width=3.5cm,align=center] {行空间中的一个方向};
- \draw[recgreen] (0,-1.65)--(0,2.4) node[above] {零空间方向 $\boldsymbol z$};
- \draw[recguide,line width=1pt] (2.7,-1.65)--(2.7,2.4);
- \draw[FiveG,line width=2pt] (2.7,-1)--(2.7,1.1);
- \fill[FiveR] (2.7,-1) circle(2.5pt);
- \fill[FiveB] (2.7,0) circle(2.5pt);
- \fill[FiveG] (2.7,1.1) circle(2.5pt);
- \node[anchor=east,text=FiveR] at (2.5,-1) {$\boldsymbol x_p$};
- \node[anchor=east,text=FiveB] at (2.5,.25) {$\boldsymbol x_{\mathrm R}$};
- \node[anchor=west,text=FiveG,font=\footnotesize] at (2.9,1.1) {$\boldsymbol x_p+0.7\boldsymbol z$};
- \node[font=\footnotesize,text=FiveK] at (10.5,2.6) {所有配方映到同一个目标};
- \draw[recguide,-{Stealth[length=2mm]}] (5.5,-.9)..controls(6.4,-.9)and(6.4,.65)..(7.2,.65);
- \draw[recguide,-{Stealth[length=2mm]}] (5.5,1.2)..controls(6.4,1.2)and(6.4,.65)..(7.2,.65);
- \node[font=\small] at (6.35,1.9) {$A$};
- \node[reccard,fill=FiveR!5,text width=5.7cm,minimum height=2.6cm,align=center] at (10.5,.65)
-  {$A(\boldsymbol x_p+t\boldsymbol z)=\boldsymbol b_0$\\[8pt]
-   $\boldsymbol b_0=(0.35,0.65,0.35,0.65)^{\mathrm T}$\\[6pt]搞笑、美食不变；科技、游戏不变};
+ \filldraw[fill=FiveB!8,draw=FiveB!55,line width=.8pt]
+  (.4,.2)--(8.6,.2)--(10.1,3.6)--(1.9,3.6)--cycle;
+ \node[align=center,text=FiveB,font=\bfseries] at (5.45,2.9)
+  {当前内容池能覆盖的口味\\$\operatorname{Col}(A)$};
+ \node[align=center,font=\footnotesize,text=FiveK] at (5.45,.72)
+  {搞笑与美食绑定\qquad 科技与游戏绑定};
+ \fill[FiveG] (4.1,1.65) circle(3pt);
+ \node[anchor=west,align=left,text=FiveG] at (4.35,1.65)
+  {原偏好 $\boldsymbol b_0$\\已有配方能够满足};
+ \fill[FiveR] (12.2,4.45) circle(3pt);
+ \node[above,text=FiveR] at (12.2,4.65) {新偏好 $\boldsymbol b$};
+ \node[reccard,fill=FiveR!4,text width=3.9cm,minimum height=1.65cm,align=center] (new) at (12.35,2.75)
+  {想增加搞笑\\却减少美食\\现有配方无法独立调整};
+ \draw[recguide] (12.2,4.45)--(new.north);
+ \node[font=\footnotesize,align=center,text=FiveR] at (12.35,.72)
+  {仅调旧权重无法跨过边界\\需要补充独立内容方向};
+ \node[font=\footnotesize,text=FiveK] at (7.4,-.45)
+  {扩充口味覆盖，需要新内容带来独立的风格方向。};
 \end{tikzpicture}}
 \FloatBarrier
 
-\FiveHead{秩数出方向，零度数出配方的自由}
-对于一般的 $m\times n$ 视频库矩阵，秩 $r$ 数出能独立表达的内容方向，$n-r$ 数出保持输出不变的权重自由度。固定特征数与视频数，秩较低意味着可达目标的维数较低，权重中的冗余较多。图\ref{fig:five-rec-rank-coverage}把这件事放进一个三维模型中观察；它不是把本例的四维特征强行画成三维。
+这时平台面对的是选择：补充能够单独体现搞笑的内容，解除第一处绑定；若还要区分科技与游戏，也需相应的独立方向。另一条路线是先给出近似配方。沿用第5.7节的最小二乘标准，本例最近的可达口味仍是 $\widehat{\boldsymbol b}=\boldsymbol b_0$，剩余误差平方和为0.13；残差 $\boldsymbol e=\boldsymbol b-\widehat{\boldsymbol b}$ 属于左零空间，满足 $A^{\mathrm T}\boldsymbol e=\boldsymbol0$。这份残差在提醒平台：\emph{当前表示还有哪些需求没有满足}。最优输出唯一，但生成它的权重仍可加上零空间中的置换方案；近似不会自动消除内容冗余。
 
-\FiveRecFigure{d}{秩与可达目标的维数。为看清空间形状，本图另取三个视频、三个特征的教学模型，坐标轴 $q_1,q_2,q_3$ 表示这三个特征。灰色箭头是视频向量，淡红区域是列空间的有限示意，绿点可达、灰点不可达。三种库的秩依次为3、2、1，全部实数权重下的自由度依次为0、1、2；若限制非负权重或总和，可执行目标还要取列空间中的相应部分。}{fig:five-rec-rank-coverage}{%
-\begin{tikzpicture}[font=\footnotesize]
- \foreach \dx/\rr/\nn in {0/3/0,5.2/2/1,10.4/1/2}{
-  \begin{scope}[shift={(\dx cm,0)},x={(.8cm,-.3cm)},y={(.8cm,.3cm)},z={(0cm,.95cm)}]
-   \draw[recgray] (0,0,0)--(3.1,0,0) node[right] {$q_1$};
-   \draw[recgray] (0,0,0)--(0,2.8,0) node[right] {$q_2$};
-   \draw[recgray] (0,0,0)--(0,0,2.8) node[above] {$q_3$};
-   \ifnum\rr=3
-    \filldraw[fill=FiveR!6,draw=FiveR!20] (0,0,0)--(2.2,0,0)--(2.2,2.2,0)--(0,2.2,0)--cycle;
-    \filldraw[fill=FiveR!7,draw=FiveR!20] (0,2.2,0)--(2.2,2.2,0)--(2.2,2.2,2.2)--(0,2.2,2.2)--cycle;
-    \draw[recgray] (0,0,0)--(2,.1,.3);
-    \draw[recgray] (0,0,0)--(.4,2,.2);
-    \draw[recgray] (0,0,0)--(.2,.5,2);
-    \fill[FiveG] (1.5,1.2,1.4) circle(2.5pt);
-   \else\ifnum\rr=2
-    \filldraw[fill=FiveR!10,draw=FiveR!45] (-.2,-.2,0)--(2.5,-.2,0)--(2.5,2.5,0)--(-.2,2.5,0)--cycle;
-    \draw[recgray] (0,0,0)--(2,0,0);
-    \draw[recgray] (0,0,0)--(0,2,0);
-    \draw[recgray] (0,0,0)--(1.4,1.4,0);
-    \fill[FiveG] (1.8,.8,0) circle(2.5pt);
-    \fill[FiveK] (1.2,1.3,1.5) circle(2.5pt);
-    \draw[recguide] (1.2,1.3,0)--(1.2,1.3,1.5);
-   \else
-    \draw[FiveR,line width=2pt] (-.25,0,0)--(2.9,0,0);
-    \draw[recgray] (0,0,0)--(.8,0,0);
-    \draw[recgray] (0,0,0)--(1.65,0,0);
-    \draw[recgray] (0,0,0)--(2.6,0,0);
-    \fill[FiveG] (2.1,0,0) circle(2.5pt);
-    \fill[FiveK] (1.2,1.4,1.1) circle(2.5pt);
-   \fi\fi
-  \end{scope}
-  \node[align=center,font=\small] at (\dx+2,-1.65)
-   {$r=\rr$，自由度 $3-r=\nn$\\[4pt]\ifnum\rr=3 整个三维空间\else\ifnum\rr=2 一个平面\else 一条直线\fi\fi};
- }
-\end{tikzpicture}}
-\FloatBarrier
+\FiveHead{把输入的调节空间，与输出的能力边界放在一起}
+四个基本子空间不是四份互不相关的名词。输入端记录三条视频的权重，输出端记录四项合成特征，它们分别回答“还能怎样调”和“能够满足什么”。\textbf{行空间}位于权重侧，是配方中真正决定口味的有效分量；零空间则是输出看不见的调整分量。任意配方都能唯一拆成 $\boldsymbol x=\boldsymbol x_{\mathrm R}+\boldsymbol x_{\mathrm N}$，而 $A\boldsymbol x=A\boldsymbol x_{\mathrm R}$。所以，两份配方的差若在零空间中，合成口味便相同。
 
-\FiveHead{目标不在列空间中：怎样给出最好的妥协？}
-现在让用户更想看搞笑、较少看美食，同时略微区分科技与游戏，取 $\boldsymbol b=(0.6,0.6,0.1,0.7)^{\mathrm T}$。它违反了两条绑定约束，所以 $r(A)=2<r(A\mid\boldsymbol b)=3$，精确解不存在。我们不用消元再证明一次，而是沿第5.7节寻找\term{least-squares-solution}：
-\begin{equation}
- \min_{\boldsymbol x\in\mathbb R^3}\|A\boldsymbol x-\boldsymbol b\|^2.
- \label{eq:five-rec-ls-objective}
-\end{equation}
-在本模型中，“最优”指四项特征误差的平方和最小，评价标准已经写在式子里。若另有未记录的“治愈感”，应先扩充特征表示；不能把第五种需求直接当作现有四维向量中的一个分量。
+输出端也分为两部分：列空间是能够达到的口味范围，左零空间指出无法独立满足的需求方向。两端各自正交互补：若有 $m$ 项特征、$n$ 条参与组合的视频，记 $r=r(A)$，权重侧有 $r$ 个有效方向、$n-r$ 个调整方向；口味侧有 $r$ 个可达方向、$m-r$ 个不可达方向。本例对应 $2+1=3$ 与 $2+2=4$。图\ref{fig:five-rec-four-spaces}把它们翻译成同一张业务框图：有效权重分量一一对应可达口味，内部置换被送到零，范围外的需求不会由旧权重凭空生成。
 
-所有可达输出都是 $(s,q,s,q)^{\mathrm T}$，于是平方和可以配成
-\begin{equation}
- \begin{aligned}
- &(s-0.6)^2+(q-0.6)^2+(s-0.1)^2+(q-0.7)^2\\
- &\hspace{1em}=2(s-0.35)^2+2(q-0.65)^2+0.13.
- \end{aligned}
- \label{eq:five-rec-completed-squares}
-\end{equation}
-前两项非负，只有 $s=0.35,q=0.65$ 时同时为零。因此最优输出与残差为
-\begin{equation}
- \widehat{\boldsymbol b}=\begin{bmatrix}0.35\\0.65\\0.35\\0.65\end{bmatrix},
- \qquad\boldsymbol e=\boldsymbol b-\widehat{\boldsymbol b}
- =\begin{bmatrix}0.25\\-0.05\\-0.25\\0.05\end{bmatrix},
- \qquad\|\boldsymbol e\|^2=0.13.
- \label{eq:five-rec-ls-numbers}
-\end{equation}
-残差对每个视频都给出零点积：$\boldsymbol\alpha_1\cdot\boldsymbol e=0.25-0.25=0$，$\boldsymbol\alpha_2\cdot\boldsymbol e=-0.05+0.05=0$，第三列也随之为零。这正是\term{normal-equations}的含义：
-\begin{equation}
- A^{\mathrm T}(\boldsymbol b-A\widehat{\boldsymbol x})=\boldsymbol0
- \quad\Longleftrightarrow\quad
- A^{\mathrm T}A\widehat{\boldsymbol x}=A^{\mathrm T}\boldsymbol b.
- \label{eq:five-rec-normal}
-\end{equation}
-为什么逐列正交就够了？任取权重增量 $\boldsymbol h$，$A\boldsymbol h$ 仍在列空间，与 $\boldsymbol e$ 正交，因而
-\begin{equation}
- \|A(\widehat{\boldsymbol x}+\boldsymbol h)-\boldsymbol b\|^2
- =\|\boldsymbol e\|^2+\|A\boldsymbol h\|^2
- \geq\|\boldsymbol e\|^2.
- \label{eq:five-rec-optimality}
-\end{equation}
-任何调整都不能再减少剩下的误差；只有沿零空间调整时，误差保持不变。本例的最优输出恰好等于旧目标 $\boldsymbol b_0$，所以全部最小二乘权重仍是式\eqref{eq:five-rec-family}。\textbf{最优输出唯一，最优配方却有无穷多个。}一般地，全部最小二乘解是 $\widehat{\boldsymbol x}_p+\operatorname{Null}(A)$；只有列向量线性无关时，配方才唯一。
-
-\FiveRecFigure{e}{最小二乘的几何意义。蓝色目标不在红色列空间内，红色垂足 $\widehat{\boldsymbol b}$ 是能达到的最近输出，黄色残差属于左零空间。坐标轴仍沿图\ref{fig:five-rec-output-split}的三个方向，灰色虚线连接目标与另一可达点 $\boldsymbol c$。直角标记和 $A^{\mathrm T}\boldsymbol e=0$ 对应式\eqref{eq:five-rec-normal}；换用 $\boldsymbol c$ 会多出式\eqref{eq:five-rec-optimality}中的一个非负平方。本图仍是四维输出空间的三维截面，不把整个左零空间误画成一条线。}{fig:five-rec-ls-geometry}{%
-\begin{tikzpicture}[font=\small]
- \begin{scope}[x={(4cm,0cm)},y={(1.2cm,1.5cm)},z={(0cm,4cm)}]
-  \filldraw[fill=FiveR!9,draw=FiveR!45] (-.18,-.2,0)--(1.22,-.2,0)--(1.22,1.2,0)--(-.18,1.2,0)--cycle;
-  \draw[recgray] (0,0,0)--(1.6,0,0) node[right] {$\boldsymbol u_1$};
-  \draw[recgray] (0,0,0)--(0,1.6,0) node[above] {$\boldsymbol u_2$};
-  \draw[recgray] (0,0,0)--(0,0,.85) node[above] {$\boldsymbol u_3$};
-  \draw[recblue] (0,0,0)--(.494975,.919239,.360555);
-  \draw[fiver] (0,0,0)--(.494975,.919239,0);
-  \draw[recgold] (.494975,.919239,0)--(.494975,.919239,.360555);
-  \draw[recguide] (.8,.4,0)--(.494975,.919239,.360555);
-  \draw[recguide] (.8,.4,0)--(.494975,.919239,0);
-  \draw[FiveK] (.434975,.919239,0)--(.434975,.919239,.06)--(.494975,.919239,.06);
-  \fill[FiveR] (.494975,.919239,0) circle(2pt) node[below right] {$\widehat{\boldsymbol b}$};
-  \fill[FiveB] (.494975,.919239,.360555) circle(2pt) node[above right] {$\boldsymbol b$};
-  \fill[FiveK] (.8,.4,0) circle(2pt) node[below right] {$\boldsymbol c$};
-  \node[text=FiveY,right] at (.494975,.919239,.2) {$\boldsymbol e$};
-  \draw[fiver] (0,0,0)--(1.414214,0,0) node[below] {$\boldsymbol\alpha_1$};
-  \draw[fiver] (0,0,0)--(0,1.414214,0) node[left] {$\boldsymbol\alpha_2$};
- \end{scope}
- \node[anchor=west,align=left,text width=6.5cm] at (7.3,2.5)
-  {$\boldsymbol e\cdot\boldsymbol\alpha_1=0$\\[5pt]
-   $\boldsymbol e\cdot\boldsymbol\alpha_2=0$\\[5pt]
-   $A^{\mathrm T}\boldsymbol e=\boldsymbol0$\\[8pt]
-   最近输出：$\widehat{\boldsymbol b}$\\最小误差平方和：$0.13$};
- \node[anchor=west,text width=6.5cm,align=left,font=\footnotesize] at (7.3,.25)
-  {灰色斜线更长：\\$\|\boldsymbol b-\boldsymbol c\|^2=\|\boldsymbol e\|^2+\|\widehat{\boldsymbol b}-\boldsymbol c\|^2$};
-\end{tikzpicture}}
-\FloatBarrier
-
-\FiveHead{回看第三章：真实ALS为什么要加权、加正则？}
-真实反馈并不像四维例子那样完整、确定。Netflix式评分表中，未评分是缺失记录，不能直接当作零分。Koren、Bell与Volinsky对Netflix Prize相关方法的总结，说明了在已观测评分上拟合平方误差、用正则化控制参数的做法。\cite{koren-mf-2009}隐式反馈还要区分“偏好”和“证据有多充分”：没看过某视频，可能只是还没遇见它。Hu、Koren与Volinsky用不同置信权重表达这种区别。\cite{hu-als-2008}
-
-固定物品因子矩阵 $Q$，令其第 $i$ 行是 $\boldsymbol q_i^{\mathrm T}$，待更新的用户因子为 $\boldsymbol p\in\mathbb R^d$，目标记录为 $b_i$。一个用户的更新任务是
-\begin{equation}
- J(\boldsymbol p)=\sum_i c_i(\boldsymbol q_i^{\mathrm T}\boldsymbol p-b_i)^2
- +\lambda\boldsymbol p^{\mathrm T}\boldsymbol p,
- \qquad c_i>0,\quad\lambda\geq0.
- \label{eq:five-rec-weighted-loss}
-\end{equation}
-这里未知量是用户隐因子，与前面的三个视频组合权重承担不同任务；它们共用的，是“给定线性关系，求最合适输入”的结构。置信权重 $c_i$ 决定哪些记录在误差中更重要，正则化项限制参数大小。
-
-令 $D=\operatorname{diag}(c_i)$、$H=Q^{\mathrm T}DQ+\lambda E_d$。不求导也能看清方程的来源：展开任意增量 $\boldsymbol h$ 前后的差，得到
-\begin{equation}
- J(\boldsymbol p+\boldsymbol h)-J(\boldsymbol p)
- =2\boldsymbol h^{\mathrm T}(H\boldsymbol p-Q^{\mathrm T}D\boldsymbol b)
- +\boldsymbol h^{\mathrm T}H\boldsymbol h.
- \label{eq:five-rec-weighted-expansion}
-\end{equation}
-若括号中的向量不为零，沿它的反方向走足够小的一步，负的一次项就超过正的二次项，目标还能降低。所以最优点必须满足
-\begin{equation}
- (Q^{\mathrm T}DQ+\lambda E_d)\widehat{\boldsymbol p}
- =Q^{\mathrm T}D\boldsymbol b.
- \label{eq:five-rec-weighted-normal}
-\end{equation}
-若 $\lambda>0$，对任意非零 $\boldsymbol h$，有 $\boldsymbol h^{\mathrm T}H\boldsymbol h=\sum_i c_i(\boldsymbol q_i^{\mathrm T}\boldsymbol h)^2+\lambda\|\boldsymbol h\|^2>0$。因此 $H$ 的零空间只含零向量，本次用户更新唯一。这只保证固定 $Q$ 后这一步唯一，不能推出整个交替训练的最终结果唯一。正则化也可能牺牲部分拟合精度，并非只从原有最优解中挑一个。
-
-第三章的 $(Q^{\mathrm T}Q+\lambda I_d)P^{\mathrm T}=Q^{\mathrm T}R^{\mathrm T}$，是目标完整、权重相同时的简化形式；本节沿用全书的单位矩阵记号 $E_d=I_d$。隐式反馈通常按用户采用不同的 $D$。Spark MLlib的官方文档明确将其隐式反馈方法归于Hu等人的工作，并说明实现还会缩放正则化参数；此处 $\lambda$ 表示一次更新使用的有效系数。\cite{spark-als-docs}加权时，残差满足的是 $Q^{\mathrm T}D(\boldsymbol b-Q\widehat{\boldsymbol p})=\lambda\widehat{\boldsymbol p}$，不能再直接套用未加权、未正则化时的 $Q^{\mathrm T}\boldsymbol e=0$。
-
-\FiveHead{从解的自由度，到内容与数据的运营空间}
-面对大量用户，系统需要分别判断两件事：目标是否超出表示范围，以及已有方案是否还有调整自由。增加一条仍在旧列空间中的视频，秩不增加，但可能增加配方的自由度；加入新的独立内容方向，才可能扩展列空间。实际视频还有作者、质量、时效等信息，四维表示中的线性冗余并不等于作品毫无价值。秩衡量的是\emph{选定表示下}的独立方向数，不能独自充当内容质量指标。
-
-\term{cold-start}首先是新用户或新内容缺少交互记录、相应参数尚未充分训练的问题。新视频即使已经落在旧列空间中，仍可能没有行为数据；新用户的偏好属于内容表示空间，也不能被放进这里的权重行空间。Spark对未训练用户或物品的说明，恰好体现了数据不足这一层含义。\cite{spark-als-docs}因此，冷启动需要利用标题、描述等已有信息，同时逐渐补充行为证据。
-
-SIGIR 2025的AlphaFuse提供了一个真实的子空间应用：它分开语言表示中的丰富语义方向与稀疏语义方向，保留前者，在后者中学习ID嵌入以吸收协同信号。\cite{alphafuse-2025}为理解这件事，我们用一个理想化的矩阵 $L_s$ 记录需要保留的语义坐标。若额外表示 $\boldsymbol\delta\in\operatorname{Null}(L_s)$，则
-\begin{equation}
- L_s(\boldsymbol\ell+\boldsymbol\delta)=L_s\boldsymbol\ell,
- \qquad L_s\boldsymbol\delta=\boldsymbol0.
- \label{eq:five-rec-semantic-preservation}
-\end{equation}
-新的协同分量不改变这组保留的语义坐标，却能参与后续推荐。这里的零空间属于语义表示空间，与视频权重空间的 $\operatorname{Null}(A)$ 不是同一个空间；它们共享的是“某个指定作用看不见这部分变化”的结构。论文通过SVD选取弱语义方向，实际还按阈值把小奇异值方向归入近似零空间，因此不能把整个原始语言表示严格不变当作无条件结论。论文的冷启动用户实验仍保留历史交互，也不意味着完全没有信息时便能推知个人偏好。\cite{alphafuse-2025}
-
-\FiveRecFigure{f}{把语义约束与协同学习分开。左侧两条信息通路分别来自内容文本与交互记录，灰色卡片提醒冷启动首先是证据不足。右侧画式\eqref{eq:five-rec-semantic-preservation}的理想化三维截面：蓝色平面是保留语义的行空间，绿色方向是该语义作用的零空间，灰色总向量含两类分量。AlphaFuse在弱语义方向学习ID表示；这些方向在实际方法中包括按阈值选择的近似零方向。图中不把新用户误画成权重空间里的一个点，也不把保留语义等同于全部推荐分数不变。}{fig:five-rec-semantic-null}{%
+\FiveRecFigure{c}{推荐系统的调节空间与能力边界。左框是三维权重空间，右框是四维特征空间，蓝、绿、红、金四块分别对应行空间、零空间、列空间、左零空间。上方箭头表示有效权重与可达口味一一对应，虚线箭头表示内部置换不产生输出；两端的正交符号表示各自的互补分工。}{fig:five-rec-four-spaces}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
- \node[reccard,fill=FiveB!5,text width=4.1cm,minimum height=1cm,align=center] at (2.15,3.35) {标题、描述等内容信息\\形成语言表示};
- \node[reccard,fill=FiveG!5,text width=4.1cm,minimum height=1cm,align=center] at (2.15,1.3) {用户与内容的交互记录\\提供协同信号};
- \node[reccard,fill=FiveK!5,text width=4.1cm,align=center,font=\footnotesize] at (2.15,-.25) {冷启动：交互记录不足\\尚未充分训练\\先利用内容信息\\再补充行为证据};
- \draw[recblue] (4.4,3.35)--(5.4,3.35);
- \draw[recgreen] (4.4,1.3)--(5.4,1.3);
- \begin{scope}[shift={(7.4,.35)},x={(1.3cm,0cm)},y={(.55cm,.55cm)},z={(0cm,1.25cm)}]
-  \filldraw[fill=FiveB!9,draw=FiveB!50] (-.5,-.6,0)--(3.4,-.6,0)--(3.4,2.2,0)--(-.5,2.2,0)--cycle;
-  \draw[recgray] (0,0,0)--(3.8,0,0) node[right] {$q_1$};
-  \draw[recgray] (0,0,0)--(0,2.8,0) node[above] {$q_2$};
-  \draw[recgreen] (0,0,-.4)--(0,0,2.75) node[above] {$\operatorname{Null}(L_s)$};
-  \draw[recblue] (0,0,0)--(2,.5,0) node[below right] {$\boldsymbol\ell$};
-  \draw[recgreen] (2,.5,0)--(2,.5,1.6) node[midway,right] {$\boldsymbol\delta$};
-  \draw[recgray] (0,0,0)--(2,.5,1.6) node[above right] {$\boldsymbol\ell+\boldsymbol\delta$};
-  \draw[recguide] (0,0,1.6)--(2,.5,1.6);
-  \node[text=FiveB] at (2.5,1.65,0) {$\operatorname{Row}(L_s)$};
- \end{scope}
- \node[font=\footnotesize,align=center] at (10,-1)
-  {保留语义坐标：$L_s(\boldsymbol\ell+\boldsymbol\delta)=L_s\boldsymbol\ell$\\[4pt]协同分量仍可改变后续推荐};
+ \draw[reccard] (-.2,-.2) rectangle (6.5,6);
+ \draw[reccard] (8.3,-.2) rectangle (15,6);
+ \node[font=\bfseries] at (3.15,5.6) {输入端：三条视频的权重};
+ \node[font=\bfseries] at (11.65,5.6) {输出端：四项内容特征};
+ \node[reccard,fill=FiveB!6,text width=5.5cm,minimum height=2.3cm,align=center] (row) at (3.15,4)
+  {\textbf{有效权重分量}\\[5pt]真正决定合成口味\\[5pt]
+   $\operatorname{Row}(A)$，维数2};
+ \node[reccard,fill=FiveG!6,text width=5.5cm,minimum height=2.05cm,align=center] (nul) at (3.15,1)
+  {\textbf{内部调整自由度}\\[5pt]可以置换，不改四项特征\\[5pt]
+   $\operatorname{Null}(A)$，维数1};
+ \node[reccard,fill=FiveR!6,text width=5.5cm,minimum height=2.3cm,align=center] (col) at (11.65,4)
+  {\textbf{内容池的口味覆盖}\\[5pt]所有能够组合出的目标\\[5pt]
+   $\operatorname{Col}(A)$，维数2};
+ \node[reccard,fill=FiveY!7,text width=5.5cm,minimum height=2.05cm,align=center] at (11.65,1)
+  {\textbf{无法满足的需求分量}\\[5pt]检查口味之间的绑定约束\\[5pt]
+   $\operatorname{Null}(A^{\mathrm T})$，维数2};
+ \node at (3.15,2.45) {$\perp$};\node at (11.65,2.45) {$\perp$};
+ \draw[recblue] (row.east)--node[above] {$A$} node[below,font=\footnotesize] {一一对应} (col.west);
+ \draw[recguide,-{Stealth[length=2mm]}] (nul.east)
+  ..controls(7.35,1)and(7.25,2.95)..(8.85,2.95);
+ \fill[FiveR] (8.85,2.95) circle(1.8pt);
+ \node[anchor=west,font=\footnotesize] at (9,2.95) {$\boldsymbol0$};
+ \node[font=\footnotesize,text=FiveK] at (7.35,2.1) {送到零};
+ \node[font=\footnotesize] at (3.15,-.6) {输入维数：$2+1=3$};
+ \node[font=\footnotesize] at (11.65,-.6) {输出维数：$2+2=4$};
 \end{tikzpicture}}
 \FloatBarrier
 
-\FiveHead{把三类解，读成不同的决策处境}
-回到原来的视频库，增加冗余视频会带来更多配方，补充独立内容方向可能降低无法表示的误差。是否采用某个配方，还要在非负、资源容量、内容质量等实际约束下另作选择。零空间给出“保持选定特征不变还能怎样动”，并不保证所有数学解都能直接上线。图\ref{fig:five-rec-decision-cases}把这些处境放在一起：精确匹配、同目标的多种方案、无法精确匹配时的近似，以及近似误差仍很大的情形。
-\clearpage
+当目标能够满足时，行空间里恰好有一份基准解：它没有多余的零空间分量。其他解都是在它上面加置换方案。因此，唯一解意味着权重侧没有这种调整自由；无穷多解意味着同一口味还有多种配方；无解意味着目标超出了列空间。业务决策由此分清了三件事：\textbf{先判断能否覆盖，再辨认能否调节，最后在可执行方案中作选择。}行空间中的唯一解是结构参照，不自动代表最合适的实际曝光方案。
 
-\FiveRecFigure{g}{解的结构与推荐决策。上排画权重空间：只用前两列时，目标 $\boldsymbol b_0$ 的权重唯一；加入第三列后，全部解沿绿色零空间方向排成直线。下排画输出空间的二维截面，横向沿列空间，纵向沿左零空间；两个例子均用列无关的 $A_2=(\boldsymbol\alpha_1\ \boldsymbol\alpha_2)$，所以最优权重唯一，黄色线段是不可消除的残差。右下目标 $(1,0,0,1)^{\mathrm T}$ 的最小误差平方和为1，大于本节目标的0.13；它仍属无精确解的情形，不是第四种代数解类型。较大误差提示检查内容覆盖、特征表示和评价尺度，不能只靠继续调同一组权重解决。}{fig:five-rec-decision-cases}{%
-\begin{tikzpicture}[x=1cm,y=.9cm,font=\footnotesize]
- \foreach \xx in {0,7.8}{\foreach \yy in {0,5}{
-  \draw[reccard] (\xx,\yy) rectangle ++(7.4,4.5);}}
- \node[font=\small\bfseries] at (3.7,9.08) {精确匹配，权重唯一};
- \node[font=\small\bfseries] at (11.5,9.08) {精确匹配，存在调整空间};
- \begin{scope}[shift={(1.2,6.4)}]
-  \draw[recgray] (0,0)--(4.8,0) node[right] {$x_1$};
-  \draw[recgray] (0,0)--(0,2) node[above] {$x_2$};
-  \fill[FiveR] (1.4,1.3) circle(2.7pt);
-  \draw[recguide] (1.4,0)--(1.4,1.3)--(0,1.3);
-  \node[right,text=FiveR] at (1.65,1.3) {$(0.35,0.65)^{\mathrm T}$};
- \end{scope}
- \node[align=center] at (3.7,5.45) {$A_2\boldsymbol x=\boldsymbol b_0$\\$r(A_2)=r(A_2\mid\boldsymbol b_0)=n=2$};
- \begin{scope}[shift={(9.2,6.4)}]
-  \draw[recgray] (0,0)--(4.9,0) node[below] {行空间方向};
-  \draw[recgreen] (0,-.3)--(0,2.05) node[above] {$\boldsymbol z$};
-  \draw[FiveG,line width=1.8pt] (2.25,-.3)--(2.25,1.9);
-  \fill[FiveR] (2.25,.5) circle(2.5pt);
-  \node[right,text=FiveG] at (2.5,1.45) {$\boldsymbol x_p+t\boldsymbol z$};
- \end{scope}
- \node[align=center] at (11.5,5.45) {$A\boldsymbol x=\boldsymbol b_0$\\$r(A)=r(A\mid\boldsymbol b_0)=2<n=3$};
- \node[font=\small\bfseries] at (3.7,4.08) {无精确解，存在最优近似};
- \node[font=\small\bfseries] at (11.5,4.08) {同样无精确解，剩余误差更大};
- \foreach \dx/\err/\len/\sq in {1.2/.360555/.72111/0.13,9/1/2/1}{
-  \begin{scope}[shift={(\dx,1.45)}]
-   \draw[recgray] (-.25,0)--(4.8,0) node[below] {列空间方向};
-   \draw[recgray] (0,-.2)--(0,2.2);
-   \node[anchor=west,text=FiveK!65] at (.15,1.7) {左零方向};
-   \draw[FiveR,line width=1.3pt] (-.15,0)--(4.4,0);
-   \draw[recblue] (0,0)--(2.15,\len);
-   \draw[fiver] (0,0)--(2.15,0);
-   \draw[recgold] (2.15,0)--(2.15,\len) node[midway,right] {$\boldsymbol e$};
-   \fill[FiveB] (2.15,\len) circle(2.2pt) node[above right] {$\boldsymbol b$};
-   \fill[FiveR] (2.15,0) circle(2.2pt) node[below] {$\widehat{\boldsymbol b}$};
-   \draw[FiveK] (1.98,0)--(1.98,.17)--(2.15,.17);
-   \node[anchor=west] at (2.9,1.45) {$\|\boldsymbol e\|^2=\sq$};
-  \end{scope}}
- \node[align=center] at (3.7,.45) {$r(A_2)=2<r(A_2\mid\boldsymbol b)=3$\\最优权重：$(0.35,0.65)^{\mathrm T}$};
- \node[align=center] at (11.5,.45) {$r(A_2)=2<r(A_2\mid\boldsymbol b)=3$\\最优权重：$(0.5,0.5)^{\mathrm T}$};
-\end{tikzpicture}}
-\FloatBarrier
+真实算法也在处理类似的分工，但任务和变量更复杂。抖音公开资料中的双塔分别学习用户与内容向量，服务于召回；本节的曝光配方只是抽取向量表示思想的教学模型。\cite{douyin-recommendation}Hu等人的隐式反馈ALS把行为证据转成不同置信权重，Spark以带正则化的最小二乘更新隐因子：它在反馈不完整时拟合需求，固定其他因子且正则化系数为正时，一次更新有唯一结果，但这不等于整个训练结果唯一。Netflix相关工作同样在已观测记录上拟合，并不把缺失评分当零分。\cite{hu-als-2008,spark-als-docs,koren-mf-2009}
 
-\FiveHead{知识回响：同一个问题，逐章看得更深}
-第0章让视频有了向量形式，第1章指出独立方向与线性冗余，第2章用主元和自由变量算出配方，第3章把大量数据和参数组织成矩阵，第4章再把矩阵看成映射。本节把这些认识汇合到解集上：列空间给出可达目标，左零空间检查未满足的约束，行空间保留有效输入，零空间补出全部自由度。目标不可达时，最小二乘依然保留同样的输入结构；只是目标先换成了能够达到的最近输出。
+零空间还提供了一种表示学习思路。AlphaFuse把语言表示中丰富语义与弱语义方向分开，在后者学习ID嵌入以加入协同信号。\cite{alphafuse-2025}这与本节“保留指定输出，利用看不见的自由度”相呼应，不过它使用的是语义表示的零空间或近似零方向，不是这里的曝光权重零空间。\term{cold-start}主要是行为证据不足，也不能简单等同于用户偏好跑出列空间。
 
-后续章节还会把图中的方向看得更清楚。第6章给出可逆性的体积解释，第7章系统研究正交投影，第8章研究 $A^{\mathrm T}A$ 等方阵的特征方向。第11章的\term{svd}将为四个基本子空间提供正交单位基：完整分解 $A=U\Sigma V^{\mathrm T}$ 中，$U$ 的前 $r$ 列张成列空间、其余列张成左零空间，$V$ 的前 $r$ 列张成行空间、其余列张成零空间；非零奇异值的个数就是秩。\cite{strang-svd-four-spaces}届时，我们还会学习最佳低秩近似；这里先记住这些基是在描写已经认识的四块空间，不要求现在计算SVD。
-
-从精确配方到最优近似，从隐藏自由度到保留语义的协同学习，推荐系统不断提出同一类问题：现有表示能够承载什么，又允许我们怎样调整？\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}理解这句话，便能把一串权重读成一个方案，把一族解读成一份调整空间，把剩余误差读成需要补充数据或内容方向的线索。
-\FloatBarrier
+\textbf{本节所有视频特征、权重及配方规则均为教学简化，不代表抖音线上算法。}从特解到齐次解，我们看见一份基准怎样容纳调整；从零空间到列空间，我们又看见调整与覆盖各自的边界。理解解的结构，便不只会算出一组权重，还能判断现有内容池允许怎样调节、哪些需求必须靠补充独立内容或改进表示来满足。\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}
 \endgroup
 % CHAPTER 5 RECOMMENDATION CASE END
 
