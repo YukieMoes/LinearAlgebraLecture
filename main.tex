@@ -269,6 +269,36 @@
 % --- 字体 ---
 \setmainfont{TeX Gyre Pagella}
 
+% Dedication: separate book faces; the lecture's main fonts remain unchanged.
+\newfontfamily\DedicationSerif{EBGaramond-Regular.otf}[Ligatures=TeX]
+\newfontfamily\DedicationTitleFont{EBGaramond-Medium.otf}[
+    Letters=SmallCaps,LetterSpace=7,Ligatures=TeX]
+\newcommand{\MakeDedicationPage}{%
+    \clearpage
+    \newgeometry{left=3cm,right=3cm,top=4cm,bottom=4cm,
+        headheight=0pt,headsep=0pt,footskip=0pt}
+    \begingroup
+    \thispagestyle{empty}
+    \color{black}\setlength{\parindent}{0pt}\setlength{\parskip}{0pt}
+    \linespread{1}\DedicationSerif\fontsize{14pt}{20.3pt}\selectfont
+    \null\vfill
+    \noindent\begin{minipage}{\linewidth}
+        \centering
+        {\DedicationTitleFont\fontsize{16.5pt}{23.925pt}\selectfont
+         Dedication\par}
+        \vspace{\baselineskip}
+        \mbox{For the fifteen-year-old girl searching for her own coordinates in the dim light,}\\
+        \mbox{and for all those still learning to discern order out of chaos.}\par
+        \vspace{\baselineskip}
+        \mbox{To the unseen structure beneath the world,}\\
+        \mbox{and to everyone building their own basis.}\par
+    \end{minipage}\par
+    \vfill\null
+    \clearpage
+    \endgroup
+    \restoregeometry
+}
+
 \setCJKmainfont[
     BoldFont = Noto Serif CJK SC Bold,
     ItalicFont = Noto Serif CJK SC Light
@@ -455,7 +485,7 @@
 \numberwithin{equation}{chapter}
 
 % ============================================================
-% 3. 前置部分：封面、前言、目录
+% 3. 前置部分：封面、内封、献词、前言、目录
 % ============================================================
 \usepackage{placeins}
 \usepackage{xurl}
@@ -474,6 +504,7 @@
 \LecturePageNumbersfalse
 \MakeTitlePage
 \MakeInsideCover
+\MakeDedicationPage
 
 % 前言：字号、行距和中文标点仅在本组内调整。
 \begingroup
