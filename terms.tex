@@ -271,9 +271,12 @@
 \DeclareLectureTerm{taylor}{泰勒多项式}{Taylor Polynomial}{用函数在某一点的有限阶导数作系数构造的多项式，本书用于选读的函数近似例子。}
 \DeclareLectureTerm{token}{词元}{Token}{分词器按规则将文本切分得到的基本处理单元，可为完整的词、词的一部分或标点等，不必与汉字或自然语言中的词一一对应。模型先将其映射为初始向量，再通过后续计算融入上下文信息。}
 \DeclareLectureTerm{transitive}{传递性}{Transitivity}{若对象一与二、二与三具有某种关系，则对象一与三也具有该关系。}
-\DeclareLectureTerm{transpose}{转置}{Transpose}{实数标准坐标下，将输出端的线性评价反向折算到输入端的映射所对应的矩阵，满足 $(A^{\mathrm T}\boldsymbol y)\cdot\boldsymbol x=\boldsymbol y\cdot(A\boldsymbol x)$；行列互换是其坐标表现，通常不是逆矩阵。向量横排与竖排的转换也沿用上标 $\mathrm T$。}
-\DeclareLectureTerm{linear-functional}{线性泛函}{Linear Functional}{将向量线性地映为实数的评分规则；在 $\mathbb R^m$ 中可唯一写成 $\ell_{\boldsymbol y}(\boldsymbol b)=\boldsymbol y\cdot\boldsymbol b$，系数向量 $\boldsymbol y$ 记录各分量的评价权重。}
-\DeclareLectureTerm{dual-map}{对偶映射}{Dual Map}{把输出空间上的线性评分 $\ell$ 拉回为输入空间上的评分 $\ell\circ T$ 的线性对应，记作 $T^*$；在实数标准坐标与标准点积下，其系数向量的传递由转置矩阵表示，不是逆映射。}
+\DeclareLectureTerm{transpose}{转置}{Transpose}{对偶映射在原标准基所对应的对偶基下的矩阵，满足 $\boldsymbol y\cdot(A\boldsymbol x)=(A^{\mathrm T}\boldsymbol y)\cdot\boldsymbol x$；行列互换是其坐标计算形式，通常不是逆矩阵。向量横排与竖排的转换也沿用上标 $\mathrm T$。}
+\DeclareLectureTerm{linear-functional}{线性泛函}{Linear Functional}{从实向量空间到 $\mathbb R$ 的线性评分规则，如坐标提取、固定权重点积和多项式在固定点的取值；在 $\mathbb R^m$ 中可唯一写成 $\varphi_{\boldsymbol y}(\boldsymbol b)=\boldsymbol y\cdot\boldsymbol b$。}
+\DeclareLectureTerm{dual-map}{对偶映射}{Dual Map}{线性映射 $T:V\to W$ 所诱导的反向评价传递 $T':W'\to V'$，定义为 $T'(\varphi)=\varphi\circ T$；在标准对偶基下由转置矩阵表示，不是逆映射。}
+\DeclareLectureTerm{dual-space}{对偶空间}{Dual Space}{实向量空间 $V$ 上全体线性泛函按逐点加法与数乘组成的向量空间，记为 $V'$；有限维时与 $V$ 维数相等，可理解为所有线性测量尺子的集合。}
+\DeclareLectureTerm{dual-basis}{对偶基}{Dual Basis}{与一组基对应的坐标提取泛函所组成的基；标准基的对偶基由 $\alpha_j(\boldsymbol x)=x_j$ 这些坐标尺子组成，每个线性评分器由它们唯一线性组合得到。}
+\DeclareLectureTerm{scalar-projection}{有符号投影长度}{Scalar Projection}{向量 $\boldsymbol y$ 沿单位方向 $\boldsymbol q$ 的带符号分量 $\boldsymbol q\cdot\boldsymbol y=|\boldsymbol y|\cos\theta$；反向一侧为负，原始非单位探测器的点积还需乘探测器的长度。}
 \DeclareLectureTerm{triangle}{三角形定则}{Triangle Rule}{把两个向量首尾相接，从第一支起点指向第二支终点的向量表示它们的和。}
 \DeclareLectureTerm{trivial}{零解}{Trivial Solution}{所有未知数均为0的解，是任意齐次线性方程组的一个解。}
 \DeclareLectureTerm{trivial-subspaces}{平凡子空间}{Trivial Subspaces}{所讨论空间的零子空间与全空间；零空间情形二者重合。}
