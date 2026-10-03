@@ -270,34 +270,69 @@
 \setmainfont{TeX Gyre Pagella}
 
 % Dedication: separate book faces; the lecture's main fonts remain unchanged.
-\newfontfamily\DedicationSerif{EBGaramond-Regular.otf}[Ligatures=TeX]
+\newfontfamily\DedicationSerif{EBGaramond-Regular.otf}[
+    ItalicFont=EBGaramond-Italic.otf,Ligatures=TeX]
 \newfontfamily\DedicationTitleFont{EBGaramond-Medium.otf}[
     Letters=SmallCaps,LetterSpace=7,Ligatures=TeX]
-\newcommand{\MakeDedicationPage}{%
+% A sentence and its Chinese echo share one quiet, centered unit.
+\newcommand{\DedicationEcho}[2]{%
+    {\DedicationSerif\itshape\fontsize{13.5pt}{20pt}\selectfont
+     #1\par}%
+    \vspace{6pt}%
+    {\normalfont\rmfamily\upshape\fontsize{14.5pt}{23pt}\selectfont
+     #2\par}%
+}
+% Preserve the supplied Chinese punctuation while defining this page only.
+\begingroup
+\catcode`。=12 \catcode`，=12
+\gdef\MakeDedicationPage{%
     \clearpage
     \newgeometry{left=3cm,right=3cm,top=4cm,bottom=4cm,
         headheight=0pt,headsep=0pt,footskip=0pt}
     \begingroup
     \thispagestyle{empty}
     \color{black}\setlength{\parindent}{0pt}\setlength{\parskip}{0pt}
-    \linespread{1}\DedicationSerif\fontsize{14pt}{20.3pt}\selectfont
-    \null\vfill
-    \noindent\begin{minipage}{\linewidth}
+    \linespread{1}\fontsize{13.5pt}{20pt}\selectfont
+    \vspace*{\fill}
+    \noindent\makebox[\linewidth][c]{\begin{minipage}{0.93\linewidth}
         \centering
-        {\DedicationTitleFont\fontsize{16.5pt}{23.925pt}\selectfont
-         Dedication\par}
-        \vspace{\baselineskip}
-        \mbox{For the fifteen-year-old girl searching for her own coordinates in the dim light,}\\
-        \mbox{and for all those still learning to discern order out of chaos.}\par
-        \vspace{\baselineskip}
-        \mbox{To the unseen structure beneath the world,}\\
-        \mbox{and to everyone building their own basis.}\par
-    \end{minipage}\par
-    \vfill\null
+        {\DedicationTitleFont\upshape\fontsize{19pt}{27pt}\selectfont
+         DEDICATION\enspace/\enspace
+         {\normalfont\rmfamily\fontsize{20pt}{27pt}\selectfont 献词}\par}
+        \vspace{32pt}
+        \DedicationEcho
+          {For the fifteen-year-old girl\\
+           searching for her own coordinates in the dim light,}
+          {献给那个在暗淡微光中，\\
+           寻找自己坐标的十五岁女孩，}
+        \vspace{16pt}
+        \DedicationEcho
+          {and for all those still learning to discern order out of chaos.}
+          {也献给每一个仍在混沌中，努力辨认秩序的人。}
+        \vspace{26pt}
+        \DedicationEcho
+          {To the unseen structure beneath the world,}
+          {献给隐藏在世界之下、那看不见的结构，}
+        \vspace{16pt}
+        \DedicationEcho
+          {and to everyone building their own basis.}
+          {也献给每一个正在为自己搭建基底的人。}
+        % Three Chinese baselines separate the signature from the last echo.
+        \vspace{69pt}
+        {\color{black!60}\DedicationSerif\itshape
+         \fontsize{10.5pt}{16pt}\selectfont
+         Autumn 2026, Nanchang\par}
+        \vspace{3pt}
+        {\color{black!60}\normalfont\rmfamily\upshape
+         \fontsize{11pt}{17pt}\selectfont
+         2026年秋，于南昌\par}
+    \end{minipage}}\par
+    \vspace*{\fill}
     \clearpage
     \endgroup
     \restoregeometry
 }
+\endgroup
 
 \setCJKmainfont[
     BoldFont = Noto Serif CJK SC Bold,
