@@ -6659,175 +6659,410 @@ $S(\boldsymbol\varepsilon_\ell)$ 是 $A$ 的第 $\ell$ 列，其第 $j$ 个分�
 矩阵记录了输入分量怎样影响输出分量。有时我们需要换一个方向整理这些系数：从“每个输入造成什么输出”，改看“某种输出汇总依赖哪些输入”。有时我们需要把许多输入、输出分成若干组。转置与分块分别解决这两种组织问题。
 
 \subsection{矩阵的转置}
+\label{sec:three-transpose}
+% TRANSPOSE DUAL MAP BEGIN
+\begingroup
+\definecolor{TransposeOrange}{HTML}{BB6E28}
+\definecolor{TransposePurple}{HTML}{75618F}
+\tikzset{
+ trforward/.style={-{Stealth[length=2.5mm]},ThreeBlue,line width=1.15pt},
+ trback/.style={-{Stealth[length=2.5mm]},TransposeOrange,line width=1.15pt},
+ trgrid/.style={ThreeGray!13,line width=.3pt},
+ trpanel/.style={rounded corners=3pt,draw=ThreeGray!45,fill=white,line width=.65pt},
+ trlabel/.style={fill=white,inner sep=2pt,font=\footnotesize}}
 
-先从一个线性映射的输出说起。若
-\[
- T((x_1,x_2)^{\mathrm T})=
- (x_1+3x_2,\ 2x_1+4x_2,\ 5x_1+6x_2)^{\mathrm T},
-\]
-我们想用系数 $c_1,c_2,c_3$ 对三个输出作线性汇总。把输出表达式代入并按输入分量合并，得到
-\[
-\begin{aligned}
- &c_1(x_1+3x_2)+c_2(2x_1+4x_2)+c_3(5x_1+6x_2)\\
- &\qquad=(c_1+2c_2+5c_3)x_1+(3c_1+4c_2+6c_3)x_2.
-\end{aligned}
-\]
-所以输出汇总系数 $\boldsymbol c$ 被转换成输入汇总系数
-\[
- \boldsymbol d=\OpMat{rrr}{1&2&5\\3&4&6}\boldsymbol c.
-\]
-这仍是一个线性映射，只是它记录的数表恰好把原矩阵的行与列交换了。\textbf{转置把同一组作用系数，从另一个方向重新组织起来。}这不是在恢复原输入，不应把转置与逆混为一谈。
+第3.1节告诉我们，矩阵记录基向量的像；第3.3节告诉我们，矩阵乘法记录映射的复合。现在换一个工程问题：\textbf{已经知道输入怎样产生输出，怎样把对输出的评价折算回输入端？}这不是求逆。我们并不打算从输出恢复原来的输入，而是想知道：每一个输入分量，对最后的评价贡献了多少。
 
-\begin{definition}[矩阵的转置]
-将 $m\times n$ 矩阵 $A$ 的行、列互换，得到 $n\times m$ 矩阵，称为它的\term{transpose}，记作 $A^{\mathrm T}$：
-\[
- (A^{\mathrm T})_{k,j}=A_{j,k}.
-\]
+仍以短视频为例。矩阵 $A$ 的每一列记录一条视频的特征，视频权重 $\boldsymbol{x}$ 经过 $A$，产生“搞笑、科技、美食、游戏”四项特征得分 $\boldsymbol{b}=A\boldsymbol{x}$。如果用户对四项特征另有一组评价权重 $\boldsymbol{y}$，综合评价就是第0章的点积 $\boldsymbol{y}\cdot\boldsymbol{b}$。现在希望把同一评价写在视频一侧：找出每条视频的单位贡献分 $\boldsymbol{d}$，使总分等于 $\boldsymbol{d}\cdot\boldsymbol{x}$。\textbf{转置要传回来的，是评价的系数。}
+
+\ThreeFigure{正向映射与反向折算。蓝色路径把输入组合成红色输出，橙色路径把输出端的评价权重折算为输入端的贡献系数。两条路径保持同一综合评价，不表示从输出恢复原输入。}{fig:three-transpose}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \path[use as bounding box] (-.1,-.85) rectangle (14.1,4.7);
+ \foreach \xx in {0,.5,...,14} \draw[trgrid] (\xx,-.5)--(\xx,4.1);
+ \foreach \yy in {-.5,0,...,4} \draw[trgrid] (0,\yy)--(14,\yy);
+ \draw[trpanel] (.2,-.3) rectangle (4.8,4);
+ \draw[trpanel] (9.2,-.3) rectangle (13.8,4);
+ \node[ThreeBlue,font=\bfseries] at (2.5,3.6) {输入端 $\mathbb R^n$};
+ \node[ThreeRose,font=\bfseries] at (11.5,3.6) {输出端 $\mathbb R^m$};
+ \draw[opaxis] (1.4,1.85)--(3.6,1.85);
+ \draw[opaxis] (1.4,1.85)--(1.4,3.05);
+ \draw[trforward] (1.4,1.85)--(3.1,2.85) node[right] {$\boldsymbol{x}$};
+ \draw[opaxis] (10.3,1.85)--(12.7,1.85);
+ \draw[opaxis] (10.3,1.85)--(10.3,3.05);
+ \draw[oprose] (10.3,1.85)--(12.35,2.5) node[above] {$\boldsymbol{b}=A\boldsymbol{x}$};
+ \draw[trforward] (4.95,2.5)--node[above,trlabel] {$A$：输入 $\to$ 输出}
+ node[below,trlabel] {按列组合输出}(9.05,2.5);
+ \node[TransposeOrange,align=center] at (2.5,.7) {贡献系数 $\boldsymbol{d}$\\[2pt]每个输入的单位贡献};
+ \node[TransposeOrange,align=center] at (11.5,.7) {评价权重 $\boldsymbol{y}$\\[2pt]对各输出维度打分};
+ \draw[trback] (9.05,.7)--node[above,trlabel] {$A^{\mathrm T}$：评价反向折算}
+ node[below,trlabel] {逐项汇总输入贡献}(4.95,.7);
+ \node at (7,-.7) {$\boldsymbol{y}\cdot(A\boldsymbol{x})=\boldsymbol{d}\cdot\boldsymbol{x}$};
+\end{tikzpicture}}{上方传递的是状态向量，下方传递的是评价系数。虽然箭头相反，$\boldsymbol{y}$ 并不是上方输出 $\boldsymbol{b}$ 的另一个名称；它是我们另外选定的评价权重。}
+
+\par\medskip\noindent\textbf{先给评价找一个名字，再把它传回去。}
+把一个向量线性地汇总为一个数的规则，称为\term{linear-functional}。例如，在输出空间中，
+\begin{equation}
+ \ell_{\boldsymbol{y}}(\boldsymbol{b})
+ =\boldsymbol{y}\cdot\boldsymbol{b}.
+\end{equation}
+这里的“泛函”可以先理解为一张线性评分表：加权系数固定以后，向量相加，评分也相加；向量数乘，评分也按同样的倍数变化。反过来，实数坐标空间中的每个线性评分规则，都能这样表示：它对各标准基向量的评分，就是这张评分表的系数。这仍然是第3.1节“基的像决定线性映射”的思想。
+
+若正向映射为 $T(\boldsymbol{x})=A\boldsymbol{x}$，把输出评分 $\ell$ 接在 $T$ 后面，得到输入上的评分 $\ell\circ T$。从“输出上的评分”到“输入上的评分”的对应称为\term{dual-map}，记作 $T^*$：
+\begin{equation}
+ T^*(\ell)=\ell\circ T,\qquad
+ \bigl(T^*\ell\bigr)(\boldsymbol{x})=\ell\bigl(T(\boldsymbol{x})\bigr).
+\end{equation}
+它沿着正向映射往回传递评价。两个评分相加后再传回，与分别传回后相加相同；评分数乘后再传回，也与传回后数乘相同，所以这个对应仍是线性的。我们不另建抽象的空间理论，只用评分系数向量记录这个对应；在实数标准坐标和第0章的点积下，记录它的矩阵就是转置矩阵。
+
+这个反向对应确实能构造出来。把 $A$ 的列记为 $\boldsymbol{a}_1,\ldots,\boldsymbol{a}_n$，则
+\begin{equation}
+ A\boldsymbol{x}
+ =x_1\boldsymbol{a}_1+\cdots+x_n\boldsymbol{a}_n,\qquad
+ \boldsymbol{y}\cdot(A\boldsymbol{x})
+ =x_1(\boldsymbol{y}\cdot\boldsymbol{a}_1)
+  +\cdots+x_n(\boldsymbol{y}\cdot\boldsymbol{a}_n).
+\end{equation}
+所以第 $k$ 条输入的单位贡献，就是对它的像 $\boldsymbol{a}_k$ 打一次分。把这些分数排成贡献向量，
+\begin{equation}
+ \boldsymbol{d}
+ =\bigl(\boldsymbol{y}\cdot\boldsymbol{a}_1,\ldots,
+        \boldsymbol{y}\cdot\boldsymbol{a}_n\bigr)^{\mathrm T},
+ \qquad
+ \boldsymbol{y}\cdot(A\boldsymbol{x})
+ =\boldsymbol{d}\cdot\boldsymbol{x}.
+\end{equation}
+每个分数对 $\boldsymbol{y}$ 都是线性的，因而 $\boldsymbol{y}\mapsto\boldsymbol{d}$ 也是线性映射。若另一个贡献向量给出了所有输入的同一评分，逐一输入标准基 $\mathbf{e}_1,\ldots,\mathbf{e}_n$，它的每个分量就必须相同；因此反向折算唯一。
+
+\begin{definition}[矩阵的转置：线性评价的反向映射]
+设 $A$ 表示从 $\mathbb R^n$ 到 $\mathbb R^m$ 的线性映射。将输出端的线性评价反向折算到输入端的映射，所对应的 $n\times m$ 矩阵称为 $A$ 的\term{transpose}，记作 $A^{\mathrm T}$。它由下式唯一确定：
+\begin{equation}
+ \boxed{\ (A^{\mathrm T}\boldsymbol{y})\cdot\boldsymbol{x}
+        =\boldsymbol{y}\cdot(A\boldsymbol{x})\ },
+ \qquad
+ \boldsymbol{x}\in\mathbb R^n,\quad
+ \boldsymbol{y}\in\mathbb R^m.
+ \label{eq:three-transpose-pairing}
+\end{equation}
+也就是说，无论在输出端评分，还是先折算评价再在输入端评分，结果完全相同。
 \end{definition}
 
-\ThreeFigure{转置交换行与列。原矩阵的第2行，在转置后成为第2列；元素本身的数值不变。}{fig:three-transpose}{%
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \node at (2.1,1.4) {$A=\OpMat{cc}{1&3\\\textcolor{ThreeRose}{2}&\textcolor{ThreeRose}{4}\\5&6}$};
- \draw[threearrow] (4.4,1.4)--node[above] {行列互换}(7.0,1.4);
- \node at (10.1,1.4) {$A^{\mathrm T}=\OpMat{ccc}{1&\textcolor{ThreeRose}{2}&5\\3&\textcolor{ThreeRose}{4}&6}$};
- \node[font=\footnotesize,text=ThreeGray] at (2.1,-.1) {$3\times2$};
- \node[font=\footnotesize,text=ThreeGray] at (10.1,-.1) {$2\times3$};
-\end{tikzpicture}}{若把输出分量按 $\boldsymbol c$ 加权汇总，合并后输入分量的系数就是 $A^{\mathrm T}\boldsymbol c$。这种“把汇总系数往前传”的解释只使用线性组合。}
+现在才回到数表。$A^{\mathrm T}$ 的每一行，记录一条输入的像所具有的全部评分系数，因而恰好是 $A$ 的一列横排后的结果；$A^{\mathrm T}$ 的每一列，则是 $A$ 的一行竖排后的结果。\textbf{$A$ 按列组合输出，$A^{\mathrm T}$ 逐行汇总输入端的单位贡献。行列互换只是转置的代数表现，不是它的本质。}特别要分清：反向矩阵的一行对应原来的一条视频，一列对应原来的一项特征，不能把这两个角色互换。
 
-\par\medskip\noindent\textbf{同一张数表，两种线性组合。}
-把 $m\times n$ 矩阵 $A$ 的列记为 $\boldsymbol a_1,\ldots,\boldsymbol a_n\in\mathbb R^m$，把它的第 $i$ 行写成 $\boldsymbol r_i^{\mathrm T}$，其中 $\boldsymbol r_i\in\mathbb R^n$。这里把一行的分量竖排成 $\boldsymbol r_i$，是为了继续使用本书的列向量记法。于是
-\[
- A\boldsymbol x=x_1\boldsymbol a_1+\cdots+x_n\boldsymbol a_n,
+\par\medskip\noindent\textbf{把反向折算用在三条视频上。}
+沿用第2章的四维特征次序，三条视频分别偏向“搞笑与美食”“科技与游戏”及两者的混合：
+\begin{equation}
+ A=\OpMat{ccc}{1&0&\tfrac12\\0&1&\tfrac12\\1&0&\tfrac12\\0&1&\tfrac12},
  \qquad
- A^{\mathrm T}\boldsymbol y=y_1\boldsymbol r_1+\cdots+y_m\boldsymbol r_m.
-\]
-前一个乘积用 $n$ 个系数组合 $A$ 的列；后一个乘积用 $m$ 个系数组合 $A$ 的行（竖排后）。因此，$A$ 与 $A^{\mathrm T}$ 分别给出
-\[
- \mathbb R^n\xrightarrow{\ A\ }\mathbb R^m,
+ \boldsymbol{x}=\OpCol{0.35\\0.65\\0},
  \qquad
- \mathbb R^m\xrightarrow{\ A^{\mathrm T}\ }\mathbb R^n.
-\]
-箭头方向相反，只说明输入、输出的维数交换了，并不说明两次作用能够互相撤销。
+ A\boldsymbol{x}=\OpCol{0.35\\0.65\\0.35\\0.65}.
+\end{equation}
+给四项特征的评价权重取 $\boldsymbol{y}=(1,2,0,1)^{\mathrm T}$。三条视频的单位贡献分分别为 $1,3,2$，所以
+\begin{equation}
+ A^{\mathrm T}=\OpMat{cccc}{1&0&1&0\\0&1&0&1\\\tfrac12&\tfrac12&\tfrac12&\tfrac12},
+ \qquad
+ \boldsymbol{d}=A^{\mathrm T}\boldsymbol{y}=\OpCol{1\\3\\2},
+ \qquad
+ \boldsymbol{d}\cdot\boldsymbol{x}=2.30.
+\end{equation}
+第二条视频的贡献分较高，是因为它带有被较高权重评价的科技与游戏特征。实际配方中它的贡献为 $0.65\times3$，不是单独的 $3$；贡献系数与曝光权重是两种量。这里仅是教学简化模型，不代表抖音的实际评分或推荐规则。
 
-对刚才的矩阵，取 $\boldsymbol x=(1,0)^{\mathrm T}$、$\boldsymbol y=(1,-1,0)^{\mathrm T}$，就有
-\[
- A\boldsymbol x=\OpCol{1\\2\\5},\qquad
- A^{\mathrm T}\boldsymbol y
- =\OpCol{1\\3}-\OpCol{2\\4}=\OpCol{-1\\-1}.
-\]
-第二个结果正是第一行减第二行之后竖排的结果。若把第一个结果直接送入 $A^{\mathrm T}$，却得到
-\[
- A^{\mathrm T}(A\boldsymbol x)=\OpCol{30\\41}\ne\OpCol{1\\0}.
-\]
-所以，“回到原来的维数”与“回到原来的向量”是两件事。转置的价值在于把行的组合也写成矩阵乘法，而不在于代替逆矩阵。
+\ThreeFigure{从推荐系统看转置。上方蓝色的视频权重，经 $A$ 组合成红色特征得分；下方橙色的特征评价，经 $A^{\mathrm T}$ 折算成每条视频的单位贡献分。视频卡片与特征条分别对应映射的输入、输出，反向折算保持总评分 $2.30$ 不变。}{fig:three-transpose-recommendation}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \path[use as bounding box] (-.1,-.35) rectangle (14.1,5.75);
+ \foreach \xx in {0,.5,...,14} \draw[trgrid] (\xx,0)--(\xx,5.2);
+ \foreach \yy in {0,.5,...,5} \draw[trgrid] (0,\yy)--(14,\yy);
+ \draw[trpanel] (.1,.1) rectangle (4.1,5.3);
+ \draw[trpanel] (9.9,.1) rectangle (13.9,5.3);
+ \node[ThreeBlue,font=\small\bfseries] at (2.1,4.95) {视频权重};
+ \node[ThreeRose,font=\small\bfseries] at (11.9,4.95) {特征得分};
+ \foreach \yy/\name/\val/\len in {4.15/视频1/0.35/.70,3.30/视频2/0.65/1.30,2.45/混合视频/0/0}{
+   \node[anchor=west] at (.35,\yy+.15) {\name};
+   \fill[ThreeBlue!12] (1.8,\yy-.08) rectangle (3.15,\yy+.16);
+   \fill[ThreeBlue!75] (1.8,\yy-.08) rectangle ({1.8+\len},\yy+.16);
+   \node[anchor=west,ThreeBlue] at (3.25,\yy+.04) {$\val$};
+ }
+ \foreach \yy/\name/\val/\len in {4.15/搞笑/0.35/.70,3.53/科技/0.65/1.30,2.91/美食/0.35/.70,2.29/游戏/0.65/1.30}{
+   \node[anchor=west] at (10.1,\yy+.07) {\name};
+   \fill[ThreeRose!12] (11.25,\yy-.08) rectangle (12.6,\yy+.16);
+   \fill[ThreeRose!75] (11.25,\yy-.08) rectangle ({11.25+\len},\yy+.16);
+   \node[anchor=west,ThreeRose] at (12.75,\yy+.04) {$\val$};
+ }
+ \node at (7,4.4) {$A:\mathbb R^3\to\mathbb R^4$};
+ \node at (7,3.25) {$\OpMat{ccc}{1&0&\tfrac12\\0&1&\tfrac12\\1&0&\tfrac12\\0&1&\tfrac12}$};
+ \draw[trforward] (4.3,3.25)--(5.65,3.25);
+ \draw[trforward] (8.35,3.25)--(9.7,3.25);
+ \node[ThreeGray] at (7,2.05) {列是视频，行是特征};
+ \node[TransposeOrange,align=center] at (11.9,1.13) {给特征打分\\[3pt]$\boldsymbol{y}=(1,2,0,1)^{\mathrm T}$};
+ \node[TransposeOrange,align=center] at (2.1,1.13) {每条视频的单位贡献\\[3pt]$\boldsymbol{d}=(1,3,2)^{\mathrm T}$};
+ \draw[trback] (9.7,1.13)--node[above,trlabel] {$A^{\mathrm T}$}
+ node[below,trlabel] {评价系数往回传}(4.3,1.13);
+ \node[ThreeGray] at (7,-.15) {同一总分：$\boldsymbol{y}\cdot(A\boldsymbol{x})=\boldsymbol{d}\cdot\boldsymbol{x}=2.30$};
+\end{tikzpicture}}{橙色的 $1,3,2$ 是每单位视频权重的贡献分，蓝色的 $0.35,0.65,0$ 是实际配方。转置让我们在输入端解释输出评分来自哪里，并没有反求配方。}
+
+\OpNote{转置反向传递评价，逆映射反向恢复输入。例如 $A=\OpMat{cc}{1&1}$ 将 $(1,0)^{\mathrm T}$ 送到 $1$，而 $A^{\mathrm T}$ 将 $1$ 送到 $(1,1)^{\mathrm T}$，没有还原原输入。转置对每个矩阵都存在，不能因为箭头反向就把它当成逆矩阵。}
+
+\par\medskip\noindent\textbf{评价传递的规则，决定转置的运算法则。}
+先看两次转置。点积交换两边的次序，式 \eqref{eq:three-transpose-pairing} 就可以读成
+\begin{equation}
+ \boldsymbol{x}\cdot(A^{\mathrm T}\boldsymbol{y})
+ =(A\boldsymbol{x})\cdot\boldsymbol{y}.
+\end{equation}
+因此，当 $A^{\mathrm T}$ 被看作正向映射时，把它的输出评价 $\boldsymbol{x}$ 折算回输入端，得到的恰好是 $A\boldsymbol{x}$。由反向折算的唯一性，
+\begin{equation}
+ (A^{\mathrm T})^{\mathrm T}=A.
+\end{equation}
+这还原的是原来的\textbf{映射规则}，不是说把一个状态依次乘 $A$、$A^{\mathrm T}$ 就能回到起点。
+
+\ThreeFigure{两次转置还原同一映射规则。第一行是 $A$ 的正向作用，第二行是评价系数的反向传递，第三行再次把评价关系反向，得到原来的 $A$。三行比较的是映射规则，不是一条把同一向量来回输送的数据链。}{fig:three-transpose-twice}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \path[use as bounding box] (-.1,-.5) rectangle (14.1,4.9);
+ \foreach \xx in {0,.5,...,14} \draw[trgrid] (\xx,-.2)--(\xx,4.5);
+ \foreach \yy in {0,.5,...,4.5} \draw[trgrid] (0,\yy)--(14,\yy);
+ \node[ThreeBlue,font=\bfseries] at (2.6,4.3) {$\mathbb R^n$ 一侧};
+ \node[ThreeRose,font=\bfseries] at (11.4,4.3) {$\mathbb R^m$ 一侧};
+ \foreach \yy in {3.4,2.0,.6}{
+   \node[trpanel,minimum width=3.2cm,minimum height=.7cm] at (2.6,\yy) {};
+   \node[trpanel,minimum width=3.2cm,minimum height=.7cm] at (11.4,\yy) {};
+ }
+ \node[ThreeBlue] at (2.6,3.4) {输入 $\boldsymbol{x}$};
+ \node[ThreeRose] at (11.4,3.4) {输出 $A\boldsymbol{x}$};
+ \draw[trforward] (4.4,3.4)--node[above,trlabel] {$A$}(9.6,3.4);
+ \node[TransposeOrange] at (2.6,2.0) {贡献系数 $A^{\mathrm T}\boldsymbol{y}$};
+ \node[TransposeOrange] at (11.4,2.0) {输出评价 $\boldsymbol{y}$};
+ \draw[trback] (9.6,2.0)--node[above,trlabel] {$A^{\mathrm T}$}(4.4,2.0);
+ \node[ThreeBlue] at (2.6,.6) {同一输入 $\boldsymbol{x}$};
+ \node[ThreeRose] at (11.4,.6) {同一输出 $A\boldsymbol{x}$};
+ \draw[trforward] (4.4,.6)--node[above,trlabel] {$(A^{\mathrm T})^{\mathrm T}=A$}(9.6,.6);
+ \draw[trback,ThreeGray!65] (13.25,3.15) to[bend left=30] node[right,font=\footnotesize] {转置}(13.25,2.25);
+ \draw[trback,ThreeGray!65] (.75,1.75) to[bend right=30] node[left,font=\footnotesize] {再转置}(.75,.85);
+ \node[font=\footnotesize,ThreeGray] at (7,-.3) {反转两次的是评价关系；没有把 $A^{\mathrm T}$ 当作 $A^{-1}$};
+\end{tikzpicture}}{第二行的 $\boldsymbol{y}$ 是任选的输出评价，第三行重新把 $\boldsymbol{x}$ 当作输入。两次转置还原的结论来自同一评分关系的唯一性。}
+
+两个正向映射叠加时，对总输出的评价等于对两个输出分别评价再相加，因此反向传回来的贡献也相加：
+\begin{equation}
+ \boldsymbol{y}\cdot\bigl((A+B)\boldsymbol{x}\bigr)
+ =\boldsymbol{y}\cdot(A\boldsymbol{x})+\boldsymbol{y}\cdot(B\boldsymbol{x})
+ =\bigl(A^{\mathrm T}\boldsymbol{y}+B^{\mathrm T}\boldsymbol{y}\bigr)
+       \cdot\boldsymbol{x}.
+\end{equation}
+由定义的唯一性，$(A+B)^{\mathrm T}=A^{\mathrm T}+B^{\mathrm T}$。同样，正向输出整体乘 $\lambda$，它的评价与反向贡献也都乘 $\lambda$：
+\begin{equation}
+ \boldsymbol{y}\cdot\bigl((\lambda A)\boldsymbol{x}\bigr)
+ =\bigl(\lambda A^{\mathrm T}\boldsymbol{y}\bigr)\cdot\boldsymbol{x},
+ \qquad
+ (\lambda A)^{\mathrm T}=\lambda A^{\mathrm T}.
+\end{equation}
+这两条公式只是“分别评分后相加”和“整体评分同倍缩放”的矩阵记录。
+
+乘积的转置最值得放慢来看。设 $B:\mathbb R^n\to\mathbb R^p$，$A:\mathbb R^p\to\mathbb R^m$。正向先做 $B$，再做 $A$；反向先做 $A^{\mathrm T}$，再做 $B^{\mathrm T}$。最终输出上的评价，必须先折算到中间空间，才能继续折算到最初的输入。这与先穿袜子再穿鞋、脱时先脱鞋再脱袜子的次序相同。
+
+\ThreeFigure{复合映射的转置，沿相反的路径传递评价。蓝色正向路径先经过 $B$、再经过 $A$；橙色反向路径先经过 $A^{\mathrm T}$、再经过 $B^{\mathrm T}$，紫色框是两条路径共用的中间空间。顺序反转来自评价传递的路线，因而乘积的转置为 $B^{\mathrm T}A^{\mathrm T}$。}{fig:three-transpose-composition}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \path[use as bounding box] (-.1,-1.5) rectangle (14.1,4.65);
+ \foreach \xx in {0,.5,...,14} \draw[trgrid] (\xx,-.5)--(\xx,4.3);
+ \foreach \yy in {-.5,0,...,4} \draw[trgrid] (0,\yy)--(14,\yy);
+ \foreach \xx/\name/\col in {2/输入空间 $\mathbb R^n$/ThreeBlue,7/中间空间 $\mathbb R^p$/TransposePurple,12/输出空间 $\mathbb R^m$/ThreeRose}{
+   \draw[trpanel,draw=\col!65,fill=\col!3] ({\xx-1.7},.25) rectangle ({\xx+1.7},4);
+   \node[text=\col,font=\bfseries] at (\xx,3.65) {\name};
+ }
+ \node[ThreeBlue] at (2,2.75) {$\boldsymbol{x}$};
+ \node[TransposePurple] at (7,2.75) {$B\boldsymbol{x}$};
+ \node[ThreeRose] at (12,2.75) {$AB\boldsymbol{x}$};
+ \draw[trforward] (3.85,2.75)--node[above,trlabel] {$B$}(5.15,2.75);
+ \draw[trforward] (8.85,2.75)--node[above,trlabel] {$A$}(10.15,2.75);
+ \node[TransposeOrange] at (12,1.25) {$\boldsymbol{y}$};
+ \node[TransposeOrange] at (7,1.25) {$A^{\mathrm T}\boldsymbol{y}$};
+ \node[TransposeOrange] at (2,1.25) {$B^{\mathrm T}A^{\mathrm T}\boldsymbol{y}$};
+ \draw[trback] (10.15,1.25)--node[above,trlabel] {$A^{\mathrm T}$}(8.85,1.25);
+ \draw[trback] (5.15,1.25)--node[above,trlabel] {$B^{\mathrm T}$}(3.85,1.25);
+ \node[ThreeBlue,font=\footnotesize] at (7,4.4) {正向：先 $B$，后 $A$};
+ \node[TransposeOrange,font=\footnotesize] at (7,-.2) {反向：先 $A^{\mathrm T}$，后 $B^{\mathrm T}$};
+ \node[trpanel,align=center,font=\footnotesize,minimum width=10.7cm] at (7,-1)
+ {生活中的同一顺序：穿袜子 $\to$ 穿鞋\qquad 撤销时：脱鞋 $\to$ 脱袜子};
+\end{tikzpicture}}{维数也沿路径匹配：$A^{\mathrm T}$ 把 $m$ 维评价送回 $p$ 维，$B^{\mathrm T}$ 再送回 $n$ 维。若不反序，连相邻空间都可能接不上。}
+
+把这条路径用评分关系写下来，只需两次使用定义：
+\begin{equation}
+ \boldsymbol{y}\cdot(AB\boldsymbol{x})
+ =(A^{\mathrm T}\boldsymbol{y})\cdot(B\boldsymbol{x})
+ =(B^{\mathrm T}A^{\mathrm T}\boldsymbol{y})\cdot\boldsymbol{x}.
+\end{equation}
+因此 $B^{\mathrm T}A^{\mathrm T}$ 已经完成整个复合映射的反向折算。由唯一性，
+\begin{equation}
+ \boxed{\ (AB)^{\mathrm T}=B^{\mathrm T}A^{\mathrm T}\ }.
+\end{equation}
+我们没有核对任何一个矩阵元素；只追踪了评价沿两个映射传回去的次序。
 
 \begin{property}[转置的运算法则]
-对使下列运算有意义的矩阵与实数 $\lambda$，有
-\[
- (A^{\mathrm T})^{\mathrm T}=A,\quad
- (A+B)^{\mathrm T}=A^{\mathrm T}+B^{\mathrm T},\quad
- (\lambda A)^{\mathrm T}=\lambda A^{\mathrm T},\quad
+对维数匹配的矩阵及实数 $\lambda$，
+\begin{equation}
+ \begin{gathered}
+ (A^{\mathrm T})^{\mathrm T}=A,\qquad
+ (A+B)^{\mathrm T}=A^{\mathrm T}+B^{\mathrm T},\\
+ (\lambda A)^{\mathrm T}=\lambda A^{\mathrm T},\qquad
  (AB)^{\mathrm T}=B^{\mathrm T}A^{\mathrm T}.
-\]
-若 $A$ 可逆，则
-\[
- (A^{\mathrm T})^{-1}=(A^{-1})^{\mathrm T}.
-\]
+ \end{gathered}
+\end{equation}
+若 $A$ 可逆，则 $(A^{\mathrm T})^{-1}=(A^{-1})^{\mathrm T}$。
 \end{property}
 
-前面三条来自交换两次恢复原状，以及交换位置不改变同位置的加法与数乘。乘积的反序也有直观原因：正向数据先经 $B$ 再经 $A$，而对最终输出的汇总系数，要先通过 $A^{\mathrm T}$ 传到中间，再通过 $B^{\mathrm T}$ 传到最初的输入。一个元素的核对已经足够：
-\[
- ((AB)^{\mathrm T})_{k,j}=(AB)_{j,k}
- =\sum_\ell A_{j,\ell}B_{\ell,k}
- =(B^{\mathrm T}A^{\mathrm T})_{k,j}.
-\]
-最后，对 $AA^{-1}=A^{-1}A=E$ 取转置，得到两个方向的乘积仍是 $E$，再由逆矩阵唯一性即得转置与求逆的关系。
+最后一条也从复合关系而来。恒等映射保持每个评分，其转置仍为 $E$；对 $AA^{-1}=A^{-1}A=E$ 反向传递评价，就得到
+\begin{equation}
+ (A^{-1})^{\mathrm T}A^{\mathrm T}
+ =A^{\mathrm T}(A^{-1})^{\mathrm T}=E.
+\end{equation}
+所以 $(A^{-1})^{\mathrm T}$ 正是 $A^{\mathrm T}$ 的逆。这里说明转置与求逆可以交换运算，并没有说两种运算相同。
 
-\OpNote{转置与求逆都会使乘积反序，但它们是不同的操作。转置对每个矩阵都有定义；逆矩阵仅对可逆方阵存在。一般既没有 $A^{\mathrm T}=A^{-1}$，也没有 $(AB)^{\mathrm T}=A^{\mathrm T}B^{\mathrm T}$。}
+\OpNote{乘积转置必须反序。请沿图 \ref{fig:three-transpose-composition} 的箭头读：先把最后一层的评价传回来，再处理前一层。一般不能写成 $(AB)^{\mathrm T}=A^{\mathrm T}B^{\mathrm T}$。}
 
-以主对角线为镜像轴，转置相当于把元素在轴的两侧互换。主对角线以外全为零的方阵称为\term{diagonal-matrix}，记作 $\operatorname{diag}(d_1,\ldots,d_n)$；它对应各坐标方向分别按 $d_j$ 伸缩。满足 $A^{\mathrm T}=A$ 的方阵称为\term{symmetric-matrix}；满足 $A^{\mathrm T}=-A$ 的方阵称为\term{skew-symmetric-matrix}，其主对角线元素必为零。例如
-\[
+\par\medskip\noindent\textbf{哪些映射正向与反向采用同一规则？}
+沿各标准坐标方向独立伸缩的映射，对应\term{diagonal-matrix}
+$\operatorname{diag}(d_1,\ldots,d_n)$。每个方向只与自身联系，反向折算仍采用原来的倍数，所以它的转置就是自身。更一般地，满足 $A^{\mathrm T}=A$ 的方阵称为\term{symmetric-matrix}；这表示正向作用与评价的反向传递使用同一规则。由转置定义，它也等价于
+\begin{equation}
+ \boldsymbol{y}\cdot(A\boldsymbol{x})
+ =\boldsymbol{x}\cdot(A\boldsymbol{y})
+ \quad\text{对所有 }\boldsymbol{x},\boldsymbol{y}\text{ 成立}.
+\end{equation}
+互换“被作用的输入”和“评价它的向量”，评分不变，这就是对称性的映射含义。
+
+满足 $A^{\mathrm T}=-A$ 的方阵称为\term{skew-symmetric-matrix}。它的反向评价与正向作用相差一个负号，因而
+\begin{equation}
+ \boldsymbol{y}\cdot(A\boldsymbol{x})
+ =-\boldsymbol{x}\cdot(A\boldsymbol{y}).
+\end{equation}
+取 $\boldsymbol{x}=\boldsymbol{y}$，便有 $\boldsymbol{x}\cdot(A\boldsymbol{x})=0$：非零输出与该输入垂直。再取标准基向量，就看出主对角线元素必为零，因为沿自身方向的分量为零。例如
+\begin{equation}
  \OpMat{rr}{2&-1\\-1&3}\quad\text{是对称矩阵},\qquad
  \OpMat{rr}{0&-2\\2&0}\quad\text{是反对称矩阵}.
-\]
-任意实方阵都可以分为对称与反对称两部分：
-\[
- A=\frac{A+A^{\mathrm T}}2+\frac{A-A^{\mathrm T}}2.
-\]
-对两部分分别取转置，就能核对它们的性质。
+\end{equation}
+右边的映射将平面向量逆时针旋转 $90^\circ$ 并放大两倍，反向评价则对应顺时针旋转并放大两倍，恰好差一个负号。
 
-\par\medskip\noindent\textbf{从转置看四个相关的子空间。}
-第1章已经讲过向量组的张成空间。现在可以把矩阵的两组向量分别组织起来：$A$ 的各列张成的空间称为\term{column-space}，记作 $\operatorname{Col}(A)$；各行竖排后张成的空间称为\term{row-space}，记作 $\operatorname{Row}(A)$。由刚才的线性组合式，
-\[
- \operatorname{Col}(A)=\{A\boldsymbol x:\boldsymbol x\in\mathbb R^n\},
- \qquad
- \operatorname{Row}(A)=\{A^{\mathrm T}\boldsymbol y:\boldsymbol y\in\mathbb R^m\}.
-\]
-列空间回答“$A$ 能产生哪些输出”，行空间回答“把 $A$ 的各行组合起来，能得到哪些向量”。转置恰好把这两个视角接起来：
-\[
- \boxed{\operatorname{Row}(A)=\operatorname{Col}(A^{\mathrm T})},\qquad
- \operatorname{Col}(A)=\operatorname{Row}(A^{\mathrm T}).
-\]
-这不是说 $A$ 自己的行空间与列空间相等。前者位于 $\mathbb R^n$，后者位于 $\mathbb R^m$，连所在空间的维数都可能不同。
+借助已经推导的转置法则，任意实方阵还可以拆成两部分：
+\begin{equation}
+ A=S+K,\qquad
+ S=\frac{A+A^{\mathrm T}}2,\qquad
+ K=\frac{A-A^{\mathrm T}}2,\qquad
+ S^{\mathrm T}=S,\quad K^{\mathrm T}=-K.
+\end{equation}
+其中 $S$ 是正向、反向一致的部分，$K$ 是正向、反向相反的部分。这个拆分只用到了映射的加法、数乘与两次转置还原。
 
-另一个自然问题是：哪些输入会被送到零？把齐次方程 $A\boldsymbol x=\boldsymbol0$ 的全部解组成的集合称为 $A$ 的\term{null-space}，记作 $\operatorname{null}A$。同样可以考察 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$。它的解空间称为 $A$ 的\term{left-null-space}，记作 $\operatorname{null}(A^{\mathrm T})$；名称中的“左”来自等价的写法 $\boldsymbol y^{\mathrm T}A=\boldsymbol0^{\mathrm T}$。如果两个向量都被同一矩阵送到零，那么它们的任意线性组合也被送到零，所以这两组解确实都是子空间。第4章会系统研究零空间与值域；这里先认清它们与转置的联系。
+\par\medskip\noindent\textbf{从评价的流向，看两侧的可达范围。}
+第1章的张成空间给出了一个自然问题：正向映射能产生哪些向量，反向折算又能产生哪些向量？$A$ 的各列张成的空间称为\term{column-space}，记作 $\operatorname{Col}(A)\subseteq\mathbb R^m$；$A$ 的各行竖排后张成的空间称为\term{row-space}，记作 $\operatorname{Row}(A)\subseteq\mathbb R^n$。前者是正向输出的可达范围，后者是反向评价系数的可达范围：
+\begin{equation}
+ \operatorname{Col}(A)=\{A\boldsymbol{x}:\boldsymbol{x}\in\mathbb R^n\},\qquad
+ \operatorname{Row}(A)=\{A^{\mathrm T}\boldsymbol{y}:\boldsymbol{y}\in\mathbb R^m\}.
+\end{equation}
+这是因为 $A$ 按列组合输出，而 $A^{\mathrm T}$ 将原矩阵的各行竖排后组合。于是
+\begin{equation}
+ \boxed{\operatorname{Col}(A^{\mathrm T})=\operatorname{Row}(A)},\qquad
+ \operatorname{Row}(A^{\mathrm T})=\operatorname{Col}(A).
+\end{equation}
+转置交换了两组空间的角色，并没有把它们混成同一个空间：行空间在输入端，列空间在输出端；当 $m\ne n$ 时，它们连所在空间都不同。
 
-这四个对象合称矩阵的\term{fundamental-subspaces}，也常称“四大子空间”。先按所在空间分成两组，后面的关系就不容易混淆：
-\ThreeFigure{转置把矩阵的行组合写成列组合，并引出两组齐次方程。四个子空间分别位于输入空间与输出空间中。}{fig:three-four-subspaces}{%
-\begin{tikzpicture}[font=\small,x=1cm,y=1cm]
- \node[threecard,fill=ThreeBlue!4,minimum width=5.55cm,minimum height=2.6cm] at (2.8,0) {};
- \node[threecard,fill=ThreeGreen!4,minimum width=5.55cm,minimum height=2.6cm] at (11.3,0) {};
- \node[font=\bfseries] at (2.8,.95) {输入所在的空间 $\mathbb R^n$};
- \node[font=\bfseries] at (11.3,.95) {输出所在的空间 $\mathbb R^m$};
- \node[align=center] at (2.8,.15) {$\operatorname{Row}(A)=\operatorname{Col}(A^{\mathrm T})$\\[4pt]组合 $A$ 的行};
- \node[align=center] at (2.8,-.85) {$\operatorname{null}A$：解 $A\boldsymbol x=\boldsymbol0$};
- \node[align=center] at (11.3,.15) {$\operatorname{Col}(A)$\\[4pt]组合 $A$ 的列};
- \node[align=center] at (11.3,-.85) {$\operatorname{null}(A^{\mathrm T})$：解 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$};
- \draw[threearrow,ThreeBlue] (5.7,.45)--node[above] {$A$}(8.4,.45);
- \draw[threearrow,ThreeRose] (8.4,-.45)--node[below] {$A^{\mathrm T}$}(5.7,-.45);
-\end{tikzpicture}}{两条箭头表示 $A$ 与 $A^{\mathrm T}$ 在两个空间之间的作用，不表示互为逆映射。图中先列出四个子空间的位置和求法，它们之间的几何关系将在后文展开。}
+\ThreeFigure{行空间与列空间，分别是反向、正向映射的可达范围。蓝色直线位于三维输入空间，红色直线位于二维输出空间；此图使用秩为1的教学矩阵 $A$。正向 $A$ 与反向 $A^{\mathrm T}$ 分别联系这两条直线，但两者一般不能互相撤销。}{fig:three-transpose-row-column}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \path[use as bounding box] (-.1,-.6) rectangle (14.1,5.2);
+ \foreach \xx in {0,.5,...,14} \draw[trgrid] (\xx,0)--(\xx,4.8);
+ \foreach \yy in {0,.5,...,4.5} \draw[trgrid] (0,\yy)--(14,\yy);
+ \draw[trpanel] (.15,.05) rectangle (5.2,4.65);
+ \draw[trpanel] (8.8,.05) rectangle (13.85,4.65);
+ \node[ThreeBlue,font=\small\bfseries] at (2.7,4.3) {输入空间 $\mathbb R^3$};
+ \node[ThreeRose,font=\small\bfseries] at (11.3,4.3) {输出空间 $\mathbb R^2$};
+ \begin{scope}[shift={(2.1,1.5)},x={(.85cm,-.3cm)},y={(.6cm,.32cm)},z={(0cm,.75cm)}]
+   \draw[opaxis] (-1,0,0)--(2,0,0);
+   \draw[opaxis] (0,-1,0)--(0,2,0);
+   \draw[opaxis] (0,0,-.6)--(0,0,2.5);
+   \draw[ThreeBlue!50,line width=2pt] (-.6,-1.2,-1.8)--(.9,1.8,2.7);
+   \draw[trforward] (0,0,0)--(.7,1.4,2.1);
+   \fill[ThreeGray] (0,0,0) circle (1.4pt);
+ \end{scope}
+ \node[ThreeBlue,align=center] at (2.7,.5)
+ {$\operatorname{Row}(A)$\\$\operatorname{Span}\{(1,2,3)^{\mathrm T}\}$};
+ \begin{scope}[shift={(10.75,1.5)}]
+   \draw[opaxis] (-1.1,0)--(2.25,0);
+   \draw[opaxis] (0,-.65)--(0,2.25);
+   \draw[ThreeRose!50,line width=2pt] (-.6,-1.2)--(1.05,2.1);
+   \draw[oprose] (0,0)--(.8,1.6);
+   \fill[ThreeGray] (0,0) circle (1.4pt);
+ \end{scope}
+ \node[ThreeRose,align=center] at (11.3,.5)
+ {$\operatorname{Col}(A)$\\$\operatorname{Span}\{(1,2)^{\mathrm T}\}$};
+ \draw[trforward] (5.4,3.15)--node[above,trlabel] {$A$}(8.6,3.15);
+ \draw[trback] (8.6,2.1)--node[above,trlabel] {$A^{\mathrm T}$}(5.4,2.1);
+ \node[align=center] at (7,1.1) {$A=\OpMat{ccc}{1&2&3\\2&4&6}$};
+ \node[ThreeGray] at (7,-.4) {两侧均为一维，但向量的坐标分别有3个、2个分量};
+\end{tikzpicture}}{限制在图中的两条直线上，$A$ 与 $A^{\mathrm T}$ 各自是一一对应的映射；这一结构将在第5章说明。双向箭头表示两种作用方向，不表示两种作用互为逆映射。}
 
-\par\medskip\noindent\textbf{用一个小矩阵把四组向量算出来。}
-取
-\[
- A=\OpMat{rrr}{1&2&3\\2&4&6},\qquad
- A^{\mathrm T}=\OpMat{rr}{1&2\\2&4\\3&6}.
-\]
-由于第二、三列分别是第一列的2倍、3倍，第二行是第一行的2倍，所以
-\[
- \operatorname{Col}(A)=\operatorname{Span}\left\{\OpCol{1\\2}\right\}\subseteq\mathbb R^2,
- \qquad
- \operatorname{Row}(A)=\operatorname{Span}\left\{\OpCol{1\\2\\3}\right\}\subseteq\mathbb R^3.
-\]
-两边各由一个非零向量张成，却不是同一个空间。再看两组齐次方程：
-\[
-\begin{aligned}
- A\boldsymbol x=\boldsymbol0
- &\iff x_1+2x_2+3x_3=0
- \iff \boldsymbol x=s\OpCol{-2\\1\\0}+t\OpCol{-3\\0\\1},\quad s,t\in\mathbb R,\\[5pt]
- A^{\mathrm T}\boldsymbol y=\boldsymbol0
- &\iff y_1+2y_2=0
- \iff \boldsymbol y=u\OpCol{-2\\1},\quad u\in\mathbb R.
-\end{aligned}
-\]
-因此 $\operatorname{null}A$ 是三维输入空间中的一个过原点平面，$\operatorname{null}(A^{\mathrm T})$ 是二维输出空间中的一条过原点直线。前者描述不同输入怎样相互抵消；后者描述不同输出分量之间有哪些恒成立的线性关系。例如 $\boldsymbol y=(-2,1)^{\mathrm T}$ 给出 $-2$ 倍第一行加第二行等于零，也就说明任意输出的第二分量都是第一分量的2倍。
+\par\medskip\noindent\textbf{哪些输入消失，哪些评价永远读不到输出？}
+有些输入经过 $A$ 得到零，组成矩阵的\term{null-space}：
+\begin{equation}
+ \operatorname{Null}(A)
+ =\{\boldsymbol{x}\in\mathbb R^n:A\boldsymbol{x}=\boldsymbol{0}\}.
+\end{equation}
+例如推荐模型中某些权重置换恰好抵消，特征得分便完全不变。反向也可能出现抵消：有些评价权重 $\boldsymbol{y}$ 满足 $A^{\mathrm T}\boldsymbol{y}=\boldsymbol{0}$，它们构成\term{left-null-space}：
+\begin{equation}
+ \operatorname{Null}(A^{\mathrm T})
+ =\{\boldsymbol{y}\in\mathbb R^m:A^{\mathrm T}\boldsymbol{y}=\boldsymbol{0}\}.
+\end{equation}
+这些评价对所有可达输出都给出零分，因此揭示了输出间恒成立的线性约束；“左”也可由等价写法 $\boldsymbol{y}^{\mathrm T}A=\boldsymbol{0}^{\mathrm T}$ 理解。在刚才的二维输出例子中，第二分量总是第一分量的两倍，评价权重 $(-2,1)^{\mathrm T}$ 对任何输出都评分为零。左零空间位于输出端，不是原输入的零空间。
 
-\par\medskip\noindent\textbf{“相乘为零”留下了怎样的几何线索？}
-如果 $\boldsymbol x\in\operatorname{null}A$，那么 $A$ 的每一行与 $\boldsymbol x$ 的对应分量乘积之和都为0。这对各行的任意线性组合也成立。若 $\boldsymbol r=A^{\mathrm T}\boldsymbol c\in\operatorname{Row}(A)$，则由乘积转置法则与结合律，
-\[
- \boldsymbol r^{\mathrm T}\boldsymbol x
- =(A^{\mathrm T}\boldsymbol c)^{\mathrm T}\boldsymbol x
- =\boldsymbol c^{\mathrm T}A\boldsymbol x=0.
-\]
-同理，若 $\boldsymbol y\in\operatorname{null}(A^{\mathrm T})$，则它与每个可能输出 $\boldsymbol b=A\boldsymbol z\in\operatorname{Col}(A)$ 都满足
-\[
- \boldsymbol y^{\mathrm T}\boldsymbol b
- =\boldsymbol y^{\mathrm T}A\boldsymbol z
- =(A^{\mathrm T}\boldsymbol y)^{\mathrm T}\boldsymbol z=0.
-\]
-这里每个结果都是一个数，只需按“对应分量相乘再相加”来核对。在上述算例中，若 $A\boldsymbol x=\boldsymbol b$ 有解，就必须有 $-2b_1+b_2=0$；例如 $(1,2)^{\mathrm T}$ 可以得到，而 $(1,3)^{\mathrm T}$ 不可能得到。转置因此也能帮助我们找出输出必须满足的条件。
+几何关系现在也有了直接的评分解释。如果输入 $\boldsymbol{x}$ 被 $A$ 消去，则所有反向传回来的评价系数都读不到它；如果输出评价 $\boldsymbol{y}$ 被 $A^{\mathrm T}$ 消去，则它读不到任何正向输出。由式 \eqref{eq:three-transpose-pairing}，
+\begin{equation}
+ \begin{gathered}
+ A\boldsymbol{x}=\boldsymbol{0}
+ \ \Longrightarrow\
+ (A^{\mathrm T}\boldsymbol{y})\cdot\boldsymbol{x}=0
+ \quad\text{对所有 }\boldsymbol{y},\\
+ A^{\mathrm T}\boldsymbol{y}=\boldsymbol{0}
+ \ \Longrightarrow\
+ \boldsymbol{y}\cdot(A\boldsymbol{x})=0
+ \quad\text{对所有 }\boldsymbol{x}.
+ \end{gathered}
+\end{equation}
+用第0章的\term{orthogonality}语言来说，行空间与零空间互相正交，列空间与左零空间互相正交。这不是把状态“倒放”，而是在同一评分关系的两端，认出能够起作用的方向与评分看不见的方向。
 
-到第7章，这种“对应分量乘积之和为0”会用\term{orthogonality}统一描述：行空间与零空间是一对，列空间与左零空间是另一对。它们是否已经包含了彼此所有正交的向量、维数如何配合，需要后面的理论继续回答。本节先掌握这条线索：\textbf{转置使“列的组合”与“行的关系”能够使用同一套矩阵语言。}
+\ThreeFigure{四个基本子空间的对偶结构。输入端的蓝色行空间与绿色零空间正交，输出端的红色列空间与绿色左零空间正交。$A$ 与 $A^{\mathrm T}$ 分别联系两侧的有效方向，而两侧的零空间分别被对应映射送到另一侧的零向量；图中的分区只示意角色，不表示维数相等。}{fig:three-four-subspaces}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \path[use as bounding box] (-.1,-.75) rectangle (14.1,5.85);
+ \foreach \xx in {0,.5,...,14} \draw[trgrid] (\xx,-.3)--(\xx,5.5);
+ \foreach \yy in {0,.5,...,5.5} \draw[trgrid] (0,\yy)--(14,\yy);
+ \draw[trpanel] (.15,.05) rectangle (5.35,5.25);
+ \draw[trpanel] (8.65,.05) rectangle (13.85,5.25);
+ \node[ThreeBlue,font=\small\bfseries] at (2.75,5.6) {输入空间 $\mathbb R^n$};
+ \node[ThreeRose,font=\small\bfseries] at (11.25,5.6) {输出空间 $\mathbb R^m$};
+ \fill[ThreeBlue!7,rounded corners=2pt] (.4,2.75) rectangle (5.1,5);
+ \fill[ThreeGreen!8,rounded corners=2pt] (.4,.3) rectangle (5.1,2.35);
+ \fill[ThreeRose!7,rounded corners=2pt] (8.9,.3) rectangle (11.6,5);
+ \fill[ThreeGreen!8,rounded corners=2pt] (12,.3) rectangle (13.6,5);
+ \node[ThreeBlue,align=center] at (2.75,4.55)
+ {$\operatorname{Row}(A)$\\[3pt]可起作用的输入方向};
+ \node[ThreeGreen,align=center] at (2.75,1.85)
+ {$\operatorname{Null}(A)$\\[3pt]被 $A$ 消去的输入};
+ \node[ThreeGray] at (2.75,2.55) {$\perp$};
+ \node[ThreeRose,align=center] at (10.25,4.5)
+ {$\operatorname{Col}(A)$\\[3pt]全部可达输出};
+ \node[ThreeGreen,align=center] at (12.8,3.35)
+ {$\operatorname{Null}(A^{\mathrm T})$\\[4pt]被 $A^{\mathrm T}$\\消去的评价};
+ \node[ThreeGray] at (11.8,3.65) {$\perp$};
+ \draw[trforward] (4.8,3.9)--node[above,trlabel] {$A$}(9.5,3.9);
+ \draw[trback] (9.5,3.05)--node[above,trlabel] {$A^{\mathrm T}$}(4.8,3.05);
+ \fill[ThreeBlue] (1.1,3.35) circle (2pt);
+ \node[ThreeBlue,right] at (1.1,3.35) {$\boldsymbol{0}$};
+ \fill[ThreeRose] (9.65,1.15) circle (2pt);
+ \node[ThreeRose,below] at (9.65,1.15) {$\boldsymbol{0}$};
+ \draw[-{Stealth[length=2mm]},ThreeGreen,densely dashed,line width=.95pt]
+ (4.5,1.15)--node[above,trlabel] {$A\boldsymbol{x}=\boldsymbol{0}$}(9.6,1.15);
+ \draw[-{Stealth[length=2mm]},ThreeGreen,densely dashed,line width=.95pt]
+ (12.7,.6) .. controls (11.8,-.55) and (1.1,-.55) .. (1.1,3.3);
+ \node[trlabel,text=ThreeGreen] at (7,-.35) {$A^{\mathrm T}\boldsymbol{y}=\boldsymbol{0}$};
+\end{tikzpicture}}{实线只连接行空间与列空间，虚线分别表示“输入被 $A$ 消去”和“评价被 $A^{\mathrm T}$ 消去”。零空间不在产生输出的必经路径上；四个子空间的维数配合与完整分解将在第5章展开。}
+
+这四个对象合称\term{fundamental-subspaces}。此处先认清位置与作用：输入端有行空间、零空间，输出端有列空间、左零空间。第4章将从映射研究零空间与值域，第5章再证明它们怎样正交互补、怎样共同决定解的存在性与自由度。转置提供了连接这两端的评价关系，使“哪些输入起作用”与“哪些输出能得到”可以放在同一张图中理解。
+
+我们已经能沿正向、反向两个方向组织同一组作用系数。实际工程还常把输入、输出按设备、区域或功能分组：若每一组单独记录，矩阵能否按块计算？这就引出下面的分块矩阵。
+\par\endgroup
+% TRANSPOSE DUAL MAP END
 
 \subsection{分块矩阵}
 
