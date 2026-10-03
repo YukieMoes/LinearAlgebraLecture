@@ -7,9 +7,11 @@
 \GlossaryEntry{映射的加法}{Addition of Maps}{对同定义域、同目标空间的映射逐点相加，$(S+T)(\boldsymbol x)=S(\boldsymbol x)+T(\boldsymbol x)$。}
 \GlossaryEntry{相反向量}{Additive Inverse}{与原向量相加得到零向量的向量，记为 $-\boldsymbol v$。}
 \GlossaryEntry{可加性}{Additivity}{映射保持向量加法的性质，即 $T(\boldsymbol x+\boldsymbol y)=T(\boldsymbol x)+T(\boldsymbol y)$。}
+\GlossaryEntry{伴随矩阵}{Adjugate Matrix}{代数余子式数表的转置，记作 $\operatorname {adj}(A)$；其第 $i$ 列是第 $i$ 行对应的代数余子式向量，满足 $A\operatorname {adj}(A)=\det (A)E$。}
 \GlossaryEntry{仿射映射}{Affine Map}{由线性作用与固定平移组成的映射 $\boldsymbol x\mapsto A\boldsymbol x+\boldsymbol a$；在原向量空间中，只有 $\boldsymbol a=\boldsymbol 0$ 时才是线性映射。}
 \GlossaryEntry{仿射子空间}{Affine Subspace}{子空间的一次平移 $\boldsymbol p+W$；其维数为 $\dim W$，当 $\boldsymbol p\notin W$ 时不经过原点。}
 \GlossaryEntry{交替最小二乘法}{Alternating Least Squares}{交替固定一组参数、对另一组参数求解最小二乘问题的方法；第3章以它说明推荐教学模型中的矩阵求解。}
+\GlossaryEntry{交错性}{Alternation}{本书实数情形中，交换两个输入使函数值变号的性质；与多重线性结合时，两输入相同则值为0。}
 \GlossaryEntry{向量夹角}{Angle Between Vectors}{两个非零实向量的夹角，取值在 $[0,\pi ]$；余弦等于点积除以两向量长度之积。}
 \GlossaryEntry{辐角}{Argument}{从正实轴转向非零复数所对应向量的有向角，相差 $2k\pi $ 的角表示同一方向。}
 \GlossaryEntry{结合律}{Associative Law}{改变相邻运算的分组方式不改变结果；如 $(\boldsymbol u+\boldsymbol v)+\boldsymbol w=\boldsymbol u+(\boldsymbol v+\boldsymbol w)$。}
@@ -35,6 +37,8 @@
 \GlossaryEntry{陪域}{Codomain}{定义映射时预先指定的目标集合；对 $T:\mathbb R^n\to \mathbb R^m$，陪域为 $\mathbb R^m$，其中的元素不一定都被取到。}
 \GlossaryEntry{系数}{Coefficient}{在给定表达式中乘在未知数或向量前的数。}
 \GlossaryEntry{系数矩阵}{Coefficient Matrix}{按固定未知数次序逐行收集线性方程组系数形成的数表。}
+\GlossaryEntry{代数余子式}{Cofactor}{余子式乘位置符号所得的数，$A_{ij}=(-1)^{i+j}M_{ij}$；本章矩阵元素另记作小写 $a_{ij}$。}
+\GlossaryEntry{代数余子式向量}{Cofactor Vector}{由某一行的全部代数余子式组成的向量，记作 $\boldsymbol c_i$；垂直于其余各行，与该行的点积为行列式。}
 \GlossaryEntry{冷启动}{Cold Start}{新用户或新内容缺少交互记录、相应参数尚未充分训练的推荐问题；不能简单等同于向量不在某个子空间中。}
 \GlossaryEntry{共线}{Collinear}{向量起点统一后位于同一直线上；两个非零向量共线当且仅当一个是另一个的数倍。}
 \GlossaryEntry{列秩}{Column Rank}{矩阵列向量张成空间的维数；等于矩阵的秩，也等于行秩。}
@@ -56,6 +60,7 @@
 \GlossaryEntry{坐标}{Coordinates}{向量关于一组有序基的唯一线性表示系数，随所选基及其顺序而定。}
 \GlossaryEntry{共面}{Coplanar}{向量起点统一后位于同一个平面内；三个空间向量共面时线性相关。}
 \GlossaryEntry{余弦相似度}{Cosine Similarity}{两个非零实向量的标准内积除以各自长度的乘积，用于比较方向的接近程度。}
+\GlossaryEntry{叉乘}{Cross Product}{两支三维向量所确定的法向量，长度为平行四边形面积，方向按右手法则；共线时为零向量。}
 \GlossaryLetter{D}
 \GlossaryEntry{棣莫弗定理}{De Moivre's Theorem}{对整数 $n$，$(\cos \theta +i\sin \theta )^n=\cos (n\theta )+i\sin (n\theta )$。}
 \GlossaryEntry{自由度}{Degrees of Freedom}{表示全部解所需的独立自由参数个数；线性方程组有解时等于相应零空间的维数。}
@@ -138,10 +143,15 @@
 \GlossaryEntry{反函数}{Inverse Function}{在指定定义域与目标集合之间，双射函数把输出唯一还原为输入的函数；它与原函数两个方向的复合均为相应集合的恒等映射。}
 \GlossaryEntry{逆映射}{Inverse Map}{双射把每个输出反查为唯一输入的映射；双射线性映射的逆仍是线性映射。}
 \GlossaryEntry{逆矩阵}{Inverse Matrix}{满足 $AB=BA=E$ 的方阵 $B$，记为 $A^{-1}$，表示撤销 $A$ 对应线性作用的映射。}
+\GlossaryEntry{逆序数}{Inversion Number}{排列中前项大于后项的数对个数；行列式项的符号为 $(-1)^{N(\sigma )}$。}
 \GlossaryEntry{可逆矩阵}{Invertible Matrix}{存在双侧逆的方阵；等价于对应线性映射为双射。}
+\GlossaryLetter{J}
+\GlossaryEntry{雅可比行列式}{Jacobian Determinant}{输入与输出维数相同时，雅可比矩阵的行列式；绝对值表示局部的面积或体积缩放倍率，正负记录方向。}
+\GlossaryEntry{雅可比矩阵}{Jacobian Matrix}{按输出分量为行、输入坐标为列排列偏导数的矩阵；在固定一点，把输入小变化映到输出的一阶变化。}
 \GlossaryLetter{K}
 \GlossaryEntry{键}{Key}{注意力计算中与查询配对、用来计算关联分数的向量，常按行组成矩阵 $K$。}
 \GlossaryLetter{L}
+\GlossaryEntry{拉普拉斯展开}{Laplace Expansion}{沿固定的一行或一列，将元素与对应代数余子式的乘积求和，得到整个行列式的计算公式。}
 \GlossaryEntry{隐因子}{Latent Factor}{模型用于表示潜在联系的向量分量；本章以少量隐因子展示用户与内容的匹配。}
 \GlossaryEntry{余弦定理}{Law of Cosines}{三角形一边的平方等于另两边的平方和减去这两边与其夹角余弦乘积的两倍；将勾股定理推广到任意三角形。}
 \GlossaryEntry{最小二乘法}{Least Squares}{通过使误差平方和尽可能小来确定参数的方法；第3章先应用其线性方程形式，第5.7节用正交直和说明最优近似与解的结构。}
@@ -161,6 +171,7 @@
 \GlossaryEntry{线性相关}{Linearly Dependent}{存在不全为零的系数，使给定向量组的线性组合等于零向量。}
 \GlossaryEntry{线性无关}{Linearly Independent}{只有全部系数为零，给定向量组的线性组合才等于零向量。}
 \GlossaryEntry{荷载工况}{Load Case}{结构分析中一组指定的外部荷载情形；结构参数固定时，不同工况通常对应不同右端项。}
+\GlossaryEntry{局部线性化}{Local Linearization}{在固定位置，用一个线性映射近似输入小变化引起的输出变化；加上起点输出后的近似通常是仿射映射，不是把原函数变成全局线性函数。}
 \GlossaryEntry{下三角矩阵}{Lower Triangular Matrix}{主对角线上方全为零的方阵。}
 \GlossaryEntry{LU分解}{LU Factorization}{将矩阵写成 $A=LU$，其中 $L$ 为单位下三角矩阵，$U$ 为上三角矩阵，用来保存并复用无换行消元。}
 \GlossaryLetter{M}
@@ -174,7 +185,9 @@
 \GlossaryEntry{矩阵数乘}{Matrix Scalar Multiplication}{将矩阵每个元素同乘一个标量，表示把线性映射的所有输出作相同倍数的缩放。}
 \GlossaryEntry{极大线性无关组}{Maximal Linearly Independent Subset}{从原向量组中选出的无关部分组，并能线性表示原组的全部向量。}
 \GlossaryEntry{度量结构}{Metric Structure}{用于刻画长度、夹角等几何量的附加结构；本书第0章从实向量的标准点积出发建立直观。}
+\GlossaryEntry{余子式}{Minor}{删去指定元素所在的一行和一列，保留其余行列次序得到的低一阶行列式，记作 $M_{ij}$；约定0阶行列式为1。}
 \GlossaryEntry{模}{Modulus}{复数 $z=a+bi$ 对应点到原点的距离，$|z|=\sqrt {a^2+b^2}$。}
+\GlossaryEntry{多重线性}{Multilinearity}{多输入函数固定其他输入后，对每一个输入分别保持加法与数乘；不是要求所有输入同时改变时仍整体线性。}
 \GlossaryLetter{N}
 \GlossaryEntry{$n$ 维实向量}{n-Dimensional Real Vector}{由 $n$ 个实数按固定次序组成的数组，是 $\mathbb R^n$ 的元素。}
 \GlossaryEntry{必要条件}{Necessary Condition}{某结论成立时必须满足的条件；条件成立本身未必能推出该结论。例如，线性映射必须把零向量送到零向量。}
@@ -183,6 +196,8 @@
 \GlossaryEntry{非齐次递推}{Nonhomogeneous Recurrence}{带不恒为零的给定外部输入的线性状态更新，如 $\boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u_k$；其通解是一串特解加任意齐次解序列。}
 \GlossaryEntry{非零解}{Nontrivial Solution}{分量不全为0的解向量；不要求每个分量都非零。}
 \GlossaryEntry{正规方程}{Normal Equations}{最小二乘问题对应的线性方程组 $A^{\mathrm T}A\boldsymbol x=A^{\mathrm T}\boldsymbol b$；它始终有解，全部解构成原矩阵零空间的一次平移。}
+\GlossaryEntry{法向量}{Normal Vector}{垂直于所讨论平面或其方向子空间的非零向量；底面不退化时，叉乘与代数余子式向量提供相应的构造。}
+\GlossaryEntry{归一化}{Normalization}{选定度量基准的条件；行列式规定标准基有序组或单位矩阵的值为1，以固定整体尺度。}
 \GlossaryEntry{复数的 $n$ 次根}{nth Root of a Complex Number}{满足 $w^n=z$ 的复数 $w$；非零复数有 $n$ 个互异的 $n$ 次根。}
 \GlossaryEntry{零空间}{Null Space}{线性映射把它映为零向量的全部输入所成的子空间，记为 $\operatorname {null}T$；矩阵的零空间就是齐次方程组的解空间。}
 \GlossaryEntry{零度}{Nullity}{线性映射或矩阵的零空间的维数；等于相应齐次方程组自由变量的个数。}
@@ -191,6 +206,9 @@
 \GlossaryEntry{斜投影}{Oblique Projection}{沿与目标子空间不垂直的互补方向投到该子空间、并保持其上的向量不动的线性映射；本章以沿 $(1,1,1)^{\mathrm T}$ 投到 $xy$ 平面为例。}
 \GlossaryEntry{一一对应}{One-to-One Correspondence}{两类对象之间互相唯一确定、没有遗漏的配对关系；固定标准基后，$\mathbb R^n$ 到 $\mathbb R^m$ 的线性映射与 $m\times n$ 矩阵一一对应。}
 \GlossaryEntry{有序基}{Ordered Basis}{指定了基向量先后次序的一组基，坐标必须按该次序排列。}
+\GlossaryEntry{有向面积}{Oriented Area}{按两条边的先后次序记录正负的平行四边形面积；平面标准定向中逆时针为正，共线时为0。}
+\GlossaryEntry{有向体积}{Oriented Volume}{按有序边的定向记录正负的体积；三维中由混合积给出，通常体积为其绝对值。}
+\GlossaryEntry{正交补向量}{Orthogonal Complement Vector}{本章指按既定方向约定选出的垂直向量；二维取原向量逆时针旋转90度的像，高维余子式向量垂直于其余各行。}
 \GlossaryEntry{正交互补子空间}{Orthogonal Complementary Subspaces}{在给定实向量空间中互相正交，且直和等于整个空间的两个子空间；每个向量均有唯一分解，二者维数之和等于环境空间的维数，并不要求维数相等。}
 \GlossaryEntry{正交直和}{Orthogonal Direct Sum}{互相正交的子空间所构成的直和；其中每个向量的分量分解唯一。}
 \GlossaryEntry{正交矩阵}{Orthogonal Matrix}{满足 $Q^{\mathrm T}Q=E$ 的实方阵；列向量单位且两两垂直，逆矩阵等于转置，保持标准点积；不一定表示旋转，也可能包含反射。}
@@ -201,9 +219,11 @@
 \GlossaryLetter{P}
 \GlossaryEntry{平行四边形定则}{Parallelogram Rule}{以同一起点的两个向量为邻边作平行四边形，其从共同起点出发的对角线表示向量和。}
 \GlossaryEntry{平行多面体}{Parallelotope}{由同一空间中的向量作为邻边、系数分别在0到1之间变化而得到的区域；边向量相关时退化到较低维子空间。}
+\GlossaryEntry{偏导数}{Partial Derivative}{固定其余输入变量，只改变一个变量时的瞬时变化率；在二元曲面上对应固定另一坐标的截线切线斜率。}
 \GlossaryEntry{部分选主元}{Partial Pivoting}{每一步在当前列尚未处理的行中选绝对值最大的元素，交换到主元行后再消元。}
 \GlossaryEntry{特解}{Particular Solution}{一个确实满足给定方程组的具体解；一个特解未必代表全部解。}
 \GlossaryEntry{被动旋转}{Passive Rotation}{向量不动，转动描述它的坐标架；新坐标由对应主动旋转矩阵的逆矩阵换算。}
+\GlossaryEntry{排列}{Permutation}{把 $1,\ldots ,n$ 的全部下标按某一顺序重排，或相应的下标一一对应；行列式排列式中每行每列恰取一个元素。}
 \GlossaryEntry{置换矩阵}{Permutation Matrix}{单位矩阵的行重新排列所得矩阵，每行每列恰有一个1；左乘它可重排行，且 $P^{-1}=P^{\mathrm T}$。}
 \GlossaryEntry{状态平面}{Phase Plane}{用二维状态的两个分量作为坐标形成的平面；点代表状态，曲线代表状态演化，不一定是物体运动的实际空间。}
 \GlossaryEntry{主元}{Pivot}{阶梯形非零行的首个非零元素，用于组织消元与确定主元变量。}
@@ -255,6 +275,7 @@
 \GlossaryEntry{标量}{Scalar}{来自所选域、用于数乘向量的数。}
 \GlossaryEntry{数乘}{Scalar Multiplication}{以一个标量乘一个向量；在 $\mathbb R^n$ 中，每个分量都乘同一个数。}
 \GlossaryEntry{映射的数乘}{Scalar Multiplication of a Map}{把映射的每个输出同乘标量，$(\lambda T)(\boldsymbol x)=\lambda T(\boldsymbol x)$。}
+\GlossaryEntry{混合积}{Scalar Triple Product}{三维中的 $\boldsymbol w\cdot (\boldsymbol u\times \boldsymbol v)$；给出三条有序边围出的有向体积，循环换序不变、交换两条边变号。}
 \GlossaryEntry{缩放变换}{Scaling Transformation}{将各坐标分量分别乘以固定实数的线性变换；所有缩放因子非零时可逆，因子为零时会压缩相应方向。}
 \GlossaryEntry{剪切变换}{Shear Transformation}{保持一组平行方向不变、使另一方向按位置成比例偏移的线性变换；平面例为 $(x,y)\mapsto (x+ky,y)$。}
 \GlossaryEntry{Sigmoid函数}{Sigmoid Function}{本书指函数 $\sigma (t)=1/(1+e^{-t})$，把实数映入0与1之间；数值处于该区间不自动保证概率预测准确。}
@@ -296,6 +317,7 @@
 \GlossaryEntry{三角形定则}{Triangle Rule}{把两个向量首尾相接，从第一支起点指向第二支终点的向量表示它们的和。}
 \GlossaryEntry{零解}{Trivial Solution}{所有未知数均为0的解，是任意齐次线性方程组的一个解。}
 \GlossaryEntry{平凡子空间}{Trivial Subspaces}{所讨论空间的零子空间与全空间；零空间情形二者重合。}
+\GlossaryEntry{二维广义叉乘}{Two-Dimensional Generalized Cross Product}{本章采用一个平面向量输入的垂直生成操作，$(a,b)^{\mathrm T}\mapsto (-b,a)^{\mathrm T}$；区别于三维的双向量叉乘。}
 \GlossaryEntry{双塔召回模型}{Two-Tower Retrieval Model}{分别生成用户与候选内容的向量表征，再按匹配程度筛选候选的模型；两座塔通常包含非线性运算。}
 \GlossaryLetter{U}
 \GlossaryEntry{唯一解}{Unique Solution}{方程组恰有一个解向量；有解且没有自由变量时出现。}

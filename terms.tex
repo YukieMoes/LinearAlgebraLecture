@@ -324,3 +324,26 @@
 
 % 第5.10节：推荐系统的解结构案例。
 \DeclareLectureTerm{cold-start}{冷启动}{Cold Start}{新用户或新内容缺少交互记录、相应参数尚未充分训练的推荐问题；不能简单等同于向量不在某个子空间中。}
+
+% 第6章：从有向面积、体积到归一化的交错多重线性函数。
+\DeclareLectureTerm{oriented-area}{有向面积}{Oriented Area}{按两条边的先后次序记录正负的平行四边形面积；平面标准定向中逆时针为正，共线时为0。}
+\DeclareLectureTerm{oriented-volume}{有向体积}{Oriented Volume}{按有序边的定向记录正负的体积；三维中由混合积给出，通常体积为其绝对值。}
+\DeclareLectureTerm{orthogonal-complement-vector}{正交补向量}{Orthogonal Complement Vector}{本章指按既定方向约定选出的垂直向量；二维取原向量逆时针旋转90度的像，高维余子式向量垂直于其余各行。}
+\DeclareLectureTerm{generalized-cross-product-2d}{二维广义叉乘}{Two-Dimensional Generalized Cross Product}{本章采用一个平面向量输入的垂直生成操作，$(a,b)^{\mathrm T}\mapsto(-b,a)^{\mathrm T}$；区别于三维的双向量叉乘。}
+\DeclareLectureTerm{cross-product}{叉乘}{Cross Product}{两支三维向量所确定的法向量，长度为平行四边形面积，方向按右手法则；共线时为零向量。}
+\DeclareLectureTerm{normal-vector}{法向量}{Normal Vector}{垂直于所讨论平面或其方向子空间的非零向量；底面不退化时，叉乘与代数余子式向量提供相应的构造。}
+\DeclareLectureTerm{scalar-triple-product}{混合积}{Scalar Triple Product}{三维中的 $\boldsymbol w\cdot(\boldsymbol u\times\boldsymbol v)$；给出三条有序边围出的有向体积，循环换序不变、交换两条边变号。}
+\DeclareLectureTerm{multilinearity}{多重线性}{Multilinearity}{多输入函数固定其他输入后，对每一个输入分别保持加法与数乘；不是要求所有输入同时改变时仍整体线性。}
+\DeclareLectureTerm{alternation}{交错性}{Alternation}{本书实数情形中，交换两个输入使函数值变号的性质；与多重线性结合时，两输入相同则值为0。}
+\DeclareLectureTerm{normalization}{归一化}{Normalization}{选定度量基准的条件；行列式规定标准基有序组或单位矩阵的值为1，以固定整体尺度。}
+\DeclareLectureTerm{permutation}{排列}{Permutation}{把 $1,\ldots,n$ 的全部下标按某一顺序重排，或相应的下标一一对应；行列式排列式中每行每列恰取一个元素。}
+\DeclareLectureTerm{inversion-number}{逆序数}{Inversion Number}{排列中前项大于后项的数对个数；行列式项的符号为 $(-1)^{N(\sigma)}$。}
+\DeclareLectureTerm{minor}{余子式}{Minor}{删去指定元素所在的一行和一列，保留其余行列次序得到的低一阶行列式，记作 $M_{ij}$；约定0阶行列式为1。}
+\DeclareLectureTerm{cofactor}{代数余子式}{Cofactor}{余子式乘位置符号所得的数，$A_{ij}=(-1)^{i+j}M_{ij}$；本章矩阵元素另记作小写 $a_{ij}$。}
+\DeclareLectureTerm{cofactor-vector}{代数余子式向量}{Cofactor Vector}{由某一行的全部代数余子式组成的向量，记作 $\boldsymbol c_i$；垂直于其余各行，与该行的点积为行列式。}
+\DeclareLectureTerm{laplace-expansion}{拉普拉斯展开}{Laplace Expansion}{沿固定的一行或一列，将元素与对应代数余子式的乘积求和，得到整个行列式的计算公式。}
+\DeclareLectureTerm{adjugate-matrix}{伴随矩阵}{Adjugate Matrix}{代数余子式数表的转置，记作 $\operatorname{adj}(A)$；其第 $i$ 列是第 $i$ 行对应的代数余子式向量，满足 $A\operatorname{adj}(A)=\det(A)E$。}
+\DeclareLectureTerm{local-linearization}{局部线性化}{Local Linearization}{在固定位置，用一个线性映射近似输入小变化引起的输出变化；加上起点输出后的近似通常是仿射映射，不是把原函数变成全局线性函数。}
+\DeclareLectureTerm{partial-derivative}{偏导数}{Partial Derivative}{固定其余输入变量，只改变一个变量时的瞬时变化率；在二元曲面上对应固定另一坐标的截线切线斜率。}
+\DeclareLectureTerm{jacobian-matrix}{雅可比矩阵}{Jacobian Matrix}{按输出分量为行、输入坐标为列排列偏导数的矩阵；在固定一点，把输入小变化映到输出的一阶变化。}
+\DeclareLectureTerm{jacobian-determinant}{雅可比行列式}{Jacobian Determinant}{输入与输出维数相同时，雅可比矩阵的行列式；绝对值表示局部的面积或体积缩放倍率，正负记录方向。}
