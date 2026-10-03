@@ -343,7 +343,29 @@
 \DeclareLectureTerm{cofactor-vector}{代数余子式向量}{Cofactor Vector}{由某一行的全部代数余子式组成的向量，记作 $\boldsymbol c_i$；垂直于其余各行，与该行的点积为行列式。}
 \DeclareLectureTerm{laplace-expansion}{拉普拉斯展开}{Laplace Expansion}{沿固定的一行或一列，将元素与对应代数余子式的乘积求和，得到整个行列式的计算公式。}
 \DeclareLectureTerm{adjugate-matrix}{伴随矩阵}{Adjugate Matrix}{代数余子式数表的转置，记作 $\operatorname{adj}(A)$；其第 $i$ 列是第 $i$ 行对应的代数余子式向量，满足 $A\operatorname{adj}(A)=\det(A)E$。}
-\DeclareLectureTerm{local-linearization}{局部线性化}{Local Linearization}{在固定位置，用一个线性映射近似输入小变化引起的输出变化；加上起点输出后的近似通常是仿射映射，不是把原函数变成全局线性函数。}
+
+% 附录B：多元微积分的线性代数脚手架；全部为选读拓展。
+\DeclareLectureTerm{level-curve}{等高线}{Level Curve}{二元标量函数中具有相同函数值的输入点组成的曲线；非零梯度垂直于经过该点的等高线切向。}
+\DeclareLectureTerm{conservative-force}{保守力}{Conservative Force}{可由单值势能函数的负梯度表示的力；力的方向指向势能下降的方向。}
+\DeclareLectureTerm{scalar-field}{标量场}{Scalar Field}{给空间中每个位置指定一个数的函数，如高度、温度；输入可用位置向量表示，输出是标量。}
 \DeclareLectureTerm{partial-derivative}{偏导数}{Partial Derivative}{固定其余输入变量，只改变一个变量时的瞬时变化率；在二元曲面上对应固定另一坐标的截线切线斜率。}
+\DeclareLectureTerm{gradient}{梯度}{Gradient}{把标量函数对各输入坐标的偏导数按顺序排成的列向量；对平滑函数，非零梯度指向每单位距离上升最快的方向。}
+\DeclareLectureTerm{directional-derivative}{方向导数}{Directional Derivative}{沿指定单位方向的瞬时变化率；对本附录的平滑函数，等于梯度与该单位方向的点积，是带符号的投影长度。}
+\DeclareLectureTerm{riemann-sum}{黎曼和}{Riemann Sum}{把区域分成有限小块，将每块中的函数采样值乘以该块大小后求和；网格逐渐细分时用于描述积分的累积思想。}
+\DeclareLectureTerm{double-integral}{二重积分}{Double Integral}{对平面区域上小面积的函数贡献进行累积的积分；可表示曲面下的体积或由面密度决定的总质量。}
+\DeclareLectureTerm{triple-integral}{三重积分}{Triple Integral}{对空间区域上小体积的函数贡献进行累积的积分；如把体密度乘体积微元后相加得到总质量。}
+\DeclareLectureTerm{polar-coordinates}{极坐标}{Polar Coordinates}{用到原点的距离 $r$ 与方向角 $\theta$ 描述平面位置，满足 $x=r\cos\theta,y=r\sin\theta$；面积微元为 $r\,\mathrm dr\,\mathrm d\theta$。}
 \DeclareLectureTerm{jacobian-matrix}{雅可比矩阵}{Jacobian Matrix}{按输出分量为行、输入坐标为列排列偏导数的矩阵；在固定一点，把输入小变化映到输出的一阶变化。}
 \DeclareLectureTerm{jacobian-determinant}{雅可比行列式}{Jacobian Determinant}{输入与输出维数相同时，雅可比矩阵的行列式；绝对值表示局部的面积或体积缩放倍率，正负记录方向。}
+\DeclareLectureTerm{divergence}{散度}{Divergence}{向量场各分量对相同坐标方向的偏导数之和，即场的雅可比矩阵的迹；表示局部单位体积的净流出率。}
+\DeclareLectureTerm{trace}{迹}{Trace}{方阵主对角线上元素的和，记作 $\operatorname{tr}A$；在线性向量场中表示体积的瞬时相对膨胀率。}
+\DeclareLectureTerm{curl}{旋度}{Curl}{三维向量场横向偏导数按叉乘结构成对作差得到的向量，描述局部旋转倾向；刚体旋转场的旋度为角速度向量的两倍。}
+\DeclareLectureTerm{potential-function}{势函数}{Potential Function}{其梯度给出某个向量场的标量函数；物理中的保守力也常以负梯度表示。无旋场能否在整个区域具有势函数还取决于区域条件。}
+\DeclareLectureTerm{local-linearization}{局部线性化}{Local Linearization}{在固定位置，用一个线性映射近似输入小变化引起的输出变化；加上起点输出后的近似通常是仿射映射，不是把原函数变成全局线性函数。}
+\DeclareLectureTerm{tangent-plane}{切平面}{Tangent Plane}{平滑曲面在一点附近的一阶仿射近似，由该点高度和各输入方向的偏导数决定。}
+\DeclareLectureTerm{chain-rule}{链式法则}{Chain Rule}{复合函数的局部变化率由各层局部映射复合得到；多元情形按正确取值位置将雅可比矩阵依次相乘。}
+\DeclareLectureTerm{loss-function}{损失函数}{Loss Function}{用一个标量衡量模型预测与目标的偏差或其他训练目标的函数；把模型参数视为输入时，是一个多元标量函数。}
+\DeclareLectureTerm{gradient-descent}{梯度下降}{Gradient Descent}{按负梯度方向小步调整参数的方法；梯度非零且步长足够小时局部下降，不自动保证达到全局最低点。}
+\DeclareLectureTerm{learning-rate}{学习率}{Learning Rate}{梯度下降中控制每次参数更新步长的正数；太大的步长可能使损失增加。}
+\DeclareLectureTerm{activation-function}{激活函数}{Activation Function}{神经网络中对线性组合结果施加的函数，常逐分量作用并引入非线性；局部导数参与链式法则。}
+\DeclareLectureTerm{backpropagation}{反向传播}{Backpropagation}{利用链式法则，从计算的输出端向前层依次传递梯度的方法；负责计算梯度，与使用梯度更新参数的优化步骤不同。}

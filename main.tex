@@ -15463,6 +15463,584 @@ $i=\cos(\pi/2)+i\sin(\pi/2)$，模为1，辐角为 $\pi/2$。因此乘以 $i$ �
 \par\clearpage
 \endgroup
 
+% ============================================================
+% APPENDIX B BEGIN：多元微积分脚手架，全部选读，不安排习题。
+% ============================================================
+\begingroup
+\catcode`。=12 \catcode`，=12 \catcode`：=12 \catcode`；=12
+\catcode`？=12 \catcode`！=12 \catcode`（=12 \catcode`）=12
+\ctexset{
+ chapter={name={附录\space,},number=\Alph{chapter},afterskip=24pt},
+ section={format=\raggedright\Large\bfseries\color{MainText},beforeskip=19pt,afterskip=11pt},
+ subsection={format=\raggedright\normalsize\bfseries,beforeskip=14pt,afterskip=8pt}}
+\chapter[多元微积分初步：从线性化到雅可比]{多元微积分初步：\\非线性世界的局部显微镜}
+\label{app:multivariable}
+% 附录B的目录只显示章、节两层；离开附录时恢复全书的默认深度。
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+\linespread{1}\fontsize{12pt}{20pt}\selectfont
+\setlength{\parindent}{2em}\setlength{\parskip}{4pt}
+\setlength{\abovedisplayskip}{8pt}\setlength{\belowdisplayskip}{8pt}
+\clubpenalty=10000 \widowpenalty=10000
+\definecolor{BCBlue}{HTML}{397AA1}
+\definecolor{BCOrange}{HTML}{C8813E}
+\definecolor{BCGreen}{HTML}{448678}
+\definecolor{BCRed}{HTML}{AC4963}
+\definecolor{BCGray}{HTML}{68747D}
+\tikzset{
+ bcaxis/.style={BCGray!75,thin,-{Stealth[length=1.8mm]}},
+ bcblue/.style={BCBlue,line width=1.2pt,-{Stealth[length=2.3mm]}},
+ bcorange/.style={BCOrange,line width=1.2pt,-{Stealth[length=2.3mm]}},
+ bcgreen/.style={BCGreen,line width=1.1pt,-{Stealth[length=2.1mm]}},
+ bcred/.style={BCRed,line width=1.1pt,-{Stealth[length=2.1mm]}},
+ bcguide/.style={BCGray!65,densely dashed,thin}}
+\captionsetup[figure]{font=small,labelfont=bf,skip=7pt}
+\renewcommand{\thefigure}{\thechapter.\arabic{figure}}
+\renewcommand{\theHfigure}{\thechapter.calculus.\arabic{figure}}
+\newcommand{\BCFigure}[3]{%
+ \par\addvspace{7pt}\noindent\begin{minipage}{\linewidth}
+ \centering #3\par\captionof{figure}{#1}\label{#2}
+ \end{minipage}\par\addvspace{7pt}}
+\newcommand{\BCGrid}[4]{\draw[step=.5,BCGray!13,very thin] (#1,#2) grid (#3,#4);}
+% 曲面网格的每个顶点都取自 z=x^2+y^2，供图B.2与图B.8复用。
+\newcommand{\BCBowlSurface}{%
+ \foreach \i in {0,...,5}{\foreach \j in {0,...,5}{%
+  \pgfmathsetmacro{\xa}{-.9+.3*\i}\pgfmathsetmacro{\xb}{\xa+.3}
+  \pgfmathsetmacro{\ya}{-.9+.3*\j}\pgfmathsetmacro{\yb}{\ya+.3}
+  \path[fill=BCBlue!7,draw=BCBlue!26,line width=.35pt]
+   (\xa,\ya,{\xa*\xa+\ya*\ya})--(\xb,\ya,{\xb*\xb+\ya*\ya})--
+   (\xb,\yb,{\xb*\xb+\yb*\yb})--(\xa,\yb,{\xa*\xa+\yb*\yb})--cycle;
+ }}}
+
+\noindent\textbf{选读提示：本附录不做考核要求。}它是配合线性代数主线的一段脚手架，不是一门压缩后的微积分课。我们只挑与向量、矩阵、映射和体积缩放直接相连的内容，帮助你读懂第6章的雅可比行列式，以及第\ref{sec:five-continuous}节的矢量场。下面使用的函数都选得足够平滑；遇到尖角、断裂等情形时，不能直接套用这些局部近似。
+
+\setcounter{section}{-1}
+\refstepcounter{section}
+\section*{B.0\quad 引子：二元函数}
+\label{sec:calculus-introduction}
+
+如果输出同时受两个输入影响，还能把函数画出来吗？一元函数 $y=f(x)$ 的输入是数轴上的一个数；二元函数 $z=f(x,y)$ 的输入是平面上的一对数，输出仍是一个数。把输出当作高度，就得到空间中的曲面。例如
+\begin{equation}
+ z=f(x,y)=x^2+y^2.
+ \label{eq:calculus-bowl}
+\end{equation}
+在原点高度为0，离原点越远，高度越大，图像像一只向上张开的碗。这里的 $(x,y)^{\mathrm T}$ 正是第0章熟悉的二维输入向量，只是输出规则不再是线性的。把每个位置对应到一个数的函数，也称为\term{scalar-field}；地形高度、温度都可以这样记录。
+
+面对弯曲的世界，前面学过的矩阵还能帮什么忙？它不能把所有弯曲一次性变成直线，却能描述一个位置附近的小变化。我们把观察尺度缩小，就会反复遇到下面这些对应关系。表中说的是各概念的联系，不是把不同对象混为一谈。
+
+\begin{center}
+\begingroup\fontsize{10.5pt}{16pt}\selectfont
+\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.13}
+\begin{tabular}{p{2.7cm}p{3.1cm}p{7.7cm}}
+\toprule
+微积分中的对象 & 线性代数中的对象 & 联系发生在哪里\\
+\midrule
+导数 & 线性映射 & 把输入的小变化变成输出的一阶变化。\\
+梯度 & 向量 & 把各坐标方向的变化率排成一支向量。\\
+雅可比矩阵 & 矩阵 & 表示多输入、多输出函数的局部线性作用。\\
+链式法则 & 矩阵乘法 & 复合函数的小变化，要依次经过两个局部映射。\\
+散度 & 雅可比矩阵的迹 & 相加的是各坐标方向的自身变化率。\\
+旋度 & 叉乘的分量结构 & 将三维叉乘的排列方式用于偏导运算。\\
+\bottomrule
+\end{tabular}
+\endgroup
+\end{center}
+
+下面的路线是：先从一个方向的斜率走到梯度，再看积分时的小面积，接着看流动中的向量，最后把这些图景收拢到局部矩阵与链式法则。你不必记住一整套微积分技巧，只需不断追问：\textbf{眼前的小变化，是由哪一个线性映射在近似描述？}
+
+\section{偏导数、梯度与方向导数}
+\label{sec:calculus-gradient}
+
+\subsection{从一元导数到多元偏导数：变化率的多元视角}
+
+沿着地面走，哪一个方向的坡更陡？一元函数的导数记录沿自变量正方向的变化率；二元函数有两个坐标方向，不能只用一个数概括所有坡度。先固定 $y=b$，只让 $x$ 变化，就得到一元函数 $x\mapsto f(x,b)$。它在 $x=a$ 处的导数称为对 $x$ 的\term{partial-derivative}，记作 $f_x(a,b)$ 或 $\partial f/\partial x(a,b)$。固定 $x=a$，则得到对 $y$ 的偏导数。
+
+拿式\eqref{eq:calculus-bowl}来说，求导时把另一个变量当作常数，便有
+\begin{equation}
+ f_x(x,y)=2x,\qquad f_y(x,y)=2y;
+ \qquad f_x(1,2)=2,\quad f_y(1,2)=4.
+\end{equation}
+这句话说的是：在 $(1,2)$ 附近，沿 $x$ 正方向前进一点，高度约增加前进距离的2倍；沿 $y$ 正方向则约增加4倍。两个数分别对应标准基 $\boldsymbol e_1,\boldsymbol e_2$ 所指的方向，和第3章“先看映射对基向量做什么”的思路相通。
+
+\subsection{梯度向量：把各方向的变化率放在一起}
+
+知道了两个坐标方向的坡度，能否合成一份方向记录？把偏导数依照输入坐标的顺序竖排，就得到\term{gradient}：
+\begin{equation}
+ \nabla f(x,y)=\begin{pmatrix}f_x(x,y)\\f_y(x,y)\end{pmatrix};
+ \qquad f=x^2+y^2\ \Longrightarrow\ \nabla f(1,2)=\begin{pmatrix}2\\4\end{pmatrix}.
+ \label{eq:calculus-gradient}
+\end{equation}
+梯度是一支\textbf{位于输入空间中的向量}，不是曲面上画出的高度箭头。它在每一点记录该处各方向的上升倾向。当它非零时，它的方向就是每单位行走距离上升最快的方向；为什么会这样，下一段用点积就能看清。
+
+三元函数只需把三个偏导数排成一列，运算仍沿用第0章与第1章的向量规则。
+
+\subsection{方向导数与梯度的几何意义}
+
+斜着走时，坡度怎么算？取单位向量 $\boldsymbol u$，沿 $\boldsymbol p+t\boldsymbol u$ 移动。函数在这条路线上的瞬时变化率称为\term{directional-derivative}；对本附录的平滑函数，有
+\begin{equation}
+ D_{\boldsymbol u}f(\boldsymbol p)
+ =\nabla f(\boldsymbol p)\cdot\boldsymbol u
+ =\|\nabla f(\boldsymbol p)\|\cos\alpha,\qquad \|\boldsymbol u\|=1.
+ \label{eq:calculus-directional}
+\end{equation}
+其中 $\alpha$ 是梯度与行走方向的夹角。方向导数是梯度在该方向上的\textbf{带符号的投影长度}，不是投影向量本身；同向时最陡，反向时下降最快，垂直时一阶变化为0。这正是第0章点积的几何含义。若梯度为零，各方向的一阶变化率都为0，不能据此指定唯一的最陡方向。\cite{openstax-gradient}
+
+把高度相同的输入点连起来，就得到\term{level-curve}。梯度在非零时垂直于经过该点的等高线：沿等高线走，高度不变，切向的方向导数便为0。
+
+\BCFigure{灰色圆圈是 $f=x^2+y^2$ 的等高线，同一圈上的高度相同；从 $\boldsymbol p=(1,0)^{\mathrm T}$ 出发的蓝箭头是梯度，橙箭头是单位方向 $\boldsymbol u$。绿色虚线给出梯度在该方向上的投影，长度为方向导数；这与第0章用点积计算带符号投影是同一件事。}{fig:B-gradient}{%
+\begin{tikzpicture}[x=.87cm,y=.87cm,font=\small]
+ \BCGrid{-3.3}{-3.3}{3.3}{3.3}
+ \foreach \r in {1,2,3}{\draw[BCGray!45] (0,0) circle (\r);}
+ \draw[bcaxis] (-3.4,0)--(3.6,0) node[right] {$x$};
+ \draw[bcaxis] (0,-3.4)--(0,3.5) node[above] {$y$};
+ \fill[BCBlue] (1,0) circle (.045) node[below right] {$\boldsymbol p$};
+ \draw[bcblue] (1,0)--(3,0);
+ \node[BCBlue] at (2.5,-.75) {$\nabla f=(2,0)^{\mathrm T}$};
+ \draw[BCGreen,densely dashed,line width=1.1pt,-{Stealth[length=2mm]}]
+  (1,0)--(2.5,.866);
+ \node[BCGreen,fill=white,inner sep=1pt] at (2.0,1.5) {方向导数 $\sqrt3$};
+ \draw[bcorange] (1,0)--(1.866,.5) node[above left] {$\boldsymbol u$};
+ \draw[bcguide] (3,0)--(2.5,.866);
+ \begin{scope}[shift={(2.5,.866)},rotate=30]
+  \draw[BCGreen] (0,-.16)--(-.16,-.16)--(-.16,0);
+ \end{scope}
+ \node[BCGray,fill=white,inner sep=1pt] at (-2.5,1.8) {$f=9$};
+ \node[BCGray,fill=white,inner sep=1pt] at (-1.6,1.1) {$f=4$};
+ \node[BCGray,fill=white,inner sep=1pt] at (-.7,.55) {$f=1$};
+ \node[anchor=west,align=left,text width=5.2cm] at (4.8,.1)
+  {沿梯度：上升最快\\沿橙色方向：取投影\\沿等高线切向：一阶变化为0};
+\end{tikzpicture}}
+
+在图\ref{fig:B-gradient}中，$\nabla f(1,0)=(2,0)^{\mathrm T}$，取 $\boldsymbol u=(\sqrt3/2,1/2)^{\mathrm T}$，方向导数就是 $2\times\sqrt3/2+0\times1/2=\sqrt3$。再回到三维曲面看：偏导数是两条特定截线的切线斜率，梯度把这些斜率汇总到输入平面。两幅图说的是同一个函数的两种观察方式。
+
+\BCFigure{蓝色网格画出曲面 $z=x^2+y^2$，切点为 $(0.6,0.4,0.52)$；两条有色直线分别沿固定 $y$、固定 $x$ 的截线相切，斜率为1.2和0.8。把这两个斜率按坐标顺序排列，就得到输入平面中的梯度向量，呼应第3章按标准基组织映射信息的方式。}{fig:B-partials}{%
+\begin{tikzpicture}[font=\small]
+ \begin{scope}[x={(1.7cm,-.55cm)},y={(1.05cm,.65cm)},z={(0cm,1.3cm)}]
+  \foreach \t in {-1,-.5,0,.5,1}{
+   \draw[BCGray!15] (-1,\t,0)--(1,\t,0);
+   \draw[BCGray!15] (\t,-1,0)--(\t,1,0);}
+  \BCBowlSurface
+  \draw[bcaxis] (-1.15,0,0)--(1.45,0,0) node[right] {$x$};
+  \draw[bcaxis] (0,-1.1,0)--(0,1.4,0) node[above right] {$y$};
+  \draw[bcaxis] (0,0,0)--(0,0,2.05) node[above] {$z$};
+  \draw[BCBlue,line width=1.3pt] (.1,.4,-.08)--(1.1,.4,1.12);
+  \draw[BCOrange,line width=1.3pt] (.6,-.1,.12)--(.6,.9,.92);
+  \fill[BCRed] (.6,.4,.52) circle (1.8pt);
+  \draw[bcguide] (.6,.4,0)--(.6,.4,.52);
+ \end{scope}
+ \node[anchor=west,align=left,text width=6.6cm] at (4.0,1.0)
+  {蓝线：沿 $x$ 方向，斜率 $f_x=1.2$\\[4pt]
+   橙线：沿 $y$ 方向，斜率 $f_y=0.8$\\[4pt]
+   红点：两条切线共用的切点};
+\end{tikzpicture}}
+
+\section{多重积分与换元法}
+\label{sec:calculus-integration}
+
+\subsection{二重积分与三重积分：把小块的贡献加起来}
+
+知道某处的高度或密度，怎样得到整个区域的总量？一元积分把许多“小宽度乘以函数值”加起来。二维只是把小线段换成小面积：把区域 $D$ 切成小块，第 $i$ 块面积为 $\Delta S_i$，在块内取一点 $(x_i,y_i)$，其贡献近似为 $f(x_i,y_i)\Delta S_i$。网格越细，这种\term{riemann-sum}越能贴近总量，记号写成\term{double-integral}：
+\begin{equation}
+ \iint_D f(x,y)\,\mathrm dx\,\mathrm dy
+ \ \approx\ \sum_i f(x_i,y_i)\Delta S_i.
+\end{equation}
+近似号右边是有限小块的求和；左边表示把网格不断细分后得到的积分。若 $f\ge0$ 是高度，总量是曲面下的体积；若 $f$ 是面密度，总量是质量。这里相加的是贡献，不是把各点的坐标加起来。
+
+三维里，把面积块换成体积块，就得到\term{triple-integral} $\iiint_\Omega f\,\mathrm dx\,\mathrm dy\,\mathrm dz$。例如边长为1的正方形上高度恒为2，体积就是 $2\times1=2$；体积为3的区域里密度恒为4，质量就是12。计算的出发点仍是第6章熟悉的面积和体积，微积分只是允许密度或形状逐处改变。
+
+\subsection{从直角坐标到极坐标：小格子的宽度为什么会变}
+
+同一块区域换一套坐标描述，每个小格子的面积还一样吗？圆盘用半径和角度来描述更自然。\term{polar-coordinates}把输入写成 $(r,\theta)$，并用
+\begin{equation}
+ x=r\cos\theta,\qquad y=r\sin\theta,\qquad r\ge0.
+ \label{eq:calculus-polar}
+\end{equation}
+描述同一个平面位置。固定角度走一点，移动长度约为 $\mathrm dr$；固定半径转过一点角度，弧长约为 $r\,\mathrm d\theta$，其中角度用弧度。越靠外，同样的角度张得越宽。
+
+\BCFigure{左图的绿色格子有宽 $\mathrm dx$、高 $\mathrm dy$；右图的绿色格子沿半径厚 $\mathrm dr$，沿圆周宽约 $r\,\mathrm d\theta$。因此极坐标面积微元多出一个 $r$ 因子；它就是第6章面积缩放因子在局部坐标变换中的一个例子，图中的格子为便于观察已放大。}{fig:B-polar-area}{%
+\begin{tikzpicture}[x=1.25cm,y=1.25cm,font=\small]
+ \begin{scope}
+  \BCGrid{0}{0}{2.5}{2.5}
+  \fill[BCGreen!20] (1,1) rectangle (1.5,1.5);
+  \draw[BCGreen,line width=1pt] (1,1) rectangle (1.5,1.5);
+  \draw[bcaxis] (0,0)--(2.8,0) node[right] {$x$};
+  \draw[bcaxis] (0,0)--(0,2.8) node[above] {$y$};
+  \draw[BCGreen,<->] (1,.8)--(1.5,.8) node[midway,below] {$\mathrm dx$};
+  \draw[BCGreen,<->] (1.72,1)--(1.72,1.5) node[midway,right] {$\mathrm dy$};
+  \node[BCGreen,fill=white,inner sep=1pt] at (1.25,1.25) {$\mathrm dx\,\mathrm dy$};
+  \node at (1.3,-.65) {直角坐标：均匀的小格子};
+ \end{scope}
+ \begin{scope}[shift={(5.6,0)}]
+  \foreach \r in {.5,1,1.5,2,2.5}{\draw[BCGray!23] (\r,0) arc (0:90:\r);}
+  \foreach \a in {0,15,...,90}{\draw[BCGray!23] (0,0)--(\a:2.5);}
+  \path[fill=BCGreen!20,draw=BCGreen,line width=1pt]
+   (30:1.5)--(30:2) arc (30:60:2)--(60:1.5) arc (60:30:1.5);
+  \draw[bcaxis] (0,0)--(2.8,0) node[right] {$x$};
+  \draw[bcaxis] (0,0)--(0,2.8) node[above] {$y$};
+  \draw[BCGreen,<->] (24:1.5)--(24:2) node[midway,below right] {$\mathrm dr$};
+  \draw[BCGreen,<->] (30:2.25) arc (30:60:2.25)
+   node[midway,above right] {$r\,\mathrm d\theta$};
+  \draw[BCOrange,<->] (30:.55) arc (30:60:.55) node[midway,left] {$\mathrm d\theta$};
+  \node[BCGreen,align=center] at (2.5,2.75) {面积约为\\$r\,\mathrm dr\,\mathrm d\theta$};
+  \node at (1.3,-.65) {极坐标：越往外，格子越宽};
+ \end{scope}
+\end{tikzpicture}}
+
+一个半径为 $r$、厚度为 $\Delta r$、角宽为 $\Delta\theta$ 的有限扇形格，面积为 $r\Delta r\Delta\theta+\tfrac12(\Delta r)^2\Delta\theta$。忽略比一阶厚度更小的那项，便得到面积微元
+\begin{equation}
+ \mathrm dx\,\mathrm dy=r\,\mathrm dr\,\mathrm d\theta.
+\end{equation}
+这不是说一个有限扇形恰好是矩形，而是说在足够小的尺度下，径向厚度乘圆周宽度给出它的主要面积。于是单位圆盘面积可写成 $\int_0^{2\pi}\int_0^1 r\,\mathrm dr\,\mathrm d\theta=\pi$；漏掉 $r$，便把外圈宽格子与内圈窄格子当成了同样大小。
+
+\subsection{换元法的一般形式：雅可比行列式是局部缩放因子}
+
+如果坐标变换比极坐标更复杂，还能找到这个面积倍率吗？设 $x=x(u,v)$、$y=y(u,v)$，先把各输出对各输入的偏导数排成\term{jacobian-matrix}：
+\begin{equation}
+ J=\begin{pmatrix}
+  x_u & x_v\\y_u & y_v
+ \end{pmatrix},\qquad
+ \mathrm dx\,\mathrm dy=|\det J|\,\mathrm du\,\mathrm dv.
+ \label{eq:calculus-area-jacobian}
+\end{equation}
+两列分别描述沿 $u$、$v$ 方向迈出小步后，位置在 $xy$ 平面中的一阶变化。它们围成的小平行四边形的面积倍率，就是\term{jacobian-determinant}的绝对值；取绝对值是因为面积不带方向正负。第6章用行列式度量线性变换的整体缩放，这里用同一规则度量非线性变换的\textbf{局部}缩放。
+
+\BCFigure{左侧绿色小格经过变换 $H(u,v)=(u,v+0.4u^2)^{\mathrm T}$，在中间变成橙色曲边格；右侧放大图用蓝色平行四边形近似它在一点附近的形状。这里 $|\det J|=1$，局部面积倍率为1；第6章的行列式仍在计算两条局部边围出的面积，而不是衡量整幅曲线网格是否弯曲。}{fig:B-change-area}{%
+\begin{tikzpicture}[x=1.15cm,y=1.15cm,font=\small]
+ \begin{scope}
+  \BCGrid{0}{0}{1.5}{1.5}
+  \draw[bcaxis] (0,0)--(1.8,0) node[right] {$u$};
+  \draw[bcaxis] (0,0)--(0,1.8) node[above] {$v$};
+  \filldraw[fill=BCGreen!18,draw=BCGreen,line width=1pt] (.5,.5) rectangle (.8,.8);
+  \node at (.75,-.5) {输入小格};
+ \end{scope}
+ \draw[bcorange] (2.0,.8)--(2.8,.8) node[midway,above] {$H$};
+ \begin{scope}[shift={(3.3,0)}]
+  \foreach \t in {0,.5,1,1.5}{
+   \draw[BCGray!24] (\t,{.4*\t*\t})--(\t,{1.5+.4*\t*\t});
+   \draw[BCGray!24,domain=0:1.5,samples=30] plot (\x,{\t+.4*\x*\x});}
+  \path[fill=BCOrange!18,draw=BCOrange,line width=1pt]
+   (.5,.6) plot[domain=.5:.8,samples=15] (\x,{.5+.4*\x*\x})--(.8,1.056)
+   plot[domain=.8:.5,samples=15] (\x,{.8+.4*\x*\x})--cycle;
+  \draw[bcaxis] (0,0)--(1.85,0) node[right] {$x$};
+  \draw[bcaxis] (0,0)--(0,2.55) node[above] {$y$};
+  \node at (.75,-.5) {变换后的曲边格};
+ \end{scope}
+ \draw[bcguide,-{Stealth[length=2mm]}] (5.0,1.0)--(5.9,1.0);
+ \begin{scope}[shift={(6.3,.15)}]
+  \BCGrid{-.1}{-.1}{1.7}{2.1}
+  \filldraw[fill=BCBlue!12,draw=BCBlue,line width=1pt]
+   (0,0)--(1.4,.56)--(1.4,1.96)--(0,1.4)--cycle;
+  \draw[bcblue] (0,0)--(1.4,.56);
+  \draw[bcblue] (0,0)--(0,1.4);
+  \node[align=center] at (.8,2.5) {局部放大\\面积比 $|\det J|=1$};
+  \node at (.8,-.65) {一阶近似的平行四边形};
+ \end{scope}
+\end{tikzpicture}}
+
+把面积倍率放进求和，便得到换元积分公式。这里要求变换在所用区域内不把不同小块折叠到同一处、局部倍率不为零；边界或极坐标原点等特殊位置另行处理。对这样的区域对应 $S\to D$，有
+\begin{equation}
+ \iint_D f(x,y)\,\mathrm dx\,\mathrm dy
+ =\iint_S f\bigl(x(u,v),y(u,v)\bigr)|\det J(u,v)|\,\mathrm du\,\mathrm dv.
+\end{equation}
+右边仍在计算左边的同一份总量，只是改用新坐标，并给每个小格补上真实的面积倍率。三维同理，用 $3\times3$ 雅可比矩阵的行列式绝对值乘体积微元。\cite{openstax-change-variables}
+
+极坐标能否经受这个矩阵检查？把式\eqref{eq:calculus-polar}求偏导，得到
+\begin{equation}
+ J(r,\theta)=\begin{pmatrix}\cos\theta&-r\sin\theta\\\sin\theta&r\cos\theta\end{pmatrix},
+ \qquad \det J=r\cos^2\theta+r\sin^2\theta=r.
+\end{equation}
+第一列是一支径向单位向量，第二列是一支长度为 $r$ 的切向向量；二者垂直，底乘高恰好给出 $r$。刚才的小格子直觉，现在成了一次可以核对的矩阵计算。
+
+\section{向量场、散度与旋度}
+\label{sec:calculus-fields}
+
+\subsection{从静态向量到空间中的流动}
+
+一支向量描述一个位置的速度，整个空间的速度怎样描述？给空间中每个点都指定一支向量，就得到向量场，也就是第\ref{sec:five-continuous}节已经见过的\term{vector-field}。这里统一写成 $\boldsymbol v(\boldsymbol x)$，它记录位置 $\boldsymbol x$ 处的速度；也可以记录力，或一般状态的变化率。
+
+线性场尤其熟悉：$\boldsymbol v(\boldsymbol x)=A\boldsymbol x$。同一个矩阵在各处作用，但输入位置不同，箭头便不同。若粒子随这些箭头流动，它的位置满足 $\dot{\boldsymbol x}=A\boldsymbol x$；箭头是此刻的速度，轨线则是随时间走出的路径，二者不能混为一谈。
+
+\BCFigure{左图的 $\boldsymbol v=(x,y)^{\mathrm T}$ 从原点向外展开；右图的 $\boldsymbol v=(y,0)^{\mathrm T}$ 水平流动，上方越高，箭头越长。每支箭头都属于它所在的点，这两个例子分别由单位矩阵和剪切型矩阵产生，与第5章连续线性系统的状态箭头图直接相连。}{fig:B-fields}{%
+\begin{tikzpicture}[x=1.1cm,y=1.1cm,font=\small]
+ \begin{scope}
+  \BCGrid{-1.6}{-1.6}{1.6}{1.6}
+  \draw[bcaxis] (-1.8,0)--(1.9,0) node[right] {$x$};
+  \draw[bcaxis] (0,-1.8)--(0,1.9) node[above] {$y$};
+  \foreach \a in {-1,0,1}{\foreach \b in {-1,0,1}{
+   \ifnum\numexpr\a*\a+\b*\b\relax>0
+    \draw[bcblue] (\a,\b)--({1.4*\a},{1.4*\b});\fi}}
+  \fill[BCBlue] (0,0) circle (.03);
+  \node[align=center] at (0,-2.25) {源场：$\boldsymbol v=(x,y)^{\mathrm T}$};
+ \end{scope}
+ \begin{scope}[shift={(5.7,0)}]
+  \BCGrid{-1.6}{-1.6}{1.6}{1.6}
+  \draw[bcaxis] (-1.8,0)--(1.9,0) node[right] {$x$};
+  \draw[bcaxis] (0,-1.8)--(0,1.9) node[above] {$y$};
+  \foreach \a in {-1,0,1}{\foreach \b in {-.9,-.45,.45,.9}{
+   \draw[bcblue] (\a,\b)--({\a+.55*\b},\b);}}
+  \node[align=center] at (0,-2.25) {剪切场：$\boldsymbol v=(y,0)^{\mathrm T}$};
+ \end{scope}
+\end{tikzpicture}}
+
+\subsection{散度：各方向的膨胀率为什么要相加}
+
+流动是在把一小团物质撑开，还是把它挤紧？\term{divergence}记录一个位置附近\textbf{单位体积的净流出率}。在二维用单位面积理解，对 $\boldsymbol v=(v_x,v_y)^{\mathrm T}$，定义
+\begin{equation}
+ \operatorname{div}\boldsymbol v
+ =\frac{\partial v_x}{\partial x}+\frac{\partial v_y}{\partial y}.
+ \label{eq:calculus-divergence}
+\end{equation}
+第一项比较小格子左右两边的水平流动，第二项比较上下两边的竖直流动：流出去的比流进来的多，结果为正；反过来则为负。三维再加上 $\partial v_z/\partial z$。它衡量净膨胀，不是只看箭头是否朝外，也不是把速度的三个分量直接相加。
+
+\BCFigure{绿色小区域的红边界用来比较流入与流出：左侧场 $\boldsymbol v=\boldsymbol x$ 向外撑开，右侧场 $\boldsymbol v=-\boldsymbol x$ 向内收紧。它们的散度分别为2与 $-2$，恰好是相应矩阵的迹；这里度量的是瞬时的相对面积变化，与第6章行列式度量的面积倍率相呼应。}{fig:B-divergence}{%
+\begin{tikzpicture}[x=1.12cm,y=1.12cm,font=\small]
+ \foreach \s/\sign/\title in {0/1/膨胀,5.8/-1/收缩}{
+  \begin{scope}[shift={(\s,0)}]
+   \BCGrid{-1.65}{-1.65}{1.65}{1.65}
+   \fill[BCGreen!13] (-.65,-.65) rectangle (.65,.65);
+   \draw[BCRed,line width=.8pt] (-.65,-.65) rectangle (.65,.65);
+   \foreach \a in {0,45,...,315}{
+    \ifnum\sign>0
+     \draw[bcblue] (\a:.6)--(\a:1.05);
+    \else
+     \draw[bcblue] (\a:1.05)--(\a:.6);
+    \fi}
+   \node[fill=BCGreen!13,font=\scriptsize,inner sep=1pt,align=center] at (0,0)
+    {单位体积\\净流出\\$\ifnum\sign>0 >\else <\fi 0$};
+   \node at (0,2.0) {\title};
+   \node at (0,-2.0) {$\operatorname{div}\boldsymbol v=\ifnum\sign>0 2\else -2\fi$};
+  \end{scope}}
+\end{tikzpicture}}
+
+这些相加的量在线性代数里叫什么？方阵对角线上元素的和称为\term{trace}，记作 $\operatorname{tr}A$。偏导数矩阵的对角线恰好是式\eqref{eq:calculus-divergence}中的各项，所以
+\begin{equation}
+ \operatorname{div}\boldsymbol v(\boldsymbol x)=\operatorname{tr}J_{\boldsymbol v}(\boldsymbol x),
+ \qquad \boldsymbol v=A\boldsymbol x\ \Longrightarrow\ \operatorname{div}\boldsymbol v=\operatorname{tr}A.
+\end{equation}
+散度等于场的雅可比矩阵的迹；线性场的雅可比处处都是 $A$，散度因而是常数。图\ref{fig:B-fields}的剪切场有运动，却没有净面积膨胀，因为它的迹为0。\cite{openstax-divergence-curl}
+
+为什么这个和能说明体积变化？经过很短的时间 $\Delta t$，线性场中的位移近似由 $E+\Delta t A$ 作用产生。对于 $2\times2$ 的 $A$，直接展开行列式有
+\begin{equation}
+ \det(E+\Delta t A)=1+\operatorname{tr}A\,\Delta t+\det A\,(\Delta t)^2.
+\end{equation}
+忽略二次小量，面积相对于原面积的变化约为 $\operatorname{tr}A\,\Delta t$。因此迹给出的是\textbf{瞬时相对膨胀率}，不是经过一段有限时间后的全部面积倍率；后者还要看持续演化。这把第5章的动态箭头与第6章的行列式接在了一起。
+
+\subsection{旋度：小桨轮会不会转起来}
+
+如果放入一只很小的桨轮，流动会让它转动吗？\term{curl}描述这种局部旋转倾向。三维场 $\boldsymbol v=(v_x,v_y,v_z)^{\mathrm T}$ 的旋度写成
+\begin{equation}
+ \nabla\times\boldsymbol v=
+ \begin{pmatrix}
+  \partial v_z/\partial y-\partial v_y/\partial z\\
+  \partial v_x/\partial z-\partial v_z/\partial x\\
+  \partial v_y/\partial x-\partial v_x/\partial y
+ \end{pmatrix}.
+ \label{eq:calculus-curl}
+\end{equation}
+每个分量都比较两个横向变化率，它们的差决定绕相应轴的旋转倾向。符号 $\nabla\times\boldsymbol v$ 沿用三维叉乘的分量排列，但 $\nabla$ 在这里是一组\textbf{求偏导的操作}，不是一支普通数值向量；它要作用于场的分量。
+
+\BCFigure{蓝箭头画出刚体旋转场 $\boldsymbol v=(-y,x,0)^{\mathrm T}$，沿圆周切线指向逆时针，长度随半径增大；中心的圆点符号表示旋度沿 $z$ 轴正向、朝读者伸出。其旋度为 $(0,0,2)^{\mathrm T}$，方向遵循右手法则，分量排列与第6章三维叉乘相连；这个2是角速度1的两倍。}{fig:B-curl}{%
+\begin{tikzpicture}[x=1.25cm,y=1.25cm,font=\small]
+ \BCGrid{-2.2}{-2.2}{2.2}{2.2}
+ \draw[bcaxis] (-2.3,0)--(2.5,0) node[right] {$x$};
+ \draw[bcaxis] (0,-2.3)--(0,2.5) node[above] {$y$};
+ \foreach \r in {.6,1.2,1.8}{
+  \draw[BCGray!35,densely dashed] (0,0) circle (\r);
+  \foreach \a in {0,60,...,300}{
+   \draw[bcblue] (\a:\r)--({\r*cos(\a)-.3*\r*sin(\a)},{\r*sin(\a)+.3*\r*cos(\a)});}}
+ \draw[bcred] (25:2.05) arc (25:85:2.05);
+ \node[fill=white,inner sep=1pt,text=BCRed] at (0,0) {$\odot$};
+ \node[anchor=west,align=left,text width=5.9cm] at (3.0,.5)
+  {箭头沿圆周切线\\外圈速度更大\\[5pt]
+   $\nabla\times\boldsymbol v=(0,0,2)^{\mathrm T}$\\正向：垂直纸面向外};
+\end{tikzpicture}}
+
+更一般的刚体场 $\boldsymbol v=(-\omega y,\omega x,0)^{\mathrm T}$ 的旋度为 $(0,0,2\omega)^{\mathrm T}$，不要把旋度大小直接当作角速度。散度则为0：它在转动，却没有净体积膨胀。这与旋转矩阵保持体积的图景相符。
+
+不旋转就一定能由一个函数产生吗？对本附录的平滑函数，梯度场 $\boldsymbol v=\nabla\phi$ 的旋度为零，因为成对的混合偏导相消；$\phi$ 称为\term{potential-function}。反过来，“旋度为零”能推出势函数，通常需要在所讨论区域内没有绕不过去的孔洞等条件，不能不加条件地断言。局部取一个足够小、无孔洞的区域，就可以这样理解。\cite{openstax-divergence-curl}例如 $\boldsymbol v=(2x,2y,0)^{\mathrm T}$ 来自 $\phi=x^2+y^2$；物理中也常把\term{conservative-force}写成 $-\nabla\phi$，负号表示力指向势能下降的方向。本附录到这里为止，不展开势函数的求法。
+
+\section{非线性变换的局部线性化与链式法则}
+\label{sec:calculus-linearization}
+
+\subsection{一元函数的线性逼近：先把观察尺度缩小}
+
+一条曲线弯着走，直线为什么还能近似它？在某点附近，切线抓住该点的高度和瞬时斜率。把展开点记为 $a$，输入的小变化记为 $h$，一阶近似写成
+\begin{equation}
+ f(a+h)\approx f(a)+f'(a)h.
+ \label{eq:calculus-1d-linear}
+\end{equation}
+右边就是一阶泰勒多项式：起点的函数值，加上“斜率乘小位移”。例如 $f(x)=x^2$，在 $a=1$ 处，$(1+h)^2=1+2h+h^2$；取 $h=0.1$，线性近似为1.2，实际为1.21，误差0.01；取 $h=0.01$，误差就变为0.0001。缩小尺度，弯曲造成的差别也随之减小。
+
+这就是\term{local-linearization}。需要留意第4章讲过的区别：$h\mapsto f'(a)h$ 是对\textbf{变化量}的线性映射；带有起点常数项的整条切线通常是仿射的。我们不是说原函数突然成了线性函数，而是说它的小变化有一个线性的主要部分。
+
+\subsection{多元函数的线性逼近：由斜率向量走到雅可比矩阵}
+
+曲线有切线，曲面有没有相应的近似？对标量函数 $f(x,y)$，在 $(a,b)$ 附近把两个坐标方向的变化合起来，得到\term{tangent-plane}：
+\begin{equation}
+ f(a+h_1,b+h_2)\approx f(a,b)+f_x(a,b)h_1+f_y(a,b)h_2
+ =f(a,b)+\nabla f(a,b)\cdot\boldsymbol h.
+\end{equation}
+这里 $\boldsymbol h=(h_1,h_2)^{\mathrm T}$。每个坐标方向贡献一份一阶高度变化，相加就得到平面的高度；这仍是第1章的线性组合。
+
+\BCFigure{左图的蓝色网格是 $z=x^2+y^2$，红色平面在 $(0.6,0.4,0.52)$ 处与它相切；右图固定 $y=0.4$ 后放大比较曲线与切线，橙色线段标出近似误差。离切点更近，误差从0.16减到0.04；对向量值函数，这种对小变化的线性近似由雅可比矩阵表示，呼应第3章的矩阵与映射。}{fig:B-tangent-plane}{%
+\begin{tikzpicture}[font=\small]
+ \begin{scope}[x={(1.65cm,-.55cm)},y={(1.0cm,.65cm)},z={(0cm,1.3cm)}]
+  \foreach \t in {-1,-.5,0,.5,1}{
+   \draw[BCGray!15] (-1,\t,0)--(1,\t,0);
+   \draw[BCGray!15] (\t,-1,0)--(\t,1,0);}
+  \BCBowlSurface
+  \draw[bcaxis] (-1.1,0,0)--(1.4,0,0) node[right] {$x$};
+  \draw[bcaxis] (0,-1.1,0)--(0,1.35,0) node[above right] {$y$};
+  \draw[bcaxis] (0,0,0)--(0,0,2.1) node[above] {$z$};
+  \path[fill=BCRed,fill opacity=.17,draw=BCRed!70]
+   (.2,0,-.28)--(1,0,.68)--(1,.8,1.32)--(.2,.8,.36)--cycle;
+  \fill[BCRed] (.6,.4,.52) circle (1.8pt);
+  \node[above right,text=BCRed] at (.6,.4,.52) {切点};
+ \end{scope}
+ \begin{scope}[shift={(5.0,-.6)},x=4.2cm,y=3.4cm]
+  \draw[step=.2,BCGray!14,very thin] (-.45,-.4) grid (.55,1.0);
+  \draw[bcaxis] (-.5,0)--(.63,0) node[right] {$h_1$};
+  \draw[bcaxis] (0,-.4)--(0,1.05);
+  \draw[BCBlue,line width=1pt,domain=-.4:.5,samples=40] plot (\x,{1.2*\x+\x*\x});
+  \draw[BCRed,line width=1pt,domain=-.4:.5] plot (\x,{1.2*\x});
+  \draw[BCOrange,line width=1.3pt] (.4,.48)--(.4,.64);
+  \draw[BCOrange,line width=1.3pt] (.2,.24)--(.2,.28);
+  \node[anchor=west,text=BCOrange] at (.42,.62) {$0.16$};
+  \node[anchor=east,text=BCOrange] at (.18,.32) {$0.04$};
+  \fill[BCRed] (0,0) circle (1.6pt);
+  \node[anchor=south,align=center] at (.06,1.08) {局部截线放大\\蓝：曲线；红：切线};
+ \end{scope}
+\end{tikzpicture}}
+
+\Needspace{5\baselineskip}
+输出有两个分量时，怎样记录它们的局部变化？把 $u(x,y)$、$v(x,y)$ 竖排为 $\boldsymbol F(x,y)$，再按输出逐行排列偏导数，得到
+\begin{equation}
+ J_{\boldsymbol F}(\boldsymbol p)=
+ \begin{pmatrix}u_x(\boldsymbol p)&u_y(\boldsymbol p)\\v_x(\boldsymbol p)&v_y(\boldsymbol p)\end{pmatrix},
+ \qquad
+ \boldsymbol F(\boldsymbol p+\boldsymbol h)-\boldsymbol F(\boldsymbol p)
+ \approx J_{\boldsymbol F}(\boldsymbol p)\boldsymbol h.
+ \label{eq:calculus-vector-linear}
+\end{equation}
+矩阵把输入的小位移送到输出的小位移。它随观察点改变，但在固定一点后，就是第3章已经会使用的线性映射矩阵。一般的 $n$ 个输入、$m$ 个输出对应 $m\times n$ 雅可比矩阵；只有输入、输出维数相同时，才能谈它的行列式。
+
+\BCFigure{左图是均匀的输入网格，中间是 $H(x,y)=(x,y+0.4x^2)^{\mathrm T}$ 产生的弯曲网格；橙色小格被圈出，在右侧放大。右图蓝边是雅可比矩阵给出的平行四边形，橙边保留真实的弯曲差别；全局非线性与局部的一阶线性近似同时可见，正是“先看见，再理解，最后计算”的矩阵视角。}{fig:B-local-grid}{%
+\begin{tikzpicture}[x=1.05cm,y=1.05cm,font=\small]
+ \begin{scope}
+  \BCGrid{-1.5}{-1.5}{1.5}{1.5}
+  \draw[bcaxis] (-1.6,0)--(1.8,0) node[right] {$x$};
+  \draw[bcaxis] (0,-1.6)--(0,1.8) node[above] {$y$};
+  \filldraw[BCGreen!18,draw=BCGreen,line width=1pt] (.5,.5) rectangle (.75,.75);
+  \node at (0,-2.1) {全局：输入网格};
+ \end{scope}
+ \draw[bcorange] (2.0,.1)--(2.6,.1);
+ \begin{scope}[shift={(4.4,0)}]
+  \foreach \t in {-1.5,-1,...,1.5}{
+   \draw[BCGray!30] (\t,{-1.5+.4*\t*\t})--(\t,{1.5+.4*\t*\t});
+   \draw[BCGray!30,domain=-1.5:1.5,samples=40] plot (\x,{\t+.4*\x*\x});}
+  \draw[bcaxis] (-1.6,0)--(1.8,0) node[right] {$u$};
+  \draw[bcaxis] (0,-1.6)--(0,2.7) node[above] {$v$};
+  \path[fill=BCOrange!20,draw=BCOrange,line width=1pt]
+   (.5,.6) plot[domain=.5:.75,samples=20] (\x,{.5+.4*\x*\x})--(.75,.975)
+   plot[domain=.75:.5,samples=20] (\x,{.75+.4*\x*\x})--cycle;
+  \draw[BCOrange,densely dashed] (.64,.78) circle (.45);
+  \node at (0,-2.1) {全局：弯曲网格};
+ \end{scope}
+ \draw[bcguide,-{Stealth[length=2mm]}] (5.55,.85)--(6.35,.85);
+ \begin{scope}[shift={(6.75,-.15)},x=1.15cm,y=1.15cm]
+  \BCGrid{-.1}{-.1}{1.3}{1.9}
+  \path[fill=BCBlue!8,draw=BCBlue,line width=1pt]
+   (0,0)--(1.1,.44)--(1.1,1.54)--(0,1.1)--cycle;
+  \draw[BCOrange,line width=1pt,domain=0:1.1,samples=25]
+   plot (\x,{.4*\x+(1/11)*\x*\x});
+  \draw[BCOrange,line width=1pt,domain=0:1.1,samples=25]
+   plot (\x,{1.1+.4*\x+(1/11)*\x*\x});
+  \draw[BCOrange,line width=1pt] (1.1,.55)--(1.1,1.65);
+  \node[align=center] at (.55,2.1) {局部放大\\蓝：线性近似};
+  \node[align=center] at (.55,-.75) {橙：真实弯曲\\误差随格子缩小而减小};
+ \end{scope}
+\end{tikzpicture}}
+
+这幅图可以亲手验算。在 $\boldsymbol p=(0.5,0.5)^{\mathrm T}$ 处，雅可比矩阵的两列分别为 $(1,0.4)^{\mathrm T}$、$(0,1)^{\mathrm T}$。取 $\boldsymbol h=(0.1,0)^{\mathrm T}$，矩阵预测输出变化为 $(0.1,0.04)^{\mathrm T}$；真实变化为 $(0.1,0.044)^{\mathrm T}$。差出的0.004来自 $0.4h_1^2$；缩小输入变化，这项就比主要变化消失得更快。\textbf{局部线性化近似的是变化量，不是把原函数变成全局线性函数。}
+
+\subsection{链式法则：微积分中的矩阵乘法}
+
+一个小变化先经过一层函数，再经过另一层，最后怎样传下去？一元复合 $z=f(y)$、$y=g(x)$ 满足\term{chain-rule}：$\frac{\mathrm dz}{\mathrm dx}=f'(g(x))g'(x)$。先由 $g$ 的斜率放大输入变化，再由 $f$ 在\textbf{中间输出处}的斜率放大，两个倍率相乘。
+
+多元复合不再只有一个倍率，却仍是同一条路线。设 $G:\mathbb R^n\to\mathbb R^m$、$F:\mathbb R^m\to\mathbb R^p$，则
+\begin{equation}
+ J_{F\circ G}(\boldsymbol x)=J_F\bigl(G(\boldsymbol x)\bigr)J_G(\boldsymbol x),
+ \qquad (p\times m)(m\times n)=p\times n.
+ \label{eq:calculus-chain}
+\end{equation}
+输入变化先乘右边的 $J_G$，再乘左边的 $J_F$；后一矩阵要在 $G(\boldsymbol x)$ 处取值。于是第3.3节的“矩阵乘法表示映射复合”，在微积分里成为小变化的传递法则。
+
+不妨用一个两层规则核对。取 $G(x,y)=(x^2,y)^{\mathrm T}$，$F(u,v)=(u+v,2v)^{\mathrm T}$。在 $(1,1)$ 处有
+\begin{equation}
+ J_G=\begin{pmatrix}2&0\\0&1\end{pmatrix},\qquad
+ J_F=\begin{pmatrix}1&1\\0&2\end{pmatrix},\qquad
+ J_FJ_G=\begin{pmatrix}2&1\\0&2\end{pmatrix}.
+\end{equation}
+直接对复合函数 $(x^2+y,2y)^{\mathrm T}$ 求偏导，也得到最后这个矩阵。维数、乘法次序、数值三者一起对上了；交换次序一般会描述另一条路线。
+
+\subsection{局部线性化的代数意义：重访“先看见，再理解，最后计算”}
+
+这些图为什么都能用线性代数解释？偏导数记录局部基方向的作用；梯度把标量输出的变化率排成向量；雅可比把多分量输出的变化排成矩阵；链式法则把局部映射复合；行列式读出局部的面积或体积倍率。
+
+先看见曲线、曲面与流动，再理解小尺度上的线性结构，最后用矩阵计算：这不是忽略弯曲，而是使用与观察尺度相配的尺子。线性代数就是非线性世界的\textbf{局部显微镜}，但要说明在哪一点、看多小的变化，以及忽略了什么。
+
+\section{【应用案例】梯度下降与反向传播}
+\label{sec:calculus-backpropagation}
+
+\subsection{参数也是向量：让误差往下走}
+
+网络输出与目标有差别，怎样判断应当调哪一个参数？把所有参数按固定顺序排成向量 $\boldsymbol\theta$，用\term{loss-function} $\mathcal L(\boldsymbol\theta)$ 记录预测偏差。它是一个多元标量函数，梯度的每个分量回答“单独增加这个参数一点，损失的一阶变化有多大”。
+
+想让损失下降，就沿负梯度试着走一小步。这称为\term{gradient-descent}：
+\begin{equation}
+ \boldsymbol\theta_{\rm new}
+ =\boldsymbol\theta-\eta\nabla\mathcal L(\boldsymbol\theta),\qquad \eta>0.
+ \label{eq:calculus-gradient-descent}
+\end{equation}
+正数 $\eta$ 称为\term{learning-rate}，控制这一步走多远。在梯度非零且步子足够小时，损失的一阶变化为 $-\eta\|\nabla\mathcal L\|^2$，是负数；走得太大则可能越过低处，不能保证下降。梯度为零也不自动说明找到了最低点，更不保证找到了全局最优解。
+
+\subsection{反向传播：沿着复合路线把变化率送回来}
+
+层数很多时，每个参数都要从头求一遍导数吗？不必。第3章已经见过网络中的矩阵运算，这里把一层写成 $\boldsymbol h_\ell=\sigma(W_\ell\boldsymbol h_{\ell-1}+\boldsymbol c_\ell)$，其中 $\sigma$ 是逐分量作用的\mbox{\term{activation-function}}。矩阵部分线性，激活部分一般非线性；整个网络不能当作一个固定的线性映射。
+
+在当前输入处，把激活函数的各分量导数放在对角矩阵 $D_\ell$ 上，这一层对输入小变化的局部矩阵便是 $J_\ell=D_\ell W_\ell$。多层正向变化依照式\eqref{eq:calculus-chain}逐层相乘。\term{backpropagation}则用同一条链式法则，从输出端向输入端传递损失的梯度。若 $\boldsymbol g_\ell$ 是损失对本层输出的梯度，则
+\begin{equation}
+ \boldsymbol g_{\ell-1}=J_\ell^{\mathrm T}\boldsymbol g_\ell
+ =W_\ell^{\mathrm T}D_\ell^{\mathrm T}\boldsymbol g_\ell.
+ \label{eq:calculus-backward}
+\end{equation}
+转置把输出各方向的损失敏感度汇总到输入各方向；它不是把非线性网络“求逆”。这与第3章的转置、矩阵乘法和复合映射相接。反向传播负责\textbf{算梯度}，梯度下降负责\textbf{用梯度更新参数}，两件事分工不同。\cite{d2l-backprop}
+
+\subsection{一个可以手算的微型网络}
+
+能否看见一次更新到底改变了什么？以下是\textbf{教学简化模型}，不代表Transformer或任何实际产品的内部实现。输入固定为 $\boldsymbol x=(1,2)^{\mathrm T}$，网络只有一个隐藏输出，目标为1：
+\begin{equation}
+ z=\boldsymbol w^{\mathrm T}\boldsymbol x,\qquad
+ h=\tanh z,\qquad \widehat y=vh,\qquad
+ \mathcal L=\tfrac12(\widehat y-1)^2.
+\end{equation}
+这里 $\tanh z=(e^z-e^{-z})/(e^z+e^{-z})$ 是把输入平滑压到 $-1$ 与1之间的激活函数，导数为 $1-\tanh^2z$；两个待调的输入权重在 $\boldsymbol w$ 中，输出权重是 $v$。
+
+先取 $\boldsymbol w=(0,0)^{\mathrm T}$、$v=1$。正向计算给出 $z=0,h=0,\widehat y=0,\mathcal L=1/2$。反向依次经过平方误差、乘法、激活和输入乘法，得到
+\begin{equation}
+ \frac{\partial\mathcal L}{\partial v}=(\widehat y-1)h=0,\qquad
+ \nabla_{\boldsymbol w}\mathcal L
+ = (\widehat y-1)v(1-h^2)\boldsymbol x
+ =\begin{pmatrix}-1\\-2\end{pmatrix}.
+\end{equation}
+这次输出权重的一阶梯度为0，两个输入权重的梯度分别为 $-1,-2$，是各层局部变化率连乘后传回的结果。取学习率 $\eta=0.1$，同步更新便得到 $\boldsymbol w_{\mathrm{new}}=(0.1,0.2)^{\mathrm T}$、$v_{\mathrm{new}}=1$。重新正向计算有 $z_{\mathrm{new}}=0.5$、$\widehat y_{\mathrm{new}}\approx0.4621$，损失约为0.1447，确实小于原来的0.5。
+
+这个小模型展示了一条路线：用向量存参数，用矩阵传小变化，用链式法则求梯度，再沿负梯度调整。第3章的Transformer展示了矩阵怎样组织计算，本附录补上了非线性计算怎样在局部求导。它的任务正是：\textbf{在非线性世界里，辨认出可以用线性代数理解的一小片结构。}
+
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+\par\clearpage
+\endgroup
+% APPENDIX B END
+
 % 书末术语表：数据源 terms.tex；每次完整编译自动生成排序后的术语表.tex。
 \backmatter
 \begingroup
@@ -15474,7 +16052,7 @@ $i=\cos(\pi/2)+i\sin(\pi/2)$，模为1，辐角为 $\pi/2$。因此乘以 $i$ �
 \addcontentsline{toc}{chapter}{术语表}
 \linespread{1}\fontsize{11pt}{17pt}\selectfont
 \setlength{\parindent}{0pt}\setlength{\parskip}{0pt}
-本表按英文术语的首字母分组，组内按英文字母顺序排列，统一采用“中文术语 (English Term) [释义]”格式。条目涵盖已撰写正文与附录A的关键概念；正文只作预告的后续术语，在释义中注明相应章节。英语中的同义说法及本书采用的简称，尽量合并在同一词条中。\par\medskip
+本表按英文术语的首字母分组，组内按英文字母顺序排列，统一采用“中文术语 (English Term) [释义]”格式。条目涵盖已撰写正文与附录A、B的关键概念；正文只作预告的后续术语，在释义中注明相应章节。英语中的同义说法及本书采用的简称，尽量合并在同一词条中。\par\medskip
 \PrintLectureGlossary
 \par\clearpage
 \endgroup
@@ -15712,6 +16290,24 @@ Strang G. \textit{Graphs, Networks, Incidence Matrices}[EB/OL]. MIT OpenCourseWa
 U.S. Department of Energy, Electricity Advisory Committee. \textit{National Distributed Energy Storage in the Electric Grid}[R/OL]. 2016. 第2部分“Current State of Distributed Energy Storage” [2026-09-30].
 \newblock \url{https://www.energy.gov/oe/articles/eac-recommendations-national-distributed-energy-storage-electric-grid}.
 % CHAPTER 5 INTRODUCTION REFERENCES END
+
+% APPENDIX B REFERENCES BEGIN
+\bibitem{openstax-gradient}
+Strang G, Herman E J. \textit{Calculus Volume 3}[M/OL]. OpenStax, 2016. 第4.6节：方向导数、梯度与等高线的几何关系 [2026-10-03].
+\newblock \url{https://openstax.org/books/calculus-volume-3/pages/4-6-directional-derivatives-and-the-gradient}.
+
+\bibitem{openstax-change-variables}
+Strang G, Herman E J. \textit{Calculus Volume 3}[M/OL]. OpenStax, 2016. 第5.7节：多重积分换元与雅可比行列式 [2026-10-03].
+\newblock \url{https://openstax.org/books/calculus-volume-3/pages/5-7-change-of-variables-in-multiple-integrals}.
+
+\bibitem{openstax-divergence-curl}
+Strang G, Herman E J. \textit{Calculus Volume 3}[M/OL]. OpenStax, 2016. 第6.5节：散度、旋度，以及无旋场与势函数的适用条件 [2026-10-03].
+\newblock \url{https://openstax.org/books/calculus-volume-3/pages/6-5-divergence-and-curl}.
+
+\bibitem{d2l-backprop}
+Zhang A, Lipton Z C, Li M, Smola A J. \textit{Dive into Deep Learning}[M/OL]. 在线版1.0.3，第5.3节：Forward Propagation, Backward Propagation, and Computational Graphs. 链式法则、反向计算与转置矩阵乘法 [2026-10-03].
+\newblock \url{https://d2l.ai/chapter_multilayer-perceptrons/backprop.html}.
+% APPENDIX B REFERENCES END
 
 \end{thebibliography}
 \par\clearpage

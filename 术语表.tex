@@ -2,6 +2,7 @@
 \GlossaryLetter{A}
 \GlossaryEntry{绝对收敛}{Absolute Convergence}{无穷和中各项绝对值（复数项取模）的和有限；附录用它说明复指数展开可以按奇偶次幂分组。}
 \GlossaryEntry{抽象向量空间}{Abstract Vector Space}{不限定元素具体形式，只要求加法与数乘满足向量空间公理的集合。}
+\GlossaryEntry{激活函数}{Activation Function}{神经网络中对线性组合结果施加的函数，常逐分量作用并引入非线性；局部导数参与链式法则。}
 \GlossaryEntry{主动旋转}{Active Rotation}{固定坐标基，对向量或物体施加旋转作用，用同一组基记录作用前后的坐标；转轴上的向量可以保持不变。}
 \GlossaryEntry{加减消元法}{Addition Method of Elimination}{把一个方程的倍数加到另一个方程，以消去某个未知数的方法。}
 \GlossaryEntry{映射的加法}{Addition of Maps}{对同定义域、同目标空间的映射逐点相加，$(S+T)(\boldsymbol x)=S(\boldsymbol x)+T(\boldsymbol x)$。}
@@ -20,6 +21,7 @@
 \GlossaryEntry{增广矩阵}{Augmented Matrix}{在系数矩阵右侧附上常数项列得到的矩阵，记为 $[A\mid \boldsymbol b]$。}
 \GlossaryLetter{B}
 \GlossaryEntry{回代}{Back Substitution}{从阶梯形的最后一个有效方程开始，逐行向上求出主元变量的方法。}
+\GlossaryEntry{反向传播}{Backpropagation}{利用链式法则，从计算的输出端向前层依次传递梯度的方法；负责计算梯度，与使用梯度更新参数的优化步骤不同。}
 \GlossaryEntry{主元变量}{Basic Variable}{系数部分的主元列所对应的未知数；有解时由自由变量确定。}
 \GlossaryEntry{基}{Basis}{既线性无关又张成整个所讨论空间的向量组。}
 \GlossaryEntry{基扩充定理}{Basis Extension Theorem}{有限维空间中的任意线性无关组，都能通过添加该空间中的向量扩充为一组基。}
@@ -31,6 +33,7 @@
 \GlossaryEntry{加法消去律}{Cancellation Law for Addition}{由 $\boldsymbol u+\boldsymbol w=\boldsymbol v+\boldsymbol w$ 可推出 $\boldsymbol u=\boldsymbol v$。}
 \GlossaryEntry{柯西--施瓦茨不等式}{Cauchy-Schwarz Inequality}{实向量点积的绝对值不超过两向量长度之积；保证非零向量夹角余弦公式的取值在 $[-1,1]$ 内，第7章给出证明。}
 \GlossaryEntry{中心}{Center}{附近非平衡状态沿闭合轨线绕行的典型矢量场形态；本书用二维圆周运动模型建立直观。}
+\GlossaryEntry{链式法则}{Chain Rule}{复合函数的局部变化率由各层局部映射复合得到；多元情形按正确取值位置将雅可比矩阵依次相乘。}
 \GlossaryEntry{基变换}{Change of Basis}{改变描述向量所用的有序基，从而改变坐标表示；向量本身不变。第4章选读讨论坐标转换。}
 \GlossaryEntry{过渡矩阵}{Change-of-Coordinates Matrix}{把同一向量在一组有序基下的坐标转换到另一组基下的坐标的可逆矩阵；必须同时指明输入基与输出基。}
 \GlossaryEntry{对运算封闭}{Closure under an Operation}{集合中允许的元素按指定运算组合后，结果仍属于该集合。}
@@ -53,6 +56,7 @@
 \GlossaryEntry{复向量空间}{Complex Vector Space}{以复数作为数乘系数的向量空间；讨论线性关系时必须允许复系数。}
 \GlossaryEntry{分量}{Component}{有序数组中某个固定位置的数，位置次序是向量表示的一部分。}
 \GlossaryEntry{复合}{Composition}{把一个映射的输出作为另一个映射的输入；$(S\circ T)(\boldsymbol x)=S(T(\boldsymbol x))$，先作右侧映射。}
+\GlossaryEntry{保守力}{Conservative Force}{可由单值势能函数的负梯度表示的力；力的方向指向势能下降的方向。}
 \GlossaryEntry{有解}{Consistent}{线性方程组至少有一个公共解，也称相容。}
 \GlossaryEntry{常数项}{Constant Term}{线性方程中不含未知数的已知量；本书通常将其放在等号右端。}
 \GlossaryEntry{内容空间}{Content Space}{教学推荐案例中由给定视频特征向量张成的子空间；不是有限视频集合本身。}
@@ -61,6 +65,7 @@
 \GlossaryEntry{共面}{Coplanar}{向量起点统一后位于同一个平面内；三个空间向量共面时线性相关。}
 \GlossaryEntry{余弦相似度}{Cosine Similarity}{两个非零实向量的标准内积除以各自长度的乘积，用于比较方向的接近程度。}
 \GlossaryEntry{叉乘}{Cross Product}{两支三维向量所确定的法向量，长度为平行四边形面积，方向按右手法则；共线时为零向量。}
+\GlossaryEntry{旋度}{Curl}{三维向量场横向偏导数按叉乘结构成对作差得到的向量，描述局部旋转倾向；刚体旋转场的旋度为角速度向量的两倍。}
 \GlossaryLetter{D}
 \GlossaryEntry{棣莫弗定理}{De Moivre's Theorem}{对整数 $n$，$(\cos \theta +i\sin \theta )^n=\cos (n\theta )+i\sin (n\theta )$。}
 \GlossaryEntry{自由度}{Degrees of Freedom}{表示全部解所需的独立自由参数个数；线性方程组有解时等于相应零空间的维数。}
@@ -73,11 +78,14 @@
 \GlossaryEntry{直和}{Direct Sum}{当 $U\cap V=\{\boldsymbol 0\}$ 时的子空间和，记作 $U\oplus V$；等价地，每个和向量的分解唯一。}
 \GlossaryEntry{有向角}{Directed Angle}{同时记录转动大小与方向的角；本附录约定逆时针为正、顺时针为负。}
 \GlossaryEntry{方向余弦矩阵}{Direction Cosine Matrix}{两组单位且两两垂直的基之间的坐标过渡矩阵；第 $(i,j)$ 个元素为旧基第 $i$ 个向量与新基第 $j$ 个向量的夹角余弦，须注明换算方向。}
+\GlossaryEntry{方向导数}{Directional Derivative}{沿指定单位方向的瞬时变化率；对本附录的平滑函数，等于梯度与该单位方向的点积，是带符号的投影长度。}
 \GlossaryEntry{离散余弦变换}{Discrete Cosine Transform}{把有限个采样值改写为不同余弦模式的系数；本书使用规范化的二型DCT，完整保留系数时可以逆变换恢复输入。}
 \GlossaryEntry{离散线性动力系统}{Discrete-Time Linear Dynamical System}{按离散时刻用线性规则更新状态的系统，如 $\boldsymbol x_{k+1}=F\boldsymbol x_k+\boldsymbol u_k$；解是一串状态记录。}
 \GlossaryEntry{分配律}{Distributive Law}{数乘对向量加法与标量加法分别满足分配规则。}
+\GlossaryEntry{散度}{Divergence}{向量场各分量对相同坐标方向的偏导数之和，即场的雅可比矩阵的迹；表示局部单位体积的净流出率。}
 \GlossaryEntry{定义域}{Domain}{映射允许的全部输入组成的集合；对 $T:\mathbb R^n\to \mathbb R^m$，定义域为 $\mathbb R^n$。}
 \GlossaryEntry{数量积（点积）}{Dot Product}{实向量对应分量乘积之和；在二维、三维中等于两向量长度之积乘夹角余弦，零向量与任意向量的点积为0。}
+\GlossaryEntry{二重积分}{Double Integral}{对平面区域上小面积的函数贡献进行累积的积分；可表示曲面下的体积或由面密度决定的总质量。}
 \GlossaryLetter{E}
 \GlossaryEntry{特征空间}{Eigenspace}{给定特征值对应的全部特征向量连同零向量构成的子空间；第8章展开。}
 \GlossaryEntry{特征值}{Eigenvalue}{线性变换在某个非零向量方向上表现为数乘时的缩放系数；第8章展开。}
@@ -118,6 +126,8 @@
 \GlossaryEntry{高斯--若尔当消元法}{Gauss-Jordan Elimination}{继续把主元化为1并消去主元列其余元素，得到行最简形的方法。}
 \GlossaryEntry{高斯消元法}{Gaussian Elimination}{通过同解初等变换化为行阶梯形，再指定自由变量并回代求解的方法。}
 \GlossaryEntry{通解}{General Solution}{以任意参数或自由的齐次解完整表示全部解的表达式；不是一个特解或有限几个解。}
+\GlossaryEntry{梯度}{Gradient}{把标量函数对各输入坐标的偏导数按顺序排成的列向量；对平滑函数，非零梯度指向每单位距离上升最快的方向。}
+\GlossaryEntry{梯度下降}{Gradient Descent}{按负梯度方向小步调整参数的方法；梯度非零且步长足够小时局部下降，不自动保证达到全局最低点。}
 \GlossaryLetter{H}
 \GlossaryEntry{齐次性}{Homogeneity}{映射保持数乘的性质，即对所有实数 $c$ 和允许的向量 $\boldsymbol x$ 有 $T(c\boldsymbol x)=cT(\boldsymbol x)$。}
 \GlossaryEntry{齐次坐标}{Homogeneous Coordinates}{用增加一个分量的方式表示几何点；本章把二维点记为 $(x,y,1)^{\mathrm T}$，以三阶矩阵统一表示平移与线性作用。}
@@ -154,9 +164,11 @@
 \GlossaryEntry{拉普拉斯展开}{Laplace Expansion}{沿固定的一行或一列，将元素与对应代数余子式的乘积求和，得到整个行列式的计算公式。}
 \GlossaryEntry{隐因子}{Latent Factor}{模型用于表示潜在联系的向量分量；本章以少量隐因子展示用户与内容的匹配。}
 \GlossaryEntry{余弦定理}{Law of Cosines}{三角形一边的平方等于另两边的平方和减去这两边与其夹角余弦乘积的两倍；将勾股定理推广到任意三角形。}
+\GlossaryEntry{学习率}{Learning Rate}{梯度下降中控制每次参数更新步长的正数；太大的步长可能使损失增加。}
 \GlossaryEntry{最小二乘法}{Least Squares}{通过使误差平方和尽可能小来确定参数的方法；第3章先应用其线性方程形式，第5.7节用正交直和说明最优近似与解的结构。}
 \GlossaryEntry{最小二乘解}{Least-Squares Solution}{使 $\|\boldsymbol b-A\boldsymbol x\|^2$ 最小的输入；等价于正规方程的解，最优输出唯一，输入是否唯一取决于 $A$ 的零空间。}
 \GlossaryEntry{左零空间}{Left Null Space}{转置矩阵的零空间，即满足 $A^{\mathrm T}\boldsymbol y=\boldsymbol 0$ 的全部向量；等价地有 $\boldsymbol y^{\mathrm T}A=\boldsymbol 0^{\mathrm T}$。若 $A$ 为 $m\times n$，它是 $\mathbb R^m$ 的子空间。}
+\GlossaryEntry{等高线}{Level Curve}{二元标量函数中具有相同函数值的输入点组成的曲线；非零梯度垂直于经过该点的等高线切向。}
 \GlossaryEntry{线性代数}{Linear Algebra}{研究向量的线性关系、向量空间与线性映射及其代数表示的数学分支。}
 \GlossaryEntry{线性组合}{Linear Combination}{对给定向量分别作数乘后相加得到的向量。}
 \GlossaryEntry{线性方程}{Linear Equation}{形如 $a_1x_1+\cdots +a_nx_n=b$ 的方程，未知数只以一次项出现。}
@@ -172,6 +184,7 @@
 \GlossaryEntry{线性无关}{Linearly Independent}{只有全部系数为零，给定向量组的线性组合才等于零向量。}
 \GlossaryEntry{荷载工况}{Load Case}{结构分析中一组指定的外部荷载情形；结构参数固定时，不同工况通常对应不同右端项。}
 \GlossaryEntry{局部线性化}{Local Linearization}{在固定位置，用一个线性映射近似输入小变化引起的输出变化；加上起点输出后的近似通常是仿射映射，不是把原函数变成全局线性函数。}
+\GlossaryEntry{损失函数}{Loss Function}{用一个标量衡量模型预测与目标的偏差或其他训练目标的函数；把模型参数视为输入时，是一个多元标量函数。}
 \GlossaryEntry{下三角矩阵}{Lower Triangular Matrix}{主对角线上方全为零的方阵。}
 \GlossaryEntry{LU分解}{LU Factorization}{将矩阵写成 $A=LU$，其中 $L$ 为单位下三角矩阵，$U$ 为上三角矩阵，用来保存并复用无换行消元。}
 \GlossaryLetter{M}
@@ -233,8 +246,10 @@
 \GlossaryEntry{像素基}{Pixel Basis}{每个基图案仅在一个像素位置取1、其他位置取0；按固定顺序展开后就是图像向量空间的标准基。}
 \GlossaryEntry{平面向量}{Plane Vector}{位于一个平面内的向量，选定平面基后可用两个坐标表示。}
 \GlossaryEntry{PLU分解}{PLU Factorization}{把换行记录到置换矩阵中的LU分解，本书约定写成 $PA=LU$；第3.8节为选读。}
+\GlossaryEntry{极坐标}{Polar Coordinates}{用到原点的距离 $r$ 与方向角 $\theta $ 描述平面位置，满足 $x=r\cos \theta ,y=r\sin \theta $；面积微元为 $r\,\mathrm dr\,\mathrm d\theta $。}
 \GlossaryEntry{极坐标形式}{Polar Form}{用模 $r$ 和辐角 $\theta $ 表示非零复数的形式 $r(\cos \theta +i\sin \theta )$，也称极式。}
 \GlossaryEntry{多项式空间}{Polynomial Space}{以多项式为元素、按通常加法和数乘运算组成的向量空间；$P_n$ 表示次数不超过 $n$ 的情形。}
+\GlossaryEntry{势函数}{Potential Function}{其梯度给出某个向量场的标量函数；物理中的保守力也常以负梯度表示。无旋场能否在整个区域具有势函数还取决于区域条件。}
 \GlossaryEntry{原像}{Preimage}{若 $T(\boldsymbol x)=\boldsymbol y$，则输入 $\boldsymbol x$ 是输出 $\boldsymbol y$ 的一个原像；双射中每个目标向量有唯一原像。}
 \GlossaryEntry{辐角主值}{Principal Argument}{按约定区间选出的唯一辐角，本附录采用 $(-\pi ,\pi ]$，记为 $\operatorname {Arg}z$。}
 \GlossaryEntry{纯虚数}{Purely Imaginary Number}{实部为0且虚部非零的复数 $bi$。}
@@ -259,6 +274,7 @@
 \GlossaryEntry{正则化}{Regularization}{在拟合目标中加入对参数等对象的约束或惩罚，以改善模型的稳定性与泛化；本章示例采用参数平方和惩罚。}
 \GlossaryEntry{余项}{Remainder}{原函数与截断多项式之间的差，如 $R_n(t)=f(t)-T_n(t)$。}
 \GlossaryEntry{残差向量}{Residual Vector}{目标与实际输出之差 $\boldsymbol b-A\boldsymbol x$；最小二乘解的残差属于 $\operatorname {Null}(A^{\mathrm T})$，与列空间正交。}
+\GlossaryEntry{黎曼和}{Riemann Sum}{把区域分成有限小块，将每块中的函数采样值乘以该块大小后求和；网格逐渐细分时用于描述积分的累积思想。}
 \GlossaryEntry{右手法则}{Right-Hand Rule}{右手拇指指向转轴正向，四指弯曲方向规定为正向旋转；用于统一三维旋转的正负约定。}
 \GlossaryEntry{单位根}{Roots of Unity}{方程 $w^n=1$ 的解，均在单位圆上，辐角相邻间隔为 $2\pi /n$。}
 \GlossaryEntry{旋转}{Rotation}{绕原点转过固定有向角的变换；复平面上乘 $e^{i\theta }$ 表示旋转 $\theta $。}
@@ -273,6 +289,7 @@
 \GlossaryLetter{S}
 \GlossaryEntry{鞍点}{Saddle Point}{有的方向靠近平衡点、有的方向离开的矢量场形态；本节通过一个分量增长、另一个分量衰减的例子观察。}
 \GlossaryEntry{标量}{Scalar}{来自所选域、用于数乘向量的数。}
+\GlossaryEntry{标量场}{Scalar Field}{给空间中每个位置指定一个数的函数，如高度、温度；输入可用位置向量表示，输出是标量。}
 \GlossaryEntry{数乘}{Scalar Multiplication}{以一个标量乘一个向量；在 $\mathbb R^n$ 中，每个分量都乘同一个数。}
 \GlossaryEntry{映射的数乘}{Scalar Multiplication of a Map}{把映射的每个输出同乘标量，$(\lambda T)(\boldsymbol x)=\lambda T(\boldsymbol x)$。}
 \GlossaryEntry{混合积}{Scalar Triple Product}{三维中的 $\boldsymbol w\cdot (\boldsymbol u\times \boldsymbol v)$；给出三条有序边围出的有向体积，循环换序不变、交换两条边变号。}
@@ -309,12 +326,15 @@
 \GlossaryEntry{对称矩阵}{Symmetric Matrix}{满足 $A^{\mathrm T}=A$ 的实方阵，对称位置的元素相等。}
 \GlossaryEntry{对称性}{Symmetry}{某种关系成立时交换两个对象，关系仍成立；如向量组等价关系。}
 \GlossaryLetter{T}
+\GlossaryEntry{切平面}{Tangent Plane}{平滑曲面在一点附近的一阶仿射近似，由该点高度和各输入方向的偏导数决定。}
 \GlossaryEntry{泰勒多项式}{Taylor Polynomial}{用函数在某一点的有限阶导数作系数构造的多项式，本书用于选读的函数近似例子。}
 \GlossaryEntry{词元}{Token}{分词器按规则将文本切分得到的基本处理单元，可为完整的词、词的一部分或标点等，不必与汉字或自然语言中的词一一对应。模型先将其映射为初始向量，再通过后续计算融入上下文信息。}
+\GlossaryEntry{迹}{Trace}{方阵主对角线上元素的和，记作 $\operatorname {tr}A$；在线性向量场中表示体积的瞬时相对膨胀率。}
 \GlossaryEntry{暂态响应}{Transient Response}{在本书选读的衰减模型中，由初始状态偏离特解所产生、并随时间消失的齐次响应；一般齐次偏离未必衰减。}
 \GlossaryEntry{传递性}{Transitivity}{若对象一与二、二与三具有某种关系，则对象一与三也具有该关系。}
 \GlossaryEntry{转置}{Transpose}{行列互换的操作；对向量即横排与竖排互换，记作上标 $\mathrm T$。}
 \GlossaryEntry{三角形定则}{Triangle Rule}{把两个向量首尾相接，从第一支起点指向第二支终点的向量表示它们的和。}
+\GlossaryEntry{三重积分}{Triple Integral}{对空间区域上小体积的函数贡献进行累积的积分；如把体密度乘体积微元后相加得到总质量。}
 \GlossaryEntry{零解}{Trivial Solution}{所有未知数均为0的解，是任意齐次线性方程组的一个解。}
 \GlossaryEntry{平凡子空间}{Trivial Subspaces}{所讨论空间的零子空间与全空间；零空间情形二者重合。}
 \GlossaryEntry{二维广义叉乘}{Two-Dimensional Generalized Cross Product}{本章采用一个平面向量输入的垂直生成操作，$(a,b)^{\mathrm T}\mapsto (-b,a)^{\mathrm T}$；区别于三维的双向量叉乘。}
