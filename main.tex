@@ -31,13 +31,20 @@
                     every node/.style={anchor=north west,inner sep=0pt}]
                     \node[font=\fontsize{21}{27}\selectfont] at (2.2,1.45)
                         {$\displaystyle\sum_{j=1}^{m}c_j\vec v_j=\vec0,
-                          \quad\vec c\ne\vec0$};
+                          \quad c\ne\vec0$};
                     \node[font=\fontsize{30}{38}\selectfont] at (14.2,3.0)
                         {$A\vec x=\vec b$};
                     \node[font=\fontsize{21}{27}\selectfont] at (2.2,23.45)
                         {$F_{k+2}=F_{k+1}+F_k$};
                     \node[font=\fontsize{22}{28}\selectfont] at (12.0,23.45)
                         {$T:\mathbb R^n\longrightarrow\mathbb R^m$};
+                    \node[font=\fontsize{21}{27}\selectfont] at (14.2,10.65)
+                        {$A\vec v=\lambda\vec v$};
+                    \node[font=\fontsize{21}{27}\selectfont] at (12.0,22.60)
+                        {$\varphi:V\longrightarrow\mathbb R$};
+                    \node[anchor=north,font=\fontsize{21}{27}\selectfont]
+                        at (10.5,24.65)
+                        {$\langle\vec u,\vec v\rangle=\vec u^{\mathrm T}\vec v$};
                 \end{scope}
 
                 % Title and subtitle, aligned to the same left edge.
@@ -17073,7 +17080,12 @@ One tricky point: here $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i
 % IMMUTABLE ELLIPSE NARRATIVE BEGIN
 我们先来看一道高中解析几何里的常客。
 
-\noindent\textbf{例} 已知椭圆 $C:\frac{x^2}{4}+y^2=1$ 的左右顶点为 $A$、$B$，$P$ 为椭圆上不与顶点重合的动点，则直线 $PA$、$PB$ 的斜率之积为\underline{\hspace{3em}}。
+\begin{tcolorbox}[enhanced,colback=DetBlue!3,colframe=DetBlue!35,
+ boxrule=.5pt,arc=2pt,left=9pt,right=9pt,top=7pt,bottom=7pt,
+ before skip=10pt,after skip=10pt,
+ fontupper=\linespread{1}\fontsize{12pt}{23pt}\selectfont]
+\textbf{例：}\quad 已知椭圆 $C:\frac{x^2}{4}+y^2=1$ 的左右顶点为 $A$、$B$，$P$ 为椭圆上不与顶点重合的动点，则直线 $PA$、$PB$ 的斜率之积为\underline{\hspace{3em}}。
+\end{tcolorbox}
 
 相信很多人对它都有印象：这是椭圆「定值问题」里最基础的那一道，是无数次作业、考试里绕不开的计算。设点、写斜率、相乘、代入椭圆方程消元、约分化简 —— 整套流程下来，草稿纸用掉半行，时间过去几分钟，最后得到一个 $-\frac{1}{4}$。
 
@@ -17092,30 +17104,11 @@ One tricky point: here $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i
  x'^2+y'^2=1
 \end{equation}
 
+\Needspace{280pt}
 原来的点也跟着变换： 左顶点 $A(-2,0)$ 变成 $A'(-1,0)$ 右顶点 $B(2,0)$ 变成 $B'(1,0)$ 动点 $P(x,y)$ 变成 $P'(x',y')$
 
-在单位圆里，$A'B'$ 是直径。由初中就知道的圆周角定理：直径所对的圆周角为直角，因此
-\begin{equation}
- A'P'\perp B'P'
-\end{equation}
-两条直线垂直，斜率乘积自然就是 $-1$。
-
-剩下的事情，就只是把斜率「换算」回变换前的尺度： x 轴被拉长了 2 倍，同样的高度变化对应的水平变化变成了原来的 2 倍，因此斜率变成了原来的 $\frac{1}{2}$：
-\begin{equation}
- k_{PA}=\frac{k_{P'A'}}{2},\quad k_{PB}=\frac{k_{P'B'}}{2}
-\end{equation}
-
-于是答案脱口而出：
-\begin{equation}
- k_{PA}\cdot k_{PB}=\frac{k_{P'A'}\cdot k_{P'B'}}{4}=-\frac{1}{4}
-\end{equation}
-
-你看，没有复杂的联立，没有繁琐的消元。我们只是把椭圆「缩回去」变回了圆，所有的性质就都清晰了。 线性变换没有创造新的性质，它只是把圆里我们熟悉的结论，换了一副样子藏在椭圆里。 变的是斜率、长度、面积，不变的是直线、交点、平行性，以及结构本身。
-
-这就是本章一直在讲的道理：行列式负责度量的缩放，而线性变换负责结构的保持。 当年我们在坐标里死算的时候，其实是在黑暗里摸象；而线性变换给了我们一盏灯 —— 我们不再盯着一个个点的坐标算，我们直接看整个图形的变换。
-% IMMUTABLE ELLIPSE NARRATIVE END
-
-\DetFigure{左侧椭圆上的 $P$ 与右侧单位圆上的 $P'$ 相互对应。上方箭头把圆拉成椭圆，下方箭头用逆矩阵把椭圆缩回圆，两个方向不能混用。圆中的直角不被横向拉伸保持，因此两条斜率各减半，乘积由 $-1$ 变为 $-\frac14$。}{fig:six-ellipse-slope-invariant}{%
+\noindent\begin{minipage}{\linewidth}
+\centering
 \begin{tikzpicture}[x=1.2cm,y=1.2cm,font=\small]
  \begin{scope}
   \draw[step=.5,DetGray!13,very thin] (-2.3,-1.4) grid (2.3,1.4);
@@ -17146,7 +17139,34 @@ One tricky point: here $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i
   \fill[DetBlue] (bp) circle (2pt) node[below] {$B'(1,0)$};
   \node at (0,-1.8) {$k_{P'A'}k_{P'B'}=-1$};
  \end{scope}
-\end{tikzpicture}}
+\end{tikzpicture}
+\par\captionof{figure}{左侧椭圆上的 $P$ 与右侧单位圆上的 $P'$ 相互对应。上方箭头把圆拉成椭圆，下方箭头用逆矩阵把椭圆缩回圆，两个方向不能混用。圆中的直角不被横向拉伸保持，因此两条斜率各减半，乘积由 $-1$ 变为 $-\frac14$。}
+\label{fig:six-ellipse-slope-invariant}
+\end{minipage}
+
+
+在单位圆里，$A'B'$ 是直径。由初中就知道的圆周角定理：直径所对的圆周角为直角，因此
+\begin{equation}
+ A'P'\perp B'P'
+\end{equation}
+两条直线垂直，斜率乘积自然就是 $-1$。
+
+剩下的事情，就只是把斜率「换算」回变换前的尺度： x 轴被拉长了 2 倍，同样的高度变化对应的水平变化变成了原来的 2 倍，因此斜率变成了原来的 $\frac{1}{2}$：
+\begin{equation}
+ k_{PA}=\frac{k_{P'A'}}{2},\quad k_{PB}=\frac{k_{P'B'}}{2}
+\end{equation}
+
+于是答案脱口而出：
+\begin{equation}
+ k_{PA}\cdot k_{PB}=\frac{k_{P'A'}\cdot k_{P'B'}}{4}=-\frac{1}{4}
+\end{equation}
+
+你看，没有复杂的联立，没有繁琐的消元。我们只是把椭圆「缩回去」变回了圆，所有的性质就都清晰了。 线性变换没有创造新的性质，它只是把圆里我们熟悉的结论，换了一副样子藏在椭圆里。 变的是斜率、长度、面积，不变的是直线、交点、平行性，以及结构本身。
+
+这就是本章一直在讲的道理：行列式负责度量的缩放，而线性变换负责结构的保持。 当年我们在坐标里死算的时候，其实是在黑暗里摸象；而线性变换给了我们一盏灯 —— 我们不再盯着一个个点的坐标算，我们直接看整个图形的变换。
+% IMMUTABLE ELLIPSE NARRATIVE END
+
+
 
 例题中的“不变”指前面列出的仿射结构，不表示圆中的直角仍是椭圆中的直角。斜率会改变，但变换告诉我们它怎样改变；这是用整体关系替代逐点消元。
 
@@ -17512,7 +17532,8 @@ One tricky point: here $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i
 
 
 % CHAPTER 6 PERMUTATION AXIOMS BEGIN
-\section{排列的逆序数：行列式的离散对称结构}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+\section{【选读】排列的逆序数：行列式的离散对称结构}
 \label{sec:six-optional-existence}
 
 \textbf{几何给了我们三条规则，怎样保证它们在任意维数中都有且只有一个答案？} 从6.1节的有向面积、体积，到6.2节的公理性质，我们一直在观察有序边怎样张开空间。眼睛看不见高维盒子时，多重线性仍允许我们把每一条边拆成标准基分量；交替性则告诉我们，哪些组合要消去，哪些组合要带上负号。由此，连续的几何问题走向有限的排列计数。本节为\textbf{选读，不做考核要求}，任务是把前文暂缓的存在性与唯一性证明补齐。
@@ -17891,7 +17912,8 @@ One tricky point: here $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i
 % CHAPTER 6 PERMUTATION AXIOMS END
 
 % CHAPTER 6 UNITREE CASE BEGIN
-\section{应用案例：宇树机器人的运动控制与奇异性分析}
+\addtocontents{toc}{\protect\setcounter{tocdepth}{2}}
+\section{【应用案例】宇树机器人的运动控制与奇异性分析}
 \label{sec:six-unitree-control}
 
 \subsection*{从春晚舞台说起：机器人如何完成“转手绢”？}
@@ -18521,12 +18543,73 @@ Setyawan等的改进阻尼最小二乘研究，在T-FLoW七自由度机械臂的
 % CHAPTER 6 UNITREE CASE END
 
 
+\clearpage
 \section*{本章小结}
 \addcontentsline{toc}{section}{本章小结}
 
-面积意义由此不是一个事后附加的比喻：二维中的底乘高、三维中的混合积，以及任意维数的归一化交替多重线性函数，描述的是同一套体积规则。行列式为0时，我们看见方向塌缩；非零时，我们看见可逆作用的整体倍率；面对非线性变形，又在足够小的范围内把同一套规则交给局部矩阵使用。
+本章从“线性变换怎样改变空间的大小与方向”出发，沿着\textbf{有向面积与体积}\,$\longrightarrow$\,\textbf{多重线性、交替性与归一性}\,$\longrightarrow$\,\textbf{性质与可逆性判定}\,$\longrightarrow$\,\textbf{消元、余子式与方程组求解}\,$\longrightarrow$\,\textbf{局部雅可比与机器人奇异性分析}这条路径，把看得见的空间变形转化为可证明、可计算、可用于判断运动能力的工具。先看见，再理解，最后计算，是这条路径的次序。
 
-到这里，几何提出的问题已经转化为可以证明、可以计算的代数结论。下一章将进一步研究长度、夹角与正交，让我们不只量出一个区域整体缩放多少，还能更细致地理解向量之间的度量关系。
+\DetHead{一、本质洞察：用一个数读出整体的体积变化}
+\textbf{行列式的本质，是线性变换的有向体积缩放因子。}对于实 $n$ 阶方阵 $A$，它的各列是标准基的像；这些有序边张开的有向体积，就是 $\det A$。绝对值回答体积放大或缩小多少，正负号记录定向是否翻转，零则表示独立方向没有凑齐。二维的底乘高、三维的混合积与高维的三条公理，由此成为同一种测量的不同表达。
+
+三条公理也解释了计算规则的来由：一条边写成两个向量之和，对应多重线性的可加性；交换两条边，对应定向变号；标准基张开的单位盒子，把刻度固定为1。第6.5节的选读沿着标准基展开走向排列计数，补齐这套规则的存在性与唯一性证明。排列公式提供理论上的完整表达，实际计算仍应依据矩阵的结构选择方法。
+
+一个体积读数不能描述变换的全部几何。$\det A=1$ 只说明有向体积不变，并不保证长度、夹角或形状不变；机器人案例中，面积相同的速度椭圆，也可能具有很不相同的短轴。把“整体缩放多少”与“各方向怎样变化”分开，才能准确理解行列式的能力。
+
+\Needspace{330pt}
+\DetHead{二、核心结论：让代数条件与几何现象相互对应}
+下表中的 $A,B$ 均为实 $n$ 阶方阵，$\boldsymbol b\in\mathbb R^n$。每一行都在把同一个事实换成另一种语言，而不是增加一条孤立的判定。
+
+\begin{center}
+\begingroup
+\fontsize{11pt}{17pt}\selectfont
+\setlength{\tabcolsep}{7pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{.19\linewidth}>{\raggedright\arraybackslash}p{.39\linewidth}>{\raggedright\arraybackslash}p{.35\linewidth}@{}}
+\toprule
+\textbf{行列式读数} & \textbf{等价条件或运算关系} & \textbf{几何与求解含义}\\
+\midrule
+$\det A\ne0$ & $\operatorname{rank}A=n$；列向量线性无关；$A$ 可逆；$A\boldsymbol x=\boldsymbol0$ 只有零解。 & 没有方向塌缩；对任意 $\boldsymbol b$，$A\boldsymbol x=\boldsymbol b$ 有解且解唯一。\\[5pt]
+$\det A=0$ & $\operatorname{rank}A<n$；列向量线性相关；$A$ 不可逆；齐次方程有非零解。 & 至少一个输入方向被送到零，像空间维数不足；非齐次方程无解或有无穷多解。\\[5pt]
+先后复合 & $\det(AB)=\det A\det B$；若 $A$ 可逆，$\det(A^{-1})=1/\det A$。 & 两次体积倍率相乘；撤销作用时，倍率取倒数。\\[5pt]
+换一种读法 & $\det(A^{\mathrm T})=\det A$；三角矩阵的行列式等于主对角线元素之积。 & 行、列读出同一体积；化为三角矩阵后，可逐个读出新增方向的倍率。\\
+\bottomrule
+\end{tabular}
+\endgroup
+\end{center}
+
+余子式把一个 $n$ 维读数降到 $n-1$ 维，伴随矩阵则把这些降阶读数组织为整体恒等式：
+\[
+ A\operatorname{adj}(A)=\operatorname{adj}(A)A=(\det A)E_n.
+\]
+这条等式对奇异方阵也成立；只有在 $\det A\ne0$ 时，才能除以它，得到逆矩阵公式。同样，克拉默法则的 $x_i=\det A_i/\det A$ 以 $\det A\ne0$ 为前提，其中 $A_i$ 是把 $A$ 的第 $i$ 列换成右端向量后的矩阵。这个比值读出组合系数，必须保留有向体积的符号。
+
+从全局变换走向非线性变形时，变化的是观察尺度：对可微映射，固定一点，用雅可比矩阵近似附近的作用；输入、输出维数相同，才有雅可比行列式，$|\det J|$ 给出局部体积倍率。在机器人案例中，方形 $J$ 的行列式为零，表示当前速度映射丢失方向；它描述瞬时的一阶能力，不能据此判断经过姿态调整后的运动能力。矩形 $J$ 则应检查秩及像空间，不能直接写 $\det J$。
+
+\Needspace{520pt}
+\DetHead{三、计算与解题：先辨认结构，再安排运算}
+常见计算题与考研题型，可以沿着“题目要什么、矩阵有什么结构、哪种操作最合适”组织。下面的步骤把前面的结论落实到纸面计算。
+
+\begin{center}
+\begingroup
+\fontsize{11pt}{17pt}\selectfont
+\setlength{\tabcolsep}{7pt}\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{.19\linewidth}>{\raggedright\arraybackslash}p{.46\linewidth}>{\raggedright\arraybackslash}p{.28\linewidth}@{}}
+\toprule
+\textbf{任务与题型} & \textbf{计算路径} & \textbf{应保留的条件}\\
+\midrule
+数值行列式 & 优先用倍加消元形成三角矩阵，再乘主对角线元素；每次换行、倍乘都同步记录倍率。 & 换行一次变号；一行乘 $k$，行列式乘 $k$；倍加不变。\\[5pt]
+稀疏或有规律的行列式 & 选零最多的行或列展开；先写 $A_{ij}=(-1)^{i+j}M_{ij}$，再做降阶；重复结构可建立递推。 & 元素、位置符号、对应余子式必须配对；萨鲁斯法则只用于三阶。\\[5pt]
+含参数的可逆性判定 & 求出 $\det A(t)$ 并找零点；在这些参数值处，再用消元判断秩与方程组的解。 & 行列式为零不能单独区分无解与无穷多解；除以含参数的式子前须分情况。\\[5pt]
+伴随矩阵、求逆与求解 & 求逆或求唯一解时，先核对可逆条件；伴随矩阵是代数余子式矩阵的转置。低阶显式解可用克拉默法则，成批求解可保存LU或PLU分解。 & 克拉默法则替换的是列；实际求解优先解方程组，避免把显式求逆当作必经步骤。\\[5pt]
+面积、体积与局部缩放 & 先写出变换矩阵及其方向，再算行列式；通常面积、体积取绝对值，有向面积、体积保留符号。 & 非线性变形的 $J$ 随位置改变；局部倍率不能当成处处相同的全局倍率。\\
+\bottomrule
+\end{tabular}
+\endgroup
+\end{center}
+
+这些路径共同要求我们在运算之前读懂矩阵。几何说明公式在量什么，公理保证变形有依据，消元与分解则把依据变成可执行的算法。章末的机器人控制进一步显示：接近奇异时，求解还要顾及速度放大与数值稳定性，阻尼方法正是在允许误差的同时限制关节速度。
+
+行列式把前几章的线性无关、秩、可逆映射与方程组，汇聚到一个有向体积读数中；它既能给出理论判定，也能帮助我们诊断局部作用是否塌缩。接下来，只有整体倍率还不够：我们还要量出向量的长度、彼此的夹角，辨认垂直方向，并理解投影。第7章将以\textbf{内积与正交}继续这条几何主线，从“空间整体怎样缩放”，走向“空间中的方向怎样相互度量”。
 
 \par\clearpage
 \endgroup
