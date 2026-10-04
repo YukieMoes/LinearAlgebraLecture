@@ -15188,37 +15188,6 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \end{equation}
 叉乘先保存有向底面，点乘再读出第三条边的高；这个组合称为\term{scalar-triple-product}。若底面退化，叉乘为零，体积也为0，此时不再使用除以 $|\boldsymbol N|$ 的高度公式。
 
-怎样把底面法线写成三个坐标？分别看底面在 $yz$、$zx$、$xy$ 平面上的有向面积，就得到法线的三个分量。次序 $yz,zx,xy$ 与右手定向相配，代入二维面积公式得
-\begin{equation}
- \boldsymbol a_1\times\boldsymbol a_2
- =\DetMat{c}{
- a_{21}a_{32}-a_{31}a_{22}\\
- a_{31}a_{12}-a_{11}a_{32}\\
- a_{11}a_{22}-a_{21}a_{12}}.
- \label{eq:six-cross-coordinates}
-\end{equation}
-每个分量都是一个二阶有向面积；中间分量采用 $zx$ 的次序，不能擅自换成 $xz$ 而不改符号。与第三列点乘，便给出三阶行列式：
-\begin{align}
- \det(A)
- &=a_{11}a_{22}a_{33}+a_{21}a_{32}a_{13}+a_{31}a_{12}a_{23}\\
- &\quad-a_{31}a_{22}a_{13}-a_{11}a_{32}a_{23}-a_{21}a_{12}a_{33}.
- \label{eq:six-three-volume-six-terms}
-\end{align}
-这六项只是底面积乘高的坐标展开，不需要另背一套与几何无关的口诀。
-
-\Needspace{9\baselineskip}
-\begin{example}[先找到底面，再计算体积]
-取三条列向量 $\boldsymbol a_1=(1,2,0)^{\mathrm T}$、$\boldsymbol a_2=(0,1,1)^{\mathrm T}$、$\boldsymbol a_3=(2,0,1)^{\mathrm T}$。则
-\begin{equation}
- \boldsymbol N=(2,-1,1)^{\mathrm T},\qquad
- |\boldsymbol N|=\sqrt6,\qquad
- h=\frac5{\sqrt6},\qquad \det(A)=5.
-\end{equation}
-底面积与法向高度分别为 $\sqrt6$、$5/\sqrt6$，乘积为5。若把第三条边换成 $\boldsymbol a_1+\boldsymbol a_2$，它留在底面内，法向高度为0，三维体积也为0。
-\end{example}
-
-二维的三条规则在三维仍然看得见：交换两条有序边，盒子的定向反转；把一条边乘 $k$，对应的带符号高度乘 $k$；把一条边拆成两个向量之和，两份带符号高度相加。任取另两条边作底面，都能这样看。所以，对任一列都有数乘与可加性，交换任意两列都使有向体积变号。循环换序作了两次交换，符号恢复；只交换一次则不会恢复。
-
 \DetHead{小注：正交补是什么}
 刚才的叉乘向量，是“正交补”最容易看见的一种几何形式。两个不共线的向量张成一个平面子空间，叉乘给出一支与平面内\textbf{所有向量}都垂直的箭头；它的长度等于底面平行四边形的面积，方向满足右手定则。它不是另一个随意选出的方向，而是保存了底面大小与定向的高度方向。
 
@@ -15246,6 +15215,174 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \end{tikzpicture}}
 
 往回看，第5章四个基本子空间中，$\operatorname{Null}(A)$ 就是 $\operatorname{Row}(A)$ 的正交补：所有与行空间中每个向量都垂直的向量，合在一起构成一个子空间。因此，“一支正交补向量”和“整个正交补空间”不能混为一谈。
+
+怎样把底面法线写成三个坐标？分别看底面在 $yz$、$zx$、$xy$ 平面上的有向面积，就得到法线的三个分量。次序 $yz,zx,xy$ 与右手定向相配，代入二维面积公式得
+\begin{equation}
+ \boldsymbol a_1\times\boldsymbol a_2
+ =\DetMat{c}{
+ a_{21}a_{32}-a_{31}a_{22}\\
+ a_{31}a_{12}-a_{11}a_{32}\\
+ a_{11}a_{22}-a_{21}a_{12}}.
+ \label{eq:six-cross-coordinates}
+\end{equation}
+每个分量都是一个二阶有向面积；中间分量采用 $zx$ 的次序，不能擅自换成 $xz$ 而不改符号。为什么一个法向量会保存三份面积？先把底面想成一张有朝向的薄片，分别沿三个坐标轴看它：沿 $x$ 轴看，留下 $yz$ 平面中的轮廓；沿 $y$ 轴看，留下 $zx$ 平面中的轮廓；沿 $z$ 轴看，留下 $xy$ 平面中的轮廓。这里仅把两条边的相应坐标保留下来，得到三块投影平行四边形，不另研究投影变换。
+
+\DetHead{三个坐标平面，各读出一个有向面积}
+记这三份有向面积为 $S_{yz},S_{zx},S_{xy}$。比如，原来两条边的 $y,z$ 坐标分别是 $(a_{21},a_{31})^{\mathrm T}$、$(a_{22},a_{32})^{\mathrm T}$，直接用第6.1.1节的二维面积公式，就有
+\begin{equation}
+ \begin{aligned}
+ S_{yz}&=\begin{vmatrix}a_{21}&a_{22}\\a_{31}&a_{32}\end{vmatrix}
+       =a_{21}a_{32}-a_{31}a_{22}=N_x,\\
+ S_{zx}&=\begin{vmatrix}a_{31}&a_{32}\\a_{11}&a_{12}\end{vmatrix}
+       =a_{31}a_{12}-a_{11}a_{32}=N_y,\\
+ S_{xy}&=\begin{vmatrix}a_{11}&a_{12}\\a_{21}&a_{22}\end{vmatrix}
+       =a_{11}a_{22}-a_{21}a_{12}=N_z.
+ \end{aligned}
+ \label{eq:six-projected-areas}
+\end{equation}
+所以，法线的 $x$ 分量保存 $yz$ 有向面积，$y$ 分量保存 $zx$ 有向面积，$z$ 分量保存 $xy$ 有向面积。三份读数排成 $(S_{yz},S_{zx},S_{xy})^{\mathrm T}$，就是式\eqref{eq:six-cross-coordinates}中的叉乘向量。
+
+符号也有来处：按 $y$ 后 $z$ 的次序读取平面，它的正法线指向 $+x$；$z$ 后 $x$ 对应 $+y$；$x$ 后 $y$ 对应 $+z$，三者都沿用右手定向。因此，$zx$ 中逆时针的投影给出正的 $y$ 分量，顺时针则给出负的 $y$ 分量。若改按 $xz$ 读取，二阶行列式就会变号。图\ref{fig:six-coordinate-projections}用同一对边画出这三个视角。
+
+\DetFigure{蓝色、红色箭头分别是同一对底边在三个坐标平面中的投影；三栏使用相同的单位长度。按 $yz,zx,xy$ 的次序读出的有向面积依次为 $2,-1,1$，正好组成叉乘向量 $(2,-1,1)^{\mathrm T}$；每个分量都是式\eqref{eq:six-projected-areas}中的一个二阶行列式。}{fig:six-coordinate-projections}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \node[align=center] at (6.9,6.05)
+  {同一底面：$\boldsymbol a_1=(1,2,0)^{\mathrm T}$，
+   $\boldsymbol a_2=(0,1,1)^{\mathrm T}$};
+ \foreach \xx/\plane/\normal in {2.25/yz/x,6.85/zx/y,11.45/xy/z}{
+  \node[font=\bfseries] at (\xx,5.4) {$\plane$ 平面：正法线 $+\normal$};}
+ \begin{scope}[shift={(.5,2.4)},x=.8cm,y=.8cm]
+  \draw[step=.5,DetGray!12,line width=.25pt] (-.2,-.2) grid (3.7,3.3);
+  \draw[detaxis] (-.2,0)--(3.7,0) node[right] {$y$};
+  \draw[detaxis] (0,-.2)--(0,3.3) node[above] {$z$};
+  \filldraw[fill=DetBlue!10,draw=DetGray!55]
+   (0,0)--(2,0)--(3,1)--(1,1)--cycle;
+  \draw[detblue] (0,0)--(2,0) node[below] {$(2,0)$};
+  \draw[detrose] (0,0)--(1,1) node[above left] {$(1,1)$};
+  \draw[DetGreen,-{Stealth[length=1.6mm]}] (.45,0) arc (0:45:.45);
+  \node[fill=white,inner sep=1pt] at (2,.6) {$S_{yz}=2$};
+  \node[below left] at (0,0) {$O$};
+ \end{scope}
+ \begin{scope}[shift={(5.1,2.4)},x=.8cm,y=.8cm]
+  \draw[step=.5,DetGray!12,line width=.25pt] (-.2,-.2) grid (3.7,3.3);
+  \draw[detaxis] (-.2,0)--(3.7,0) node[right] {$z$};
+  \draw[detaxis] (0,-.2)--(0,3.3) node[above] {$x$};
+  \filldraw[fill=DetRose!10,draw=DetGray!55]
+   (0,0)--(0,1)--(1,1)--(1,0)--cycle;
+  \draw[detblue] (0,0)--(0,1) node[left] {$(0,1)$};
+  \draw[detrose] (0,0)--(1,0) node[below] {$(1,0)$};
+  \draw[DetRose,-{Stealth[length=1.6mm]}] (0,.35) arc (90:0:.35);
+  \node[align=center,fill=white,inner sep=1pt] at (2.35,1.25)
+   {$S_{zx}=-1$\\顺时针};
+  \node[below left] at (0,0) {$O$};
+ \end{scope}
+ \begin{scope}[shift={(9.7,2.4)},x=.8cm,y=.8cm]
+  \draw[step=.5,DetGray!12,line width=.25pt] (-.2,-.2) grid (3.7,3.3);
+  \draw[detaxis] (-.2,0)--(3.7,0) node[right] {$x$};
+  \draw[detaxis] (0,-.2)--(0,3.3) node[above] {$y$};
+  \filldraw[fill=DetBlue!10,draw=DetGray!55]
+   (0,0)--(1,2)--(1,3)--(0,1)--cycle;
+  \draw[detblue] (0,0)--(1,2) node[right] {$(1,2)$};
+  \draw[detrose] (0,0)--(0,1) node[left] {$(0,1)$};
+  \draw[DetGreen,-{Stealth[length=1.6mm]}] (.20,.40) arc (63.435:90:.4472);
+  \node[fill=white,inner sep=1pt] at (.48,1.55) {$+1$};
+  \node[below left] at (0,0) {$O$};
+ \end{scope}
+ \foreach \xx/\comp/\ii/\jj/\kk/\ll in {
+  2.25/x/21/22/31/32,6.85/y/31/32/11/12,11.45/z/11/12/21/22}{
+  \node at (\xx,1.35)
+   {$N_{\comp}=\begin{vmatrix}a_{\ii}&a_{\jj}\\a_{\kk}&a_{\ll}\end{vmatrix}$};}
+ \node[font=\footnotesize] at (2.25,.5) {$a_{21}a_{32}-a_{31}a_{22}$};
+ \node[font=\footnotesize] at (6.85,.5) {$a_{31}a_{12}-a_{11}a_{32}$};
+ \node[font=\footnotesize] at (11.45,.5) {$a_{11}a_{22}-a_{21}a_{12}$};
+ \node[font=\footnotesize,text=DetGray] at (6.85,-.05)
+  {有向面积的正负由边的次序决定，不取绝对值。};
+\end{tikzpicture}}
+
+为什么投影面积等于法线分量，而不只是碰巧写出同样的式子？底面的通常面积为 $S=|\boldsymbol N|$，正向单位法线为 $\boldsymbol n=\boldsymbol N/S$。从某坐标轴看，底面的有向投影面积等于 $S$ 乘以法线沿该轴的带符号分量：例如 $yz$ 面读出 $S n_x=N_x$。底面越朝向该轴，投影越完整；若法线垂直于该轴，投影退成一条线，相应面积和分量都为零。这里的符号记录朝向，三份面积合起来保存的是一块底面的大小与定向。底面退化时，三份面积及叉乘均为零，不再除以 $S$。
+
+与第三列点乘，便给出三阶行列式：
+\begin{align}
+ \det(A)
+ &=a_{11}a_{22}a_{33}+a_{21}a_{32}a_{13}+a_{31}a_{12}a_{23}\\
+ &\quad-a_{31}a_{22}a_{13}-a_{11}a_{32}a_{23}-a_{21}a_{12}a_{33}.
+ \label{eq:six-three-volume-six-terms}
+\end{align}
+把同一式子按三个坐标平面重新分组，就得到
+\begin{equation}
+ \det(A)=S_{yz}a_{13}+S_{zx}a_{23}+S_{xy}a_{33}
+        =N_xa_{13}+N_ya_{23}+N_za_{33}.
+ \label{eq:six-projected-volume-sum}
+\end{equation}
+每一组都用一个二阶有向投影面积，乘第三条边沿相应坐标轴的带符号分量，给出一份有向体积贡献；三份相加，就是混合积。每份投影面积又包含一加一减，展开后便是六项。要注意，$a_{13},a_{23},a_{33}$ 是三个坐标方向的分量，不能分别当作原底面的法向高度 $h$；三份贡献也不是把原盒子切成三个互不重叠的小盒子。真正的底乘高仍是 $|\boldsymbol N|h$，式\eqref{eq:six-projected-volume-sum}只是把这个点积拆成坐标形式。这六项只是底面积乘高的坐标展开，不需要另背一套与几何无关的口诀。
+
+\DetHead{萨鲁斯法则：可以速算，但先看清算的是什么}
+计算三阶行列式时，\term{sarrus-rule}给出一个方便的排列办法：把矩阵前两列抄到右侧，沿右下方向的三条对角线分别相乘再相加，沿右上方向的三条对角线分别相乘再相减。图\ref{fig:six-sarrus-geometric}右侧画出这个步骤；左侧则把相同的六项放回三个投影面积与坐标高度的配对中。
+
+\DetFigure{左侧三个小底面代表坐标平面中的有向投影面积，绿色箭头示意第三条边的相应坐标分量；蓝、红两列记录相乘展开后加上与减去的六个乘积。右侧把同样的六项排成萨鲁斯对角线，灰色两列是抄写的辅助列；颜色只表示展开式前的符号，不断言乘积的数值必为正或负。口诀便于速算，几何配对则解释它为什么计算有向体积。}{fig:six-sarrus-geometric}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,DetGray!8,line width=.25pt] (-.2,-.2) grid (14.5,5.5);
+ \node[font=\bfseries] at (3.2,5.15) {有向投影面积 $\times$ 坐标高度};
+ \node[font=\bfseries] at (11.05,5.15) {萨鲁斯法则：同样的六项};
+ \node[text=DetBlue,font=\footnotesize] at (2.8,4.6) {展开时加上};
+ \node[text=DetRose,font=\footnotesize] at (5.15,4.6) {展开时减去};
+ \foreach \yy/\plane/\comp/\third/\plus/\minus in {
+  3.65/yz/x/13/{a_{21}a_{32}a_{13}}/{a_{31}a_{22}a_{13}},
+  2.45/zx/y/23/{a_{31}a_{12}a_{23}}/{a_{11}a_{32}a_{23}},
+  1.25/xy/z/33/{a_{11}a_{22}a_{33}}/{a_{21}a_{12}a_{33}}}{
+  \filldraw[fill=DetGray!10,draw=DetGray!65,line width=.55pt]
+   (.1,{\yy-.12})--(.9,{\yy-.12})--(1.18,{\yy+.08})
+   --(.38,{\yy+.08})--cycle;
+  \draw[DetGreen,line width=.85pt,-{Stealth[length=1.5mm]}]
+   (.55,{\yy-.01})--(.55,{\yy+.48});
+  \node[anchor=west,text=DetGreen,font=\scriptsize] at (.62,{\yy+.37})
+   {$a_{\third}$};
+  \node[text=DetGray,font=\scriptsize] at (.64,{\yy-.35}) {$\plane$ 底面};
+  \node[anchor=west,font=\footnotesize] at (1.75,{\yy+.42})
+   {$S_{\plane}a_{\third}=N_{\comp}a_{\third}$};
+  \filldraw[fill=DetBlue!7,draw=DetBlue!45,rounded corners=2pt]
+   (1.75,{\yy-.23}) rectangle(3.9,{\yy+.24});
+  \filldraw[fill=DetRose!7,draw=DetRose!45,rounded corners=2pt]
+   (4.08,{\yy-.23}) rectangle(6.23,{\yy+.24});
+  \node[text=DetBlue,font=\footnotesize] at (2.825,\yy) {$+\plus$};
+  \node[text=DetRose,font=\footnotesize] at (5.155,\yy) {$-\minus$};}
+ \draw[DetGray,line width=.8pt,-{Stealth[length=2mm]}] (6.25,2.8)--(7.65,2.8);
+ \node[align=center,font=\footnotesize,text=DetGray] at (6.95,3.5) {重新排列\\六项不变};
+ \fill[DetGray!9] (11.35,1.2) rectangle(13.75,4.5);
+ \node[text=DetGray,font=\footnotesize] at (12.55,4.72) {抄写前两列};
+ % 先画对角线，再放白底元素，保证箭头不盖住下标。
+ \foreach \cc in {0,1,2}{
+  \draw[DetBlue!75,line width=.9pt,-{Stealth[length=1.6mm]}]
+   ({8.25+1.1*\cc},4.05)--({10.45+1.1*\cc},1.65);
+  \draw[DetRose!75,line width=.9pt,densely dashed,-{Stealth[length=1.6mm]}]
+   ({8.25+1.1*\cc},1.65)--({10.45+1.1*\cc},4.05);}
+ \foreach \xx/\col in {8.25/1,9.35/2,10.45/3,11.55/1,12.65/2}{
+  \node[fill=white,inner sep=2pt] at (\xx,4.05) {$a_{1\col}$};
+  \node[fill=white,inner sep=2pt] at (\xx,2.85) {$a_{2\col}$};
+  \node[fill=white,inner sep=2pt] at (\xx,1.65) {$a_{3\col}$};}
+ \draw[DetGray!75] (7.95,4.35)--(7.78,4.35)--(7.78,1.35)--(7.95,1.35);
+ \draw[DetGray!75] (10.75,4.35)--(10.92,4.35)--(10.92,1.35)--(10.75,1.35);
+ \draw[DetBlue,line width=.9pt,-{Stealth[length=1.5mm]}] (8.1,.85)--(9.1,.45);
+ \node[anchor=west,font=\footnotesize,text=DetBlue] at (9.15,.62) {右下：相加};
+ \draw[DetRose,line width=.9pt,densely dashed,-{Stealth[length=1.5mm]}] (11.15,.45)--(12.15,.85);
+ \node[anchor=west,font=\footnotesize,text=DetRose] at (12.2,.62) {右上：相减};
+ \node[text=DetGray,font=\footnotesize] at (3.2,.35) {六项来自三份有向面积，各含一加一减。};
+\end{tikzpicture}}
+
+这个口诀的价值是少抄错、算得快，它并没有给出另一种行列式。若一上来只教“看对角线”，学生容易把理解体积换成记忆路线，六个乘积为何出现反而被遮住。现在可以反过来使用它：先理解“有向面积 $\times$ 对应坐标分量”，再把对角线当作速记工具。\textbf{萨鲁斯法则只适用于三阶行列式，不能把抄列画斜线的办法直接推广到四阶。}图中的“正项、负项”仅指展开式前的加减号，各个坐标本身仍可能是负数。
+
+\Needspace{9\baselineskip}
+\begin{example}[先找到底面，再计算体积]
+取三条列向量 $\boldsymbol a_1=(1,2,0)^{\mathrm T}$、$\boldsymbol a_2=(0,1,1)^{\mathrm T}$、$\boldsymbol a_3=(2,0,1)^{\mathrm T}$。则
+\begin{equation}
+ \boldsymbol N=(2,-1,1)^{\mathrm T},\qquad
+ |\boldsymbol N|=\sqrt6,\qquad
+ h=\frac5{\sqrt6},\qquad \det(A)=5.
+\end{equation}
+底面积与法向高度分别为 $\sqrt6$、$5/\sqrt6$，乘积为5。若把第三条边换成 $\boldsymbol a_1+\boldsymbol a_2$，它留在底面内，法向高度为0，三维体积也为0。
+\end{example}
+
+二维的三条规则在三维仍然看得见：交换两条有序边，盒子的定向反转；把一条边乘 $k$，对应的带符号高度乘 $k$；把一条边拆成两个向量之和，两份带符号高度相加。任取另两条边作底面，都能这样看。所以，对任一列都有数乘与可加性，交换任意两列都使有向体积变号。循环换序作了两次交换，符号恢复；只交换一次则不会恢复。
 
 第7章会在内积空间中系统讲解正交补的定义、性质与构造。本章先记住：算面积需要垂直于底边的高，算体积需要垂直于底面的高，正交补给出这个高度方向。升到高维，底面与高度的分工仍然保留。
 
