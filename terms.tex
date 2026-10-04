@@ -348,7 +348,7 @@
 \DeclareLectureTerm{alternating-multilinear-form}{交替多重线性型}{Alternating Multilinear Form}{交换任意两个输入位置使值变号的多重线性型；在实数范围，两个输入相同则值为零，归一化的交替$n$重线性型给出行列式。}
 \DeclareLectureTerm{normalization}{归一化}{Normalization}{选定度量基准的条件；行列式规定标准基有序组或单位矩阵的值为1，以固定整体尺度。}
 \DeclareLectureTerm{permutation}{排列}{Permutation}{把 $1,\ldots,n$ 的全部下标按某一顺序重排，或相应的下标一一对应；行列式排列式中每行每列恰取一个元素。}
-\DeclareLectureTerm{inversion-number}{逆序数}{Inversion Number}{排列中前项大于后项的数对个数；行列式项的符号为 $(-1)^{N(\sigma)}$。}
+\DeclareLectureTerm{inversion-number}{逆序数}{Inversion Number}{排列中前项大于后项的数对个数；行列式项的符号为 $(-1)^{\tau(\sigma)}$。}
 \DeclareLectureTerm{minor}{余子式}{Minor}{删去指定元素所在的一行和一列，保留其余行列次序得到的低一阶行列式，记作 $M_{ij}$；约定0阶行列式为1。}
 \DeclareLectureTerm{cofactor}{代数余子式}{Cofactor}{余子式乘位置符号所得的数，$A_{ij}=(-1)^{i+j}M_{ij}$；本章矩阵元素另记作小写 $a_{ij}$。}
 \DeclareLectureTerm{cofactor-vector}{代数余子式向量}{Cofactor Vector}{由某一行的全部代数余子式组成的向量，记作 $\boldsymbol c_i$；垂直于其余各行，与该行的点积为行列式。}
@@ -386,3 +386,33 @@
 \DeclareLectureTerm{sarrus-rule}{萨鲁斯法则}{Sarrus' Rule}{三阶行列式的速算规则：抄写前两列，将右下方向的三条对角线乘积相加、右上方向的三条对角线乘积相减；它重排三阶展开的六项，不适用于四阶及更高阶行列式。}
 
 \DeclareLectureTerm{cramer-rule}{克拉默法则}{Cramer's Rule}{对可逆方阵方程组 $M\boldsymbol x=\boldsymbol b$，第 $i$ 个解分量为 $\det(M_i)/\det(M)$；$M_i$ 只把第 $i$ 列换成目标向量，比例保留有向体积的正负。}
+
+% 第6.4节：仿射结构与有向微元的选读引子。
+\DeclareLectureTerm{affine-invariance}{仿射不变性}{Affine Invariance}{在可逆仿射变换下保持的结构关系，如共线、平行、交点对应与同一直线上的有向分点比例；一般不包括长度、夹角、面积和斜率。}
+\DeclareLectureTerm{wedge-product}{外积}{Wedge Product}{组合线性测量的交替多重线性运算，记作 $\wedge$；交换两个一阶微分的次序变号，用于记录有向面积或体积，不同于列向量乘行向量的 Outer Product。}
+\DeclareLectureTerm{oriented-volume-element}{有向体积元}{Oriented Volume Element}{在一点将有序小位移测为有向体积的交替多重线性对象，记作 $\mathrm dx_1\wedge\cdots\wedge\mathrm dx_n$；坐标变换时乘带符号的雅可比行列式。}
+\DeclareLectureTerm{differential-form}{微分形式}{Differential Form}{在各点给有序位移作交替多重线性测量的对象；本章选读仅以有向体积元为例，不展开完整理论。}
+
+% 第6.5节：排列展开及行列式公理的严格构造。
+\DeclareLectureTerm{symmetric-group}{对称群}{Symmetric Group}{集合 $\{1,\ldots,n\}$ 上全部排列按复合运算组成的群，记作 $S_n$；本讲义只使用排列、对换与奇偶符号，不展开群论。}
+\DeclareLectureTerm{inversion-pair}{逆序对}{Inversion Pair}{排列中满足位置 $p<q$ 而数值 $k_p>k_q$ 的数对；前面的数比后面的数大，逆序数就是这样的数对总数。}
+\DeclareLectureTerm{permutation-parity}{排列奇偶性}{Permutation Parity}{由排列逆序数的奇偶决定的分类；任意一次对换都会翻转它，排列符号记为 $(-1)^\tau$。}
+\DeclareLectureTerm{even-permutation}{偶排列}{Even Permutation}{逆序数为偶数的排列，其符号为 $+1$；不要求各元素已经按递增次序排列。}
+\DeclareLectureTerm{odd-permutation}{奇排列}{Odd Permutation}{逆序数为奇数的排列，其符号为 $-1$。}
+\DeclareLectureTerm{transposition}{对换}{Transposition}{交换排列中两个不同位置的元素，其他位置保持不变的操作；它改变排列奇偶性。}
+\DeclareLectureTerm{adjacent-transposition}{相邻对换}{Adjacent Transposition}{交换排列中相邻两个位置的元素；逆序数恰好增加1或减少1，交换相邻倒序元素时减少1。}
+\DeclareLectureTerm{leibniz-formula}{莱布尼茨公式}{Leibniz Formula}{把行列式写成全部排列项的带符号有限和：每项从每行、每列恰取一个元素，其符号由逆序数奇偶决定。}
+
+% 第6.6节：机器人速度映射、奇异诊断与稳定求解。
+\DeclareLectureTerm{forward-kinematics}{正运动学}{Forward Kinematics}{由关节角等状态计算机器人末端位置或姿态的过程；本节2R模型用两根连杆的坐标投影相加计算平面位置。}
+\DeclareLectureTerm{kinematic-singularity}{奇异位形}{Kinematic Singularity}{所选任务雅可比的秩低于该机构在此任务下可达到的最大秩的姿态；典型表现是末端丢失独立的瞬时运动方向，不意味着所有有限时间路径均不可行。}
+\DeclareLectureTerm{differential-inverse-kinematics}{微分逆运动学}{Differential Inverse Kinematics}{固定当前姿态，由期望末端速度反求关节速度的问题；其线性模型为$J\dot{\boldsymbol\theta}=\boldsymbol v$，不同于直接由目标位置求完整关节角。}
+\DeclareLectureTerm{manipulability-ellipsoid}{可操作性椭球}{Manipulability Ellipsoid}{单位关节速度球经当前雅可比映射形成的末端速度图形；二维为椭圆，降秩时退化；使用实心球时讨论的是包含内部的速度集合，须说明速度尺度与预算。}
+\DeclareLectureTerm{manipulability-measure}{可操作度}{Manipulability Measure}{本节对$m\le n$的位置任务采用$w=\sqrt{\det(JJ^{\mathrm T})}$；行满秩时为正，行不满秩时为0，方阵情形等于$|\det J|$；数值依赖尺度，不能单独描述最困难的方向。}
+\DeclareLectureTerm{condition-number}{条件数}{Condition Number}{本节欧氏尺度下，可逆方阵把单位输入向量伸缩的最大倍率与最小倍率之比；等于像椭圆的长短半轴比，反映求解对扰动的敏感程度；奇异时约定为无穷大。}
+\DeclareLectureTerm{damped-least-squares}{阻尼最小二乘法}{Damped Least Squares}{最小化$\|J\boldsymbol q-\boldsymbol v\|^2+\lambda^2\|\boldsymbol q\|^2$（$\lambda>0$），在跟踪误差与输入大小之间折中；即使$J$降秩，阻尼线性方程仍有唯一解，但不保证原目标精确可达。}
+\DeclareLectureTerm{moore-penrose-pseudoinverse}{伪逆}{Moore-Penrose Pseudoinverse}{将任意目标送到其最小二乘解中范数最小者的矩阵，记为$J^\dagger$；$J^{\mathrm T}(JJ^{\mathrm T})^{-1}$只适用于行满秩，不得在真正降秩时照用。}
+\DeclareLectureTerm{whole-body-control}{全身控制}{Whole-Body Control}{协调机器人手臂、躯干与腿部等部位完成任务的控制思想；本节以整体姿态改变肩部位置、保留手臂有利方向作直观说明。}
+\DeclareLectureTerm{model-predictive-control}{模型预测控制}{Model Predictive Control}{依据模型预测接下来若干步并比较候选动作，只执行当前一步，再用新状态重新计算的控制策略；本节仅作进阶概念预告，不展开其完整理论。}
+\DeclareLectureTerm{inverse-kinematics}{逆运动学}{Inverse Kinematics}{由期望末端位置、姿态或运动反求相应关节状态或运动的过程；位置逆运动学求关节角，微分逆运动学在当前姿态求关节速度，两者不可混同。}
+\DeclareLectureTerm{inverse-dynamics}{逆动力学}{Inverse Dynamics}{根据期望运动以及质量等动力学信息计算所需力或关节力矩的过程；第6.6节仅作进阶概念预告，不展开动力学推导。}

@@ -184,7 +184,7 @@
 \usepackage{needspace}
 \usepackage{tikz}
 \usepackage{bm}
-\usetikzlibrary{arrows.meta}
+\usetikzlibrary{arrows.meta,calc}
 \usepackage{makecell}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
@@ -16922,195 +16922,1603 @@ One tricky point: here $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i
 从6.1节看见有向体积，到6.2节提炼几何性质，再到本节计算行列式、构造逆矩阵、读出方程组的解，我们走完了“几何直觉 $\to$ 公理体系 $\to$ 计算工具 $\to$ 方程求解”的一圈。行列式始终在度量列向量张开的盒子，也在度量空间变换的缩放。下一节把观察范围缩小，再问：若变换把直线弯曲，局部还能不能用这把尺子量面积？
 % CHAPTER 6 CRAMER RULE END
 
-\section{几何形式的深化：微积分思想下的体积度量}
+\section{几何形式的深化：从全局伸缩到局部缩放}
 \label{sec:six-jacobian-intuition}
 
-线性变换把一个区域整体按同一个倍率缩放，非线性变换则可能在不同位置伸缩得不同。例如，图像变形会使网格线弯曲：同样大小的像素块，放在不同位置，可能覆盖不同大小的区域。我们仍想量面积，只是现在要先把观察范围缩小，找到该处能够近似代替原变换的线性作用。
+第6.1节从两条边围出的面积、三条边张开的体积出发，第6.2节把这些几何规则提炼成公理，第6.3节再把公理变成求值、求逆与解方程的工具。现在还有一个问题：平行四边形之外的圆、椭圆，甚至边界弯曲的不规则区域，也能用行列式量出变形前后的面积吗？
 
-这一节只使用一元求导的类比与小区域的几何直观，不展开多元微积分的系统理论。偏导、可微性与积分换元的完整推导，留待后续附录B；这里先说明为什么行列式还会出现在非线性问题中。
+可以，但要分两步走。先看整个平面都服从同一个矩阵的线性变换，再看每一处变形都不一样的非线性变换。前者用一张矩阵量全局，后者在每个位置重新取一张局部矩阵。本节只建立必需的微积分直觉；偏导数、可微性与积分换元的系统说明，见附录B第\ref{sec:calculus-gradient}、\ref{sec:calculus-integration}、\ref{sec:calculus-linearization}节。
 
-\subsection*{局部线性化：把弯曲的小区域看成平行四边形}
+\DetHead{一、全局线性变换：从一格的面积，到整个区域的面积}
+行列式已经告诉我们，一块单位正方形经 $T(\boldsymbol x)=A\boldsymbol x$ 变换后，面积变为 $|\det(A)|$。圆盘却不是平行四边形，怎么把这条结论用上？先不急着求圆的面积，把它放在一张方格纸上。
 
-一元函数在一点附近，可以用切线近似。向量到向量的变换也有类似的想法：固定一个点 $\boldsymbol p$，把附近的位移 $\boldsymbol h$ 送入一个矩阵 $J(\boldsymbol p)$，近似得到输出的位移。这称为\term{local-linearization}。需要区分原点的位置与位移本身：输出基点是 $F(\boldsymbol p)$，矩阵作用的是从基点出发的小箭头。
+只取完全落在圆盘内部的小正方形，把它们的面积加起来。格子越细，边界附近漏掉的部分越少，近似面积便越接近圆盘面积。设小格边长为 $h$，每格的两条边是 $h\boldsymbol e_1$、$h\boldsymbol e_2$，经变换后成为 $hA\boldsymbol e_1$、$hA\boldsymbol e_2$，所以
+\begin{equation}
+ S(\text{一格的像})=|\det(hA)|=h^2|\det(A)|
+                   =|\det(A)|\,S(\text{原小格}).
+ \label{eq:six-grid-area}
+\end{equation}
+每一格都乘上同一个倍率，与格子放在哪里无关。这里使用的是第6.2节的多重线性：两条边各乘 $h$，面积要乘 $h^2$。
 
-在能够作这种线性近似的点上，写成
+\DetFigure{左侧以完全落在圆盘内的正方形近似面积，边界附近的留白在网格细分时缩小。右侧画的是同一批小格经过 $A=\operatorname{diag}(2,1)$ 的像；每格面积变为原来的2倍，累加后整体也按同一倍率变化。}{fig:six-global-grid-area}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \begin{scope}
+  \draw[step=.3,DetGray!13,very thin] (-1.8,-1.8) grid (1.8,1.8);
+  \foreach \i in {-5,...,4} {\foreach \j in {-5,...,4} {
+   \pgfmathtruncatemacro{\inside}{(max(abs(.3*\i),abs(.3*(\i+1)))^2+max(abs(.3*\j),abs(.3*(\j+1)))^2)<=2.25}
+   \ifnum\inside=1
+    \filldraw[fill=DetBlue!13,draw=DetBlue!40,line width=.25pt] ({.3*\i},{.3*\j}) rectangle ({.3*(\i+1)},{.3*(\j+1)});
+   \fi
+  }}
+  \draw[DetBlue,line width=1pt] (0,0) circle (1.5);
+  \draw[detaxis] (-1.85,0)--(1.95,0) node[right] {$u$};
+  \draw[detaxis] (0,-1.85)--(0,1.95) node[above] {$v$};
+  \node at (0,-2.2) {正方形网格：每格面积 $h^2$};
+ \end{scope}
+ \draw[detgreen] (2.15,.25)--node[above,align=center] {$T$\\$|\det(A)|=2$} (3.5,.25);
+ \begin{scope}[shift={(6.7,0)}]
+  \draw[step=.3,DetGray!13,very thin] (-3.3,-1.8) grid (3.3,1.8);
+  \foreach \i in {-5,...,4} {\foreach \j in {-5,...,4} {
+   \pgfmathtruncatemacro{\inside}{(max(abs(.3*\i),abs(.3*(\i+1)))^2+max(abs(.3*\j),abs(.3*(\j+1)))^2)<=2.25}
+   \ifnum\inside=1
+    \filldraw[fill=DetRose!10,draw=DetRose!40,line width=.25pt] ({.6*\i},{.3*\j}) rectangle ({.6*(\i+1)},{.3*(\j+1)});
+   \fi
+  }}
+  \draw[DetRose,line width=1pt] (0,0) ellipse (3 and 1.5);
+  \draw[detaxis] (-3.35,0)--(3.5,0) node[right] {$x$};
+  \draw[detaxis] (0,-1.85)--(0,1.95) node[above] {$y$};
+  \node at (0,-2.2) {变换后的格子：每格面积 $2h^2$};
+ \end{scope}
+\end{tikzpicture}}
+
+当 $A$ 可逆时，不重叠的小格变换后仍不重叠，所以可以把这些像的面积直接相加。对边界分段光滑等通常可求面积的有界区域，内部网格与边界格给出的上下近似逐渐合拢，便得到精确结论：
+
+\noindent\textbf{线性变换的面积缩放定理。} 设 $T:\mathbb R^2\to\mathbb R^2$ 的矩阵为 $A$，$R$ 为上述意义下可求面积的区域，则
+\begin{equation}
+ S(T(R))=|\det(A)|\,S(R).
+ \label{eq:six-global-area-scaling}
+\end{equation}
+用普通话说：图形可以很复杂，整体面积倍率仍只由那张矩阵决定。若 $A$ 不可逆，列空间至多是一条直线，整个区域被压到直线或点上，二维面积为0；此时公式两边也都是0。
+
+三维中，同样用小立方体逼近区域，得到
+\begin{equation}
+ V(T(R))=|\det(A)|\,V(R),\qquad A\in\mathbb R^{3\times3}.
+ \label{eq:six-global-volume-scaling}
+\end{equation}
+这说明平行六面体的体积规则也适用于球和其他可求体积的区域。推广到 $n$ 维，只需把小立方体换成 $n$ 维小盒子。
+
+\DetHead{面积大小与定向正负，要分开读}
+日常说一块区域面积为多少，指的是不带方向的大小；它由 $|\det(A)|$ 给出，恒非负。第6.1节的有向面积、体积还保留有序基的定向，因此用的是 $\det(A)$ 本身。
+
+当 $\det(A)>0$ 时，变换保持定向；当 $\det(A)<0$ 时，定向翻转，三维中的右手系变为左手系。$\det(A)=0$ 则表示降维，不能再把它称为保持或翻转定向。镜像是最容易看见的例子：
+\begin{equation}
+ A=\operatorname{diag}(1,-1),\qquad
+ \det(A)=-1,\qquad |\det(A)|=1.
+ \label{eq:six-reflection-sign}
+\end{equation}
+这个变换把图形上下翻过来，却没有把它变大或变小；负号记的是方向，绝不是“负的普通面积”。
+
+\DetFigure{蓝、红箭头依次标出两条有序基边。右图经关于横轴的反射，读取基边的定向由逆时针变为顺时针；有向面积从 $+1$ 变为 $-1$，两图的绝对面积都为1。}{fig:six-local-orientation-flip}{%
+\begin{tikzpicture}[x=1.5cm,y=1.5cm,font=\small]
+ \begin{scope}
+  \draw[step=.5,DetGray!13,very thin] (-.35,-1.35) grid (1.55,1.4);
+  \fill[DetBlue!8] (0,0) rectangle (1,1);
+  \draw[detaxis] (-.35,0)--(1.55,0) node[right] {$x$};
+  \draw[detaxis] (0,-1.3)--(0,1.45) node[above] {$y$};
+  \draw[detblue] (0,0)--(1,0) node[below] {$\boldsymbol e_1$};
+  \draw[detrose] (0,0)--(0,1) node[left] {$\boldsymbol e_2$};
+  \draw[detgreen] (.4,0) arc (0:90:.4);
+  \node[align=center] at (.65,-1.7) {有向面积 $+1$\\绝对面积 $1$};
+ \end{scope}
+ \draw[detgreen] (2.05,.4)--node[above] {$A$} (3.05,.4);
+ \begin{scope}[shift={(3.8,0)}]
+  \draw[step=.5,DetGray!13,very thin] (-.35,-1.35) grid (1.55,1.4);
+  \fill[DetRose!8] (0,0) rectangle (1,-1);
+  \draw[detaxis] (-.35,0)--(1.55,0) node[right] {$x$};
+  \draw[detaxis] (0,-1.3)--(0,1.45) node[above] {$y$};
+  \draw[detblue] (0,0)--(1,0) node[above] {$A\boldsymbol e_1$};
+  \draw[detrose] (0,0)--(0,-1) node[left] {$A\boldsymbol e_2$};
+  \draw[detgreen] (.4,0) arc (0:-90:.4);
+  \node[align=center] at (.65,-1.7) {有向面积 $-1$\\绝对面积 $1$};
+ \end{scope}
+\end{tikzpicture}}
+
+\DetHead{仿射不变性：变形之后，哪些关系还认得出来？}
+面积、长度、夹角和斜率一般会改变，但直线与分点之间有一套更坚固的关系。先假设 $A$ 可逆。原直线写成 $\boldsymbol p+t\boldsymbol v$，其中 $\boldsymbol v\ne\boldsymbol0$，那么
+\begin{equation}
+ T(\boldsymbol p+t\boldsymbol v)=A\boldsymbol p+tA\boldsymbol v.
+ \label{eq:six-affine-line}
+\end{equation}
+因为 $A\boldsymbol v\ne\boldsymbol0$，它仍是一条直线。同方向的两条直线仍同方向；由于映射一一对应，原来不同的平行线不会合并。
+
+再看同一直线上的分点：
+\begin{equation}
+ T((1-t)\boldsymbol p+t\boldsymbol q)
+   =(1-t)T(\boldsymbol p)+tT(\boldsymbol q).
+ \label{eq:six-affine-ratio}
+\end{equation}
+参数 $t$ 没有变，因此中点仍是中点，同一直线上的有向分点比例也不变。两条直线若交于 $\boldsymbol p$，它们的像便交于 $T(\boldsymbol p)$；可逆性还保证不会凭空增加交点。
+
+平移只把位置整体挪动，不改变形状和大小。所以第3章的\term{affine-map} $\boldsymbol x\mapsto A\boldsymbol x+\boldsymbol a$，在 $A$ 可逆时也保持这些关系。这些保持下来的结构关系称为\term{affine-invariance}。这里的“不变”不包括一般的角度、长度或斜率；若 $A$ 不可逆，直线还可能塌成点，完整的结构保持就不能照搬。
+
+\DetFigure{两栏分别取线段端点、中点与一条平行线，右栏施加切变 $T(u,v)=(u+v,v)$。蓝色线段变斜，红色中点仍在一半处，灰色虚线仍与蓝线平行。图形不要求全等，保留下来的是共线、平行与分点比例。}{fig:six-affine-structure}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \begin{scope}
+  \draw[step=.5,DetGray!13,very thin] (-.35,-.35) grid (2.6,2.6);
+  \draw[detaxis] (-.3,0)--(2.8,0) node[right] {$u$};
+  \draw[detaxis] (0,-.3)--(0,2.8) node[above] {$v$};
+  \draw[DetBlue,line width=1.2pt] (.5,0)--(.5,2);
+  \draw[detguide] (1.8,0)--(1.8,2);
+  \foreach \p/\l in {(0.5,0)/P,(0.5,2)/Q} {\fill[DetBlue] \p circle (2pt) node[left] {$\l$};}
+  \fill[DetRose] (.5,1) circle (2.5pt) node[left] {$M$};
+  \node at (1,-.8) {$M=(P+Q)/2$};
+ \end{scope}
+ \draw[detgreen] (3.1,1.2)--node[above] {$T$} (4.1,1.2);
+ \begin{scope}[shift={(4.8,0)}]
+  \draw[step=.5,DetGray!13,very thin] (-.35,-.35) grid (4.1,2.6);
+  \draw[detaxis] (-.3,0)--(4.3,0) node[right] {$x$};
+  \draw[detaxis] (0,-.3)--(0,2.8) node[above] {$y$};
+  \draw[DetBlue,line width=1.2pt] (.5,0)--(2.5,2);
+  \draw[detguide] (1.8,0)--(3.8,2);
+  \fill[DetBlue] (.5,0) circle (2pt) node[below] {$T(P)$};
+  \fill[DetBlue] (2.5,2) circle (2pt) node[above] {$T(Q)$};
+  \fill[DetRose] (1.5,1) circle (2.5pt) node[above left] {$T(M)$};
+  \node at (2,-.8) {$T(M)=(T(P)+T(Q))/2$};
+ \end{scope}
+\end{tikzpicture}}
+
+\DetHead{回到一张熟悉的试卷：椭圆只是被拉长的圆}
+先把两个方向说明白：下面的 $x=2x',\ y=y'$ 用标准圆坐标表示椭圆坐标，故 $A=\operatorname{diag}(2,1)$ 是“圆 $\to$ 椭圆”的拉伸矩阵；要把椭圆缩回圆，使用它的逆矩阵 $\operatorname{diag}(\frac12,1)$。例题中的点名 $A,B$ 表示顶点，公式中的 $A$ 表示矩阵，按上下文区分。
+
+% IMMUTABLE ELLIPSE NARRATIVE BEGIN
+我们先来看一道高中解析几何里的常客。
+
+\noindent\textbf{例} 已知椭圆 $C:\frac{x^2}{4}+y^2=1$ 的左右顶点为 $A$、$B$，$P$ 为椭圆上不与顶点重合的动点，则直线 $PA$、$PB$ 的斜率之积为\underline{\hspace{3em}}。
+
+相信很多人对它都有印象：这是椭圆「定值问题」里最基础的那一道，是无数次作业、考试里绕不开的计算。设点、写斜率、相乘、代入椭圆方程消元、约分化简 —— 整套流程下来，草稿纸用掉半行，时间过去几分钟，最后得到一个 $-\frac{1}{4}$。
+
+当年我们反复操练这套计算的时候，很少有人告诉我们：这道题其实根本不需要这么算。 它藏着一个极其简单的几何本质：椭圆，只是被拉长的圆。
+
+我们做一次最简单的伸缩变换，把椭圆「摁回」单位圆： 令
+\begin{equation}
+ x=2x',\quad y=y'
+\end{equation}
+对应的线性变换矩阵为：
+\begin{equation}
+ A=\begin{pmatrix}2&0\\0&1\end{pmatrix}
+\end{equation}
+代入椭圆方程 $\frac{x^2}{4}+y^2=1$，它立刻就变成了标准的单位圆：
+\begin{equation}
+ x'^2+y'^2=1
+\end{equation}
+
+原来的点也跟着变换： 左顶点 $A(-2,0)$ 变成 $A'(-1,0)$ 右顶点 $B(2,0)$ 变成 $B'(1,0)$ 动点 $P(x,y)$ 变成 $P'(x',y')$
+
+在单位圆里，$A'B'$ 是直径。由初中就知道的圆周角定理：直径所对的圆周角为直角，因此
+\begin{equation}
+ A'P'\perp B'P'
+\end{equation}
+两条直线垂直，斜率乘积自然就是 $-1$。
+
+剩下的事情，就只是把斜率「换算」回变换前的尺度： x 轴被拉长了 2 倍，同样的高度变化对应的水平变化变成了原来的 2 倍，因此斜率变成了原来的 $\frac{1}{2}$：
+\begin{equation}
+ k_{PA}=\frac{k_{P'A'}}{2},\quad k_{PB}=\frac{k_{P'B'}}{2}
+\end{equation}
+
+于是答案脱口而出：
+\begin{equation}
+ k_{PA}\cdot k_{PB}=\frac{k_{P'A'}\cdot k_{P'B'}}{4}=-\frac{1}{4}
+\end{equation}
+
+你看，没有复杂的联立，没有繁琐的消元。我们只是把椭圆「缩回去」变回了圆，所有的性质就都清晰了。 线性变换没有创造新的性质，它只是把圆里我们熟悉的结论，换了一副样子藏在椭圆里。 变的是斜率、长度、面积，不变的是直线、交点、平行性，以及结构本身。
+
+这就是本章一直在讲的道理：行列式负责度量的缩放，而线性变换负责结构的保持。 当年我们在坐标里死算的时候，其实是在黑暗里摸象；而线性变换给了我们一盏灯 —— 我们不再盯着一个个点的坐标算，我们直接看整个图形的变换。
+% IMMUTABLE ELLIPSE NARRATIVE END
+
+\DetFigure{左侧椭圆上的 $P$ 与右侧单位圆上的 $P'$ 相互对应。上方箭头把圆拉成椭圆，下方箭头用逆矩阵把椭圆缩回圆，两个方向不能混用。圆中的直角不被横向拉伸保持，因此两条斜率各减半，乘积由 $-1$ 变为 $-\frac14$。}{fig:six-ellipse-slope-invariant}{%
+\begin{tikzpicture}[x=1.2cm,y=1.2cm,font=\small]
+ \begin{scope}
+  \draw[step=.5,DetGray!13,very thin] (-2.3,-1.4) grid (2.3,1.4);
+  \draw[detaxis] (-2.4,0)--(2.45,0) node[right] {$x$};
+  \draw[detaxis] (0,-1.35)--(0,1.45) node[above] {$y$};
+  \draw[DetRose,line width=1pt] (0,0) ellipse (2 and 1);
+  \coordinate (pa) at (-2,0); \coordinate (pb) at (2,0); \coordinate (pp) at (1,0.8660254);
+  \draw[DetBlue,line width=.9pt] (pa)--(pp)--(pb);
+  \fill[DetRose] (pp) circle (2pt) node[above right] {$P(x,y)$};
+  \fill[DetBlue] (pa) circle (2pt) node[below] {$A(-2,0)$};
+  \fill[DetBlue] (pb) circle (2pt) node[below] {$B(2,0)$};
+  \node[DetBlue] at (-.9,.62) {$k_{PA}$};
+  \node[DetBlue] at (1.85,.72) {$k_{PB}$};
+  \node at (0,-1.8) {$k_{PA}k_{PB}=-\frac14$};
+ \end{scope}
+ \draw[detrose] (4.05,1.4)--node[above,align=center] {拉伸 $T$\\$\operatorname{diag}(2,1)$} (2.45,1.4);
+ \draw[detgreen] (2.45,-.65)--node[below,align=center] {缩回 $T^{-1}$\\$\operatorname{diag}(\frac12,1)$} (4.05,-.65);
+ \begin{scope}[shift={(5.65,0)}]
+  \draw[step=.5,DetGray!13,very thin] (-1.35,-1.4) grid (1.35,1.4);
+  \draw[detaxis] (-1.4,0)--(1.45,0) node[right] {$x'$};
+  \draw[detaxis] (0,-1.35)--(0,1.45) node[above] {$y'$};
+  \draw[DetBlue,line width=1pt] (0,0) circle (1);
+  \coordinate (ap) at (-1,0); \coordinate (bp) at (1,0); \coordinate (pprime) at (.5,.8660254);
+  \draw[DetBlue,line width=.9pt] (ap)--(pprime)--(bp);
+  \draw[DetGreen,line width=.8pt] (.3441,.7760)--(.4341,.6201)--(.59,.7101);
+  \fill[DetRose] (pprime) circle (2pt) node[above right] {$P'$};
+  \fill[DetBlue] (ap) circle (2pt) node[below] {$A'(-1,0)$};
+  \fill[DetBlue] (bp) circle (2pt) node[below] {$B'(1,0)$};
+  \node at (0,-1.8) {$k_{P'A'}k_{P'B'}=-1$};
+ \end{scope}
+\end{tikzpicture}}
+
+例题中的“不变”指前面列出的仿射结构，不表示圆中的直角仍是椭圆中的直角。斜率会改变，但变换告诉我们它怎样改变；这是用整体关系替代逐点消元。
+
+再用面积检验一次：单位圆面积为 $\pi$，$\det(A)=2$，故椭圆面积为 $2\pi$。更一般地，若沿横轴伸长 $a$ 倍、纵轴伸长 $b$ 倍，其中 $a,b>0$，则
+\begin{equation}
+ A=\operatorname{diag}(a,b),\qquad
+ \det(A)=ab,\qquad S(\text{椭圆})=ab\pi.
+ \label{eq:six-ellipse-area-scaling}
+\end{equation}
+高中公式 $S=\pi ab$ 由此就是面积缩放定理的一个实例，而不必作为另一个孤立公式记住。
+
+\DetFigure{左侧单位圆经 $\operatorname{diag}(a,b)$ 变为右侧半轴长为 $a,b$ 的椭圆，图形以 $a=2,b=1$ 示意。蓝、红线段分别对应两个坐标方向的拉伸；面积由 $\pi$ 变为 $\pi ab$，本例就是 $2\pi$。}{fig:six-ellipse-area-scaling}{%
+\begin{tikzpicture}[x=1.2cm,y=1.2cm,font=\small]
+ \begin{scope}
+  \draw[step=.5,DetGray!13,very thin] (-1.3,-1.3) grid (1.3,1.3);
+  \filldraw[fill=DetBlue!8,draw=DetBlue,line width=1pt] (0,0) circle (1);
+  \draw[detblue] (0,0)--(1,0) node[midway,below] {$1$};
+  \draw[detrose] (0,0)--(0,1) node[midway,left] {$1$};
+  \node at (0,-1.65) {$S=\pi$};
+ \end{scope}
+ \draw[detgreen] (1.7,.25)--node[above,align=center] {$\operatorname{diag}(a,b)$\\面积倍率 $ab$} (3.8,.25);
+ \begin{scope}[shift={(6.1,0)}]
+  \draw[step=.5,DetGray!13,very thin] (-2.3,-1.3) grid (2.3,1.3);
+  \filldraw[fill=DetRose!7,draw=DetRose,line width=1pt] (0,0) ellipse (2 and 1);
+  \draw[detblue] (0,0)--(2,0) node[midway,below] {$a$};
+  \draw[detrose] (0,0)--(0,1) node[midway,left] {$b$};
+  \node at (0,-1.65) {$S=\pi ab$};
+ \end{scope}
+\end{tikzpicture}}
+
+可如果图形不是被整体拉伸，而是每一处的拉伸都不一样 —— 也就是非线性变换的时候，我们又该怎么度量每一点的缩放？ 这就需要用到局部的线性近似：雅可比行列式。
+
+\DetHead{二、非线性变换：先学会读两个方向的变化率}
+一张图像的弯曲变形，不能用同一个矩阵解释所有位置。不过，曲线放大后看起来越来越像切线，光滑曲面的一小块也越来越像平面。我们要找的，是固定一点以后，能够描述附近小位移的一张矩阵。
+
+先补两件必需的工具。二元函数 $q(u,v)$ 接收两个数、给出一个数；例如地面高度 $q(u,v)=u^2+v^2$，横向位置与纵向位置共同决定高度。把 $v$ 暂时固定，只沿 $u$ 方向走，就得到一元函数。它的变化率称为对 $u$ 的\term{partial-derivative}：
+\begin{equation}
+ q_u(u,v)=\frac{\partial q}{\partial u}(u,v)
+   =\lim_{h\to0}\frac{q(u+h,v)-q(u,v)}{h}.
+ \label{eq:six-partial-derivative}
+\end{equation}
+这次只允许一个变量动，另一个变量保持不变；对 $v$ 的偏导数则交换这两个角色。对刚才的高度函数，$q_u=2u$、$q_v=2v$。
+
+如果不沿坐标轴走呢？取单位方向 $\boldsymbol\eta=(\eta_1,\eta_2)^{\mathrm T}$，沿它走距离 $s$，高度的变化率是\term{directional-derivative}。在一阶偏导数于附近连续的条件下，
+\begin{equation}
+ D_{\boldsymbol\eta}q(\boldsymbol p)
+  =\lim_{s\to0}\frac{q(\boldsymbol p+s\boldsymbol\eta)-q(\boldsymbol p)}{s}
+  =q_u(\boldsymbol p)\eta_1+q_v(\boldsymbol p)\eta_2.
+ \label{eq:six-directional-derivative}
+\end{equation}
+这句话的意思是：斜着走的一小步，可以拆成两个坐标方向的小步，再把两个方向的一阶高度变化相加。只知道偏导数存在，还不能保证这个结论；“附近偏导连续”是本节使用的充分条件。方向导数的完整解释见附录B与文献\cite{openstax-gradient}。
+
+\DetFigure{左栏是高度函数 $q(u,v)=u^2+v^2$ 的等高线，点 $\boldsymbol p=(1,\frac12)^{\mathrm T}$ 处分别画出两条坐标方向和一个单位斜向。右栏画的是三条路线在起点处的切线斜率，依次为 $2,1,3/\sqrt2$，不是曲面的完整形状。偏导数沿坐标轴测量，方向导数沿指定单位方向测量。}{fig:six-partial-directional-rates}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \begin{scope}
+  \draw[step=.5,DetGray!13,very thin] (-.35,-.35) grid (2.5,2.5);
+  \clip (-.4,-.4) rectangle (2.6,2.6);
+  \foreach \r in {.65,1.118034,1.6,2.1,2.6} {\draw[DetGray!35] (0,0) circle (\r);}
+ \end{scope}
+ \draw[detaxis] (-.3,0)--(2.7,0) node[right] {$u$};
+ \draw[detaxis] (0,-.3)--(0,2.7) node[above] {$v$};
+ \fill[DetRose] (1,.5) circle (2pt) node[below left] {$\boldsymbol p$};
+ \draw[detblue] (1,.5)--(2,.5) node[right] {$\boldsymbol e_1$};
+ \draw[detgreen] (1,.5)--(1,1.5) node[left] {$\boldsymbol e_2$};
+ \draw[detrose] (1,.5)--(1.7071,1.2071) node[above right] {$\boldsymbol\eta$};
+ \node[align=center] at (1.1,-.8) {沿哪条路线走？\\$\boldsymbol\eta=(1,1)^{\mathrm T}/\sqrt2$};
+ \begin{scope}[shift={(4.9,0)}]
+  \draw[step=.5,DetGray!13,very thin] (-.35,-.35) grid (2.5,2.5);
+  \draw[detaxis] (-.3,0)--(2.8,0) node[right] {$s$};
+  \draw[detaxis] (0,-.3)--(0,2.8) node[above] {$\Delta q$};
+  \draw[detblue] (0,0)--(1.05,2.1);
+  \draw[detgreen] (0,0)--(1.8,1.8);
+  \draw[detrose] (0,0)--(1.05,2.2274);
+  \node[anchor=west,align=left] at (3.05,1.85) {\textcolor{DetBlue}{$q_u=2$}\\[5pt]\textcolor{DetGreen}{$q_v=1$}\\[5pt]\textcolor{DetRose}{$D_{\boldsymbol\eta}q=3/\sqrt2$}};
+  \node[align=center] at (1.1,-.8) {对应路线的局部切线\\横轴 $s$ 为所走距离};
+ \end{scope}
+\end{tikzpicture}}
+
+\DetHead{把两项输出的变化率排成矩阵}
+变换平面坐标时，我们需要两个输出，而不只是一个高度。写成
+\begin{equation}
+ F(u,v)=\begin{pmatrix}f(u,v)\\g(u,v)\end{pmatrix},\qquad
+ x=f(u,v),\quad y=g(u,v).
+\end{equation}
+这是两项二元函数一起工作：第一项给新横坐标，第二项给新纵坐标。固定 $\boldsymbol p=(u_0,v_0)^{\mathrm T}$，分别记录“只动 $u$”与“只动 $v$”造成的两项输出变化，便得到
+\begin{equation}
+ J(u,v)=\begin{pmatrix}f_u&f_v\\g_u&g_v\end{pmatrix}.
+ \label{eq:six-jacobian-matrix}
+\end{equation}
+这张数表就是\term{jacobian-matrix}：它的第1列记录第一个输入基方向的局部像，第2列记录第二个输入基方向的局部像。第3.1节“矩阵的列是基向量的像”仍然适用，只是这里的矩阵随位置变化。
+
+设 $f,g$ 在所讨论点附近具有连续的一阶偏导数，则\term{local-linearization}写成
 \begin{equation}
  F(\boldsymbol p+\boldsymbol h)
  =F(\boldsymbol p)+J(\boldsymbol p)\boldsymbol h
-       +\boldsymbol\varepsilon(\boldsymbol h),\qquad
- \frac{|\boldsymbol\varepsilon(\boldsymbol h)|}{|\boldsymbol h|}
-       \longrightarrow0\quad(\boldsymbol h\to\boldsymbol0).
+  +\boldsymbol\varepsilon(\boldsymbol h),\qquad
+ \frac{|\boldsymbol\varepsilon(\boldsymbol h)|}{|\boldsymbol h|}\longrightarrow0
+ \quad(\boldsymbol h\to\boldsymbol0).
  \label{eq:six-local-linearization}
 \end{equation}
-最后一项比位移本身更小；忽略它，便得到附近的线性模型。不是每个非线性规则、每个点都自动具有这种近似，下一段会给出本节采用的充分条件。
+最后一项比位移本身更小；在足够小的范围内忽略它，便得到线性近似。矩阵作用的是位移 $\boldsymbol h$，而不是把基点抹掉；把 $F(\boldsymbol p)$ 加回去，得到的是附近的仿射模型。
 
-小矩形的两条边分别是 $\Delta x\,\mathbf e_1$、$\Delta y\,\mathbf e_2$，在线性近似下变为 $J(\boldsymbol p)\mathbf e_1\Delta x$ 与 $J(\boldsymbol p)\mathbf e_2\Delta y$。第三章已告诉我们，这两支箭头就是矩阵的两列分别乘边长。所以近似像是一个平行四边形，其面积为
+\DetFigure{左栏画参数平面的方格，右栏画它经 $F(u,v)=(u,v+0.3u^2)^{\mathrm T}$ 后的弯曲网格；红色小格及其像相互对应。局部放大框用 $J\boldsymbol e_1\,\mathrm du$、$J\boldsymbol e_2\,\mathrm dv$ 作两条直边，近似红色曲边小块。两列还必须各乘边长，才能得到实际微元边。}{fig:six-warped-grid-jacobian}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \begin{scope}
+  \draw[step=.4,DetGray!25,very thin] (0,0) grid (2,2);
+  \filldraw[fill=DetRose!18,draw=DetRose] (.8,.8) rectangle (1.2,1.2);
+  \draw[detaxis] (-.2,0)--(2.35,0) node[right] {$u$};
+  \draw[detaxis] (0,-.2)--(0,2.4) node[above] {$v$};
+  \node at (1,-.6) {原参数网格};
+ \end{scope}
+ \draw[detgreen] (2.7,1.15)--node[above] {$F$} (3.55,1.15);
+ \begin{scope}[shift={(4,0)}]
+  \foreach \v in {0,.4,.8,1.2,1.6,2} {\draw[DetGray!35] plot[domain=0:2,samples=25] (\x,{\v+.3*\x*\x});}
+  \foreach \u in {0,.4,.8,1.2,1.6,2} {\draw[DetGray!35] (\u,{.3*\u*\u})--(\u,{2+.3*\u*\u});}
+  \filldraw[fill=DetRose!18,draw=DetRose,line width=.8pt]
+   plot[domain=.8:1.2,samples=20] (\x,{.8+.3*\x*\x})
+   --(1.2,{1.2+.3*1.2*1.2})
+   plot[domain=1.2:.8,samples=20] (\x,{1.2+.3*\x*\x})--cycle;
+  \draw[detaxis] (-.2,0)--(2.35,0) node[right] {$x$};
+  \draw[detaxis] (0,-.2)--(0,3.5) node[above] {$y$};
+  \node at (1,-.6) {非线性变换后的网格};
+ \end{scope}
+ \draw[detguide] (5.2,1.6)--(7,2.3);
+ \begin{scope}[shift={(7.3,1.2)}]
+  \filldraw[fill=DetBlue!8,draw=DetGray!50,dashed] (0,0)--(1,.48)--(1,1.48)--(0,1)--cycle;
+  \draw[detblue] (0,0)--(1,.48) node[midway,below,sloped] {$J\boldsymbol e_1\,\mathrm du$};
+  \draw[detgreen] (0,0)--(0,1) node[midway,left] {$J\boldsymbol e_2\,\mathrm dv$};
+  \node[align=center] at (.6,-1.2) {局部放大\\$\mathrm dx\,\mathrm dy=|\det(J)|\,\mathrm du\,\mathrm dv$};
+ \end{scope}
+\end{tikzpicture}}
+
+\DetHead{微元平行四边形，把第6.1节的面积带了回来}
+原小矩形的边是 $\boldsymbol e_1\,\mathrm du$、$\boldsymbol e_2\,\mathrm dv$；$\mathrm du,\mathrm dv$ 是边长，不是向量。经过局部线性作用，它们成为 $J\boldsymbol e_1\,\mathrm du$、$J\boldsymbol e_2\,\mathrm dv$。矩阵的两列提供方向与倍率，两份边长提供这块小矩形的实际尺寸。
+
+曲边四边形在一阶近似下成为平行四边形。先读出这张局部矩阵的行列式：
 \begin{equation}
- \text{线性近似像的面积}
- =|\det J(\boldsymbol p)|\,\Delta x\,\Delta y.
+ \det(J)=f_ug_v-f_vg_u.
+ \label{eq:six-jacobian-determinant}
+\end{equation}
+这个数称为\term{jacobian-determinant}：有符号的值记录局部定向，绝对值记录局部面积倍率。取正向输入微元，便有
+\begin{equation}
+ \mathrm dS_{\text{有向}}=\det(J)\,\mathrm du\,\mathrm dv,
+ \qquad \mathrm dS=|\det(J)|\,\mathrm du\,\mathrm dv.
  \label{eq:six-local-area-factor}
 \end{equation}
-输入小块的面积是 $\Delta x\,\Delta y$，因此局部面积倍率由 $|\det J(\boldsymbol p)|$ 给出。带符号的行列式还记录该点附近的定向；实际面积倍率要取绝对值。
+输入面积乘局部倍率，就得到输出面积。微元等式表达一阶极限关系，不表示任意有限小块都精确等于一个平行四边形。
 
-\DetFigure{小矩形在非线性变换后具有弯曲边界，灰色虚线平行四边形是局部线性近似。两侧分别采用位移坐标，图形已放大；蓝、绿箭头对应近似矩阵的两列，块越小，边界与线性近似越接近。}{fig:six-local-curved-region}{%
-\begin{tikzpicture}[x=6cm,y=3cm,font=\small]
- \begin{scope}
-  \draw[detaxis] (-.04,0)--(.52,0) node[right] {$\Delta x$};
-  \draw[detaxis] (0,-.05)--(0,.54) node[above] {$\Delta y$};
+\begin{example}[同样大小的小块，在不同位置有不同倍率]
+取 $F(u,v)=(u,u^2+v^2)^{\mathrm T}$。固定一个变量，对另一个变量求导，得到
+\begin{equation}
+ J(u,v)=\begin{pmatrix}1&0\\2u&2v\end{pmatrix},\qquad
+ \det(J(u,v))=2v.
+\end{equation}
+所以面积倍率依赖纵向位置。$v=\frac12$ 处为1，$v=1$ 处为2，$v=\frac32$ 处为3；$v<0$ 处还会发生局部定向翻转。
+
+在 $\boldsymbol p=(1,1)^{\mathrm T}$，$F(\boldsymbol p)=(1,2)^{\mathrm T}$，且
+\begin{equation}
+ J(\boldsymbol p)=\begin{pmatrix}1&0\\2&2\end{pmatrix},\qquad
+ J(\boldsymbol p)\boldsymbol e_1=(1,2)^{\mathrm T},\quad
+ J(\boldsymbol p)\boldsymbol e_2=(0,2)^{\mathrm T}.
+\end{equation}
+这两列围出的有向面积为2；给它们分别乘上输入小块边长，便得到像的近似面积。
+
+若输入位移为 $(\Delta u,\Delta v)^{\mathrm T}$，两项输出的真实增量是
+\begin{equation}
+ \Delta x=\Delta u,\qquad
+ \Delta y=2\Delta u+2\Delta v+(\Delta u)^2+(\Delta v)^2.
+\end{equation}
+雅可比矩阵保留前两项的一阶变化，后两项在缩小观察范围时更快变小。$v=0$ 处的行列式为0，表示一阶近似降维，不表示每一个有限小块的真实像都恰好面积为0。
+\end{example}
+
+\DetFigure{本例输入边长取 $\Delta u=0.4,\Delta v=0.3$；右栏红色曲边是真实像，灰色虚线是基点处的线性近似，两栏分别使用位移坐标。蓝、绿箭头是雅可比矩阵两列乘相应边长，近似像面积为 $2\times0.4\times0.3=0.24$。图形已放大，继续缩小输入小块，曲边与直边的一阶差异便更小。}{fig:six-local-curved-region}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \begin{scope}[x=5cm,y=3cm]
+  \draw[step=.1,DetGray!13,very thin] (0,0) grid (.5,.5);
+  \draw[detaxis] (-.04,0)--(.55,0) node[right] {$\Delta u$};
+  \draw[detaxis] (0,-.04)--(0,.57) node[above] {$\Delta v$};
   \filldraw[fill=DetBlue!8,draw=DetBlue] (0,0) rectangle (.4,.3);
   \draw[detblue] (0,0)--(.4,0);
   \draw[detgreen] (0,0)--(0,.3);
   \node[below left] at (0,0) {$\boldsymbol p$};
-  \node[align=center] at (.2,-.22) {输入的小矩形};
+  \node at (.25,-.25) {输入的小矩形};
  \end{scope}
- \draw[detrose] (.65,.32)--node[above] {$F$} (.94,.32);
- \begin{scope}[shift={(1.15,0)}]
-  \fill[DetRose!5] (0,0)
-   plot[domain=0:.4,samples=30,variable=\q] ({\q},{2*\q+\q*\q})
-   --(.4,1.65)
-   plot[domain=.4:0,samples=30,variable=\q] ({\q},{2*\q+\q*\q+.69})
-   --cycle;
-  \draw[DetRose,line width=1pt]
-   plot[domain=0:.4,samples=30,variable=\q] ({\q},{2*\q+\q*\q});
-  \draw[DetRose,line width=1pt]
-   plot[domain=0:.4,samples=30,variable=\q] ({\q},{2*\q+\q*\q+.69});
+ \draw[detrose] (3.35,1)--node[above] {$F$} (4.1,1);
+ \begin{scope}[shift={(4.6,0)},x=5cm,y=2cm]
+  \draw[step=.2,DetGray!13,very thin] (0,0) grid (.6,1.8);
+  \fill[DetRose!6] plot[domain=0:.4,samples=30] (\x,{2*\x+\x*\x})
+   --(.4,1.65) plot[domain=.4:0,samples=30] (\x,{2*\x+\x*\x+.69})--cycle;
+  \draw[DetRose,line width=1pt] plot[domain=0:.4,samples=30] (\x,{2*\x+\x*\x});
+  \draw[DetRose,line width=1pt] plot[domain=0:.4,samples=30] (\x,{2*\x+\x*\x+.69});
   \draw[DetRose,line width=1pt] (0,0)--(0,.69) (.4,.96)--(.4,1.65);
   \draw[detguide] (0,0)--(.4,.8)--(.4,1.4)--(0,.6)--cycle;
   \draw[detblue] (0,0)--(.4,.8);
   \draw[detgreen] (0,0)--(0,.6);
-  \node[below] at (.06,0) {$F(\boldsymbol p)$};
-  \node[align=center] at (.2,-.22) {弯曲的像与线性近似};
+  \node[below] at (0,0) {$F(\boldsymbol p)$};
+  \node at (.28,-.375) {曲边的像与直边近似};
  \end{scope}
- \node[anchor=west,align=left,text width=3cm] at (1.79,1.22)
-  {红色实线：真实边界\\[5pt]灰色虚线：平行四边形近似};
+ \node[anchor=west,align=left,text width=4cm] at (8.2,2.2)
+  {\textcolor{DetRose}{实线：真实边界}\\[5pt]灰色虚线：一阶近似\\[5pt]面积倍率 $|\det(J)|=2$};
 \end{tikzpicture}}
 
-\subsection*{偏导与雅可比：把局部变化排成一张数表}
+\DetHead{把每个小块的倍率加起来：积分换元}
+若每格的倍率各不相同，就把每个位置的倍率分别带入累加。\term{double-integral}正是这种“采样值乘小面积，再取极限”的记号。它可以累加面密度、图像强度等量；仅求面积时，把被积函数取为1。
 
-怎么得到这张近似矩阵？设
+为避免同一个输出被重复计算，本节采用以下足够条件：$F$ 在有界参数区域 $D$ 的邻域内具有连续的一阶偏导数，在区域内部一一对应到像区域 $R=F(D)$，且 $\det(J)\ne0$；区域边界分段光滑，被积函数 $h$ 连续。边界上的例外可另行处理，具体说明见附录B与文献\cite{openstax-change-variables}。在这些条件下，
 \begin{equation}
- F(x,y)=\DetMat{c}{f(x,y)\\g(x,y)}.
+ \iint_R h(x,y)\,\mathrm dx\,\mathrm dy
+  =\iint_D h(f(u,v),g(u,v))\,|\det(J(u,v))|\,\mathrm du\,\mathrm dv.
+ \label{eq:six-integral-change-variables}
 \end{equation}
-先固定 $y$，只改变 $x$，便得到熟悉的一元求导；再固定 $x$，只改变 $y$。这两种方向的变化率称为\term{partial-derivative}。例如，
+左边按输出位置累加，右边按输入参数累加；采样点换了坐标，每块面积也必须乘上该处的局部倍率。雅可比行列式不是临时添上的修正因子，而是小格变形的面积账本。
+
+取绝对值，是因为这里的面积度量不带定向，恒非负；不是说 $h$ 必须为正，更不是说积分值不能为负。$\det(J)<0$ 仍有明确意义：局部定向翻转，只是在不带定向的面积累加中不保留这个负号。若映射把多个输入送到同一输出，直接套此式可能重复计数；若局部退化，也不能未经检查照搬上述条件。
+
+\DetHead{三、经典验证：极坐标公式里的 $r$ 从哪里来？}
+圆盘用横纵坐标描述，边界不够方便；换成离原点的距离与方向角，边界就简单了。\term{polar-coordinates}写成
 \begin{equation}
- f_x(x,y)=\frac{\partial f}{\partial x}(x,y)
- =\lim_{h\to0}\frac{f(x+h,y)-f(x,y)}{h},
- \label{eq:six-partial-derivative}
+ x=r\cos\theta,\qquad y=r\sin\theta,\qquad r\ge0.
+ \label{eq:six-polar-map}
 \end{equation}
-而 $f_y$ 用固定 $x$、改变 $y$ 的方式定义。下标表示对哪个变量求导，不表示向量分量。
+半径决定走多远，角度决定朝哪里走；角度在以下计算中用弧度。
 
-本节假设 $f,g$ 在所讨论点附近具有连续的一阶偏导数。在这一充分条件下，式\eqref{eq:six-local-linearization}的近似成立，矩阵为
+先看图，再求导。保持角度不变，半径增加 $\mathrm dr$，便沿射线向外走 $\mathrm dr$；保持半径不变，角度增加 $\mathrm d\theta$，便沿圆周走约 $r\,\mathrm d\theta$。两个局部方向互相垂直，因此微元面积应当是这两个长度的乘积。
+
+\DetFigure{两条射线与两条同心圆围成红色小扇环，图中边长为看清而放大。蓝色径向边长度为 $\mathrm dr$，绿色切向边的一阶长度为 $r\,\mathrm d\theta$；右栏把它近似为长方形。这里的 $r$ 来自同一角度在不同半径处对应的弧长，正是雅可比矩阵第2列的长度。}{fig:six-polar-area-element}{%
+\begin{tikzpicture}[x=1.1cm,y=1.1cm,font=\small]
+ \begin{scope}
+  \draw[step=.5,DetGray!13,very thin] (0,0) grid (3.8,3.3);
+  \draw[detaxis] (-.2,0)--(4,0) node[right] {$x$};
+  \draw[detaxis] (0,-.2)--(0,3.5) node[above] {$y$};
+  \draw[DetGray!45] (0:2.5) arc (0:75:2.5);
+  \draw[DetGray!45] (0:3.1) arc (0:75:3.1);
+  \draw[DetGray!65] (0,0)--(25:3.6) (0,0)--(40:3.6);
+  \filldraw[fill=DetRose!16,draw=DetRose,line width=1pt]
+   (25:2.5)--(25:3.1) arc (25:40:3.1)--(40:2.5) arc (40:25:2.5)--cycle;
+  \draw[detblue] (25:2.5)--(25:3.1) node[midway,below right] {$\mathrm dr$};
+  \draw[detgreen] (25:2.5) arc (25:40:2.5) node[midway,above left] {$r\,\mathrm d\theta$};
+  \draw[detguide] (25:2.5)--({2.5*cos(25)-2.5*pi/12*sin(25)},{2.5*sin(25)+2.5*pi/12*cos(25)});
+  \draw[DetGray!70] (25:1) arc (25:40:1) node[midway,right] {$\mathrm d\theta$};
+  \node[below] at (2.5,0) {$r$}; \node[below] at (3.1,0) {$r+\mathrm dr$};
+ \end{scope}
+ \draw[detguide] (3.15,1.85)--(4.4,2.3);
+ \begin{scope}[shift={(4.9,1.2)}]
+  \filldraw[fill=DetBlue!7,draw=DetGray!60,dashed] (0,0) rectangle (2,1);
+  \draw[detblue] (0,0)--(2,0) node[midway,below] {$\mathrm dr$};
+  \draw[detgreen] (0,0)--(0,1) node[midway,left] {$r\,\mathrm d\theta$};
+  \node[align=center] at (1,1.65) {局部切向、径向展开};
+  \node[align=center,anchor=north] at (1,-.75)
+   {$J=\begin{pmatrix}\cos\theta&-r\sin\theta\\\sin\theta&r\cos\theta\end{pmatrix}$\\[5pt]
+    $\det(J)=r$\\[5pt]$\mathrm dA=r\,\mathrm dr\,\mathrm d\theta$};
+ \end{scope}
+\end{tikzpicture}}
+
+把这个直觉写成矩阵，得到
 \begin{equation}
- J(x,y)=\DetMat{cc}{f_x(x,y)&f_y(x,y)\\g_x(x,y)&g_y(x,y)}.
- \label{eq:six-jacobian-matrix}
+ J(r,\theta)=
+  \begin{pmatrix}\cos\theta&-r\sin\theta\\
+                  \sin\theta&r\cos\theta\end{pmatrix},\qquad
+ \det(J)=r\cos^2\theta+r\sin^2\theta=r.
+ \label{eq:six-polar-jacobian}
 \end{equation}
-它称为\term{jacobian-matrix}：第1列记录只沿输入 $x$ 方向移动时，两项输出怎样变化；第2列记录只沿输入 $y$ 方向移动时的变化。这仍是第3.1节“列对应基向量的像”的逻辑，只是现在记录的是局部位移的像。
-
-它的\term{jacobian-determinant}为
+第1列是径向单位向量，第2列是长度为 $r$ 的切向向量；列向量围出的面积倍率正好为 $r$。因此
 \begin{equation}
- \det J(x,y)=f_xg_y-f_yg_x.
- \label{eq:six-jacobian-determinant}
+ \mathrm dx\,\mathrm dy=r\,\mathrm dr\,\mathrm d\theta.
+ \label{eq:six-polar-area}
 \end{equation}
-用普通语言说：四个局部变化率先组成一个局部线性变换，行列式再读出它的有向面积倍率。一般 $n$ 维变换同样用各项输出对各项输入的偏导数组成 $n\times n$ 矩阵；其行列式绝对值给出局部 $n$ 维体积倍率，不需要另造一套高维面积公式。
+那个常被直接背下来的 $r$，就是该点的雅可比行列式，也是同一角度步长所对应的弧长倍率。
 
-\begin{example}[局部倍率依赖所在位置]
-取 $F(x,y)=(x,x^2+y^2)^{\mathrm T}$。直接对各变量求导，得到
+若仍不放心，可以对有限小扇环核对一次。半径从 $r$ 变为 $r+\Delta r$，角度宽为 $\Delta\theta>0$，准确面积是
 \begin{equation}
- J(x,y)=\DetMat{cc}{1&0\\2x&2y},\qquad \det J(x,y)=2y.
+ \Delta A=\frac12\bigl((r+\Delta r)^2-r^2\bigr)\Delta\theta
+    =r\Delta r\Delta\theta+\frac12(\Delta r)^2\Delta\theta.
+ \label{eq:six-polar-finite-sector}
 \end{equation}
-在 $\boldsymbol p=(1,1)^{\mathrm T}$，$F(\boldsymbol p)=(1,2)^{\mathrm T}$，而
+第一项就是雅可比给出的一阶面积，第二项是有限宽度造成的高阶差异。这里要说“近似长方形”，不能把弯曲扇环当作精确长方形。
+
+例如，半径为 $R_0>0$ 的圆盘面积可用
 \begin{equation}
- J(\boldsymbol p)=\DetMat{rr}{1&0\\2&2},\qquad
- J(\boldsymbol p)\mathbf e_1=(1,2)^{\mathrm T},\quad
- J(\boldsymbol p)\mathbf e_2=(0,2)^{\mathrm T}.
+ S=\int_0^{2\pi}\!\int_0^{R_0}r\,\mathrm dr\,\mathrm d\theta
+   =\int_0^{2\pi}\frac{R_0^2}{2}\,\mathrm d\theta
+   =\pi R_0^2
+ \label{eq:six-polar-disk-area}
 \end{equation}
-这两支像向量围出的有向面积为2，故该点附近小块的面积约变为原来的2倍。图\ref{fig:six-local-curved-region}画的就是这个例子：输出第2项的增量为 $2\Delta x+2\Delta y+(\Delta x)^2+(\Delta y)^2$，虚线近似只保留前两项。
+算出。这次不是换元后碰巧得到熟悉答案，而是每块扇环的局部面积都算对了，再把它们累加起来。
 
-在 $y=\tfrac12$ 附近，倍率为1；在 $y=\tfrac32$ 附近，倍率为3；在 $y<0$ 处，符号为负，局部方向翻转。这个变换没有一个适用于所有位置的固定倍率。$y=0$ 处的行列式为0，表示一阶近似发生塌缩，不表示每个有限小块的真实像都恰好面积为0。
-\end{example}
+极坐标在 $r=0$ 处退化：所有角度都对应原点；$\theta$ 与 $\theta+2\pi$ 也对应同一点。因此使用换元公式时，在 $r>0$ 且角度限制于不绕回的区间内作一一对应；圆盘的原点和角度接缝可作为面积为0的边界处理。它们不影响面积累加，却不能被当作处处可逆的坐标变换。
 
-这里要把范围留清楚：一阶偏导数存在本身，并不足以保证任意方向都能由同一个矩阵近似；我们采用的是“附近偏导连续”这个充分条件。把局部面积倍率组织成积分换元公式，还需要可微性、区域与一一对应等条件的系统讨论，后续附录B再展开。本节只把行列式与局部线性作用连起来。
+\DetHead{【选读·不做考核要求】有向体积元与微分形式的萌芽}
+普通积分只累加大小，负号被绝对值去掉。若我们还想保留定向，该用什么记号？回到第3章的线性评分器：在一点的小位移上，$\mathrm dx_i$ 读出第 $i$ 个坐标的变化。把这些坐标读数按顺序组合起来，便可以记录有向体积。
 
-\subsection*{再回到平行四边形：用底乘高核对二阶公式}
-
-经过高维公理、消元与局部近似，再回看最初的平行四边形，公式中的每一项就有了具体位置。设两条有序边为 $\boldsymbol u=(a,b)^{\mathrm T}$、$\boldsymbol v=(c,d)^{\mathrm T}$，且 $\boldsymbol u\ne\boldsymbol0$。取垂直于底边的单位向量
+这里引入\term{wedge-product}记号 $\wedge$。它与第3章“列向量乘行向量”的外积不是同一运算；此处用于组合线性测量，并且对输入多重线性、交换次序变号。例如，
 \begin{equation}
- \boldsymbol n=\frac{1}{\sqrt{a^2+b^2}}(-b,a)^{\mathrm T}.
+ \mathrm dx_1\wedge\mathrm dx_2=-\mathrm dx_2\wedge\mathrm dx_1,
+ \qquad \mathrm dx_i\wedge\mathrm dx_i=0.
 \end{equation}
-由第0章的点积公式，带符号高度为
+换一次次序，定向翻一次；同一方向用两遍，面积塌成0。这恰好是第6.1、6.2节交替性与多重线性的微元表达。
+
+\term{oriented-volume-element}记作
 \begin{equation}
+ \omega=\mathrm dx_1\wedge\mathrm dx_2\wedge\cdots\wedge\mathrm dx_n,
+ \qquad
+ \omega(\boldsymbol v_1,\ldots,\boldsymbol v_n)
+       =\det[\boldsymbol v_1\ \cdots\ \boldsymbol v_n].
+\end{equation}
+右式说明它怎样“测量”：输入一组有序小位移，输出它们围出的有向体积。它不是把 $n$ 个普通数相乘，而是一把交替多重线性的体积尺子。这类对象属于\term{differential-form}，这里只认识体积这一种。
+
+对 $\boldsymbol y=F(\boldsymbol x)$，把同一点的一阶变化 $\mathrm dy_i=\sum_jJ_{ij}\,\mathrm dx_j$ 代入，得到
+\begin{equation}
+ \mathrm dy_1\wedge\cdots\wedge\mathrm dy_n
+   =\det(J)\,\mathrm dx_1\wedge\cdots\wedge\mathrm dx_n.
+ \label{eq:six-oriented-volume-form}
+\end{equation}
+这是把输出体积尺子拉回输入位移上比较的等式，行列式保留符号，不取绝对值。为什么系数只能是行列式？左边对输入位移多重线性、交替，在标准基上读出 $J$ 的列所围出的体积；第6.1节的唯一性结论已经决定了它的系数。这个钩子留给高阶课程，不要求在本章学习微分形式的完整理论。
+
+\DetHead{再回到起点：底乘高与局部面积用的是同一把尺子}
+从全局区域走到微元，再回看平行四边形，面积公式并没有换一套。设有序边为 $\boldsymbol u=(a,b)^{\mathrm T}$、$\boldsymbol v=(c,d)^{\mathrm T}$，且 $\boldsymbol u\ne\boldsymbol0$。逆时针法向单位向量与带符号高度分别是
+\begin{equation}
+ \boldsymbol n=\frac{(-b,a)^{\mathrm T}}{\sqrt{a^2+b^2}},\qquad
  h_{\mathrm s}=\boldsymbol v\cdot\boldsymbol n
              =\frac{ad-bc}{\sqrt{a^2+b^2}}.
 \end{equation}
-底长乘上这份高度，分母恰好消去：
+底长与高度相乘，分母消去，便得到
 \begin{equation}
- S=|\boldsymbol u|h_{\mathrm s}=ad-bc=\det(A),\qquad
- \text{通常面积}=|\boldsymbol u|\,|h_{\mathrm s}|=|\det(A)|.
+ S_{\text{有向}}=|\boldsymbol u|h_{\mathrm s}=ad-bc=\det(A),\qquad
+ S=|\boldsymbol u|\,|h_{\mathrm s}|=|\det(A)|.
  \label{eq:six-area-revisited}
 \end{equation}
-若 $h_{\mathrm s}<0$，说明第二条边位于选定法向的另一侧；若底边为零，图形直接退化，两边公式也都给出0。这样，符号、大小与退化情形都各有解释。
+若高度为负，定向翻转；若底边为零，面积直接退化为0。这是严格的底乘高，雅可比矩阵的微元平行四边形也遵守它。
 
-\DetFigure{底乘高与二阶行列式给出同一个面积。示例两条边为 $(2,1)^{\mathrm T}$、$(1,3)^{\mathrm T}$，底长与高都为 $\sqrt5$；灰色虚线为高，直角标记说明它垂直于底边，有向面积为5。}{fig:six-base-height-revisited}{%
-\begin{tikzpicture}[x=1.1cm,y=1.1cm,font=\small]
+\DetFigure{蓝色底边为 $(2,1)^{\mathrm T}$，红色边为 $(1,3)^{\mathrm T}$，它们围出的有向面积为5。灰色虚线是垂直于底边的高，底长与高均为 $\sqrt5$。底乘高、二阶行列式以及局部微元面积，在这里给出同一个结果。}{fig:six-base-height-revisited}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5,DetGray!13,very thin] (-.3,-.3) grid (3.5,4.5);
  \filldraw[fill=DetBlue!7,draw=DetBlue!45] (0,0)--(2,1)--(3,4)--(1,3)--cycle;
  \draw[detaxis] (-.3,0)--(3.7,0) node[right] {$x$};
- \draw[detaxis] (0,-.3)--(0,4.5) node[above] {$y$};
+ \draw[detaxis] (0,-.3)--(0,4.7) node[above] {$y$};
  \draw[detblue] (0,0)--(2,1) node[below right] {$\boldsymbol u$};
  \draw[detrose] (0,0)--(1,3) node[above left] {$\boldsymbol v$};
- \draw[detguide] (1,3)--(2,1) node[midway,right] {$h=\sqrt5$};
+ \draw[detguide] (1,3)--(2,1) node[midway,right,text=DetGray] {$h=\sqrt5$};
  \draw[DetGray!70] (1.84,.92)--(1.76,1.08)--(1.92,1.16);
  \node[below] at (.95,.38) {$|\boldsymbol u|=\sqrt5$};
- \node[anchor=west,align=left] at (4.6,2.6)
-  {底乘高：$\sqrt5\,\sqrt5=5$\\[7pt]
-   行列式：$2\cdot3-1\cdot1=5$};
+ \node[anchor=west,align=left] at (4.5,2.6)
+  {底乘高：$\sqrt5\,\sqrt5=5$\\[7pt]行列式：$2\cdot3-1\cdot1=5$\\[7pt]微元平行四边形也用这条规则};
 \end{tikzpicture}}
 
-\section{【选读】行列式函数的存在性与唯一性}
+\DetHead{本节回望：从整体变形，到每一处的小变形}
+第6.1节让我们看见平行多面体的有向体积，第6.2节让这份直觉成为可以推导的公理，第6.3节再由切变得到计算方法，由正交补构造逆矩阵，由克拉默法则读出组合系数的有向体积比。到了本节，同一把尺子先量出圆变椭圆的整体倍率，再落到非线性网格的每个小格，成为雅可比行列式。
+
+\DetFigure{上排从有序边张开的体积走向矩阵的全局缩放，下排把观察范围缩小，用局部矩阵 $J(\boldsymbol p)$ 衡量非线性变形。蓝色连接几何与代数，绿色连接同一面积规则的全局与局部应用。两个绝对值公式量大小，两个不带绝对值的行列式还记录定向。}{fig:six-global-local-measure-map}{%
+\begin{tikzpicture}[font=\small,
+ box/.style={draw=DetGray!45,rounded corners=2pt,fill=DetBlue!4,minimum width=4.5cm,minimum height=1.25cm,align=center}]
+ \node[box] (a) at (0,0) {有序边张开平行体\\$\det(A)$：有向体积};
+ \node[box] (b) at (7.5,0) {全局线性变换\\$S(T(R))=|\det(A)|\,S(R)$};
+ \node[box,fill=DetGreen!5] (c) at (0,-2.3) {局部线性近似\\$\boldsymbol h\mapsto J(\boldsymbol p)\boldsymbol h$\\$\det(J)$：有向倍率};
+ \node[box,fill=DetGreen!5] (d) at (7.5,-2.3) {局部微元面积\\$\mathrm dS=|\det(J)|\,\mathrm du\,\mathrm dv$};
+ \draw[detblue] (a)--node[above] {区域累加} (b);
+ \draw[detgreen] (c)--node[above] {平行四边形近似} (d);
+ \draw[detguide,-{Stealth}] (a)--node[left,text=DetGray] {同一体积规则} (c);
+ \draw[detguide,-{Stealth}] (b)--node[right,text=DetGray] {倍率随位置变化} (d);
+\end{tikzpicture}}
+
+从几何到代数，从全局到局部，从线性到非线性，我们用的始终是行列式：绝对值衡量大小，符号记录定向，零值提示降维。它是空间变形的度量衡，也是用线性工具理解非线性世界的桥梁。接下来的排列展开再检查公理定义的存在性与唯一性，把这条几何主线的代数基础补齐；下一章则进一步研究长度、夹角与正交。
+
+
+% CHAPTER 6 PERMUTATION AXIOMS BEGIN
+\section{排列的逆序数：行列式的离散对称结构}
 \label{sec:six-optional-existence}
 
-主线已经把有向体积的几何规则写成公理，并用它们推导计算性质。本节补上一个代数问题：看不见 $n$ 维盒子时，怎样保证这三条要求既不矛盾，又不会产生两种不同答案？以下证明为选读，不做考核要求；排列公式在这里用于核对定义，并不要求实际计算从列举所有排列开始。
+\textbf{几何给了我们三条规则，怎样保证它们在任意维数中都有且只有一个答案？} 从6.1节的有向面积、体积，到6.2节的公理性质，我们一直在观察有序边怎样张开空间。眼睛看不见高维盒子时，多重线性仍允许我们把每一条边拆成标准基分量；交替性则告诉我们，哪些组合要消去，哪些组合要带上负号。由此，连续的几何问题走向有限的排列计数。本节为\textbf{选读，不做考核要求}，任务是把前文暂缓的存在性与唯一性证明补齐。
 
-\DetHead{先看唯一性：把每条边拆成标准基分量}
-假设 $D$ 满足多重线性、交替性、标准基归一。若两个输入相同，交换它们既不改变输入又使输出变号，所以值为0。对 $A$ 的第 $j$ 列，按标准基写成
-\begin{equation}
- \boldsymbol a_j=\sum_{i=1}^n a_{ij}\boldsymbol e_i.
-\end{equation}
-逐列使用可加性与数乘性，$D$ 的值就展开为
-\begin{equation}
- \sum_{i_1,\ldots,i_n=1}^n
-   a_{i_1,1}\cdots a_{i_n,n}\,
-   D(\boldsymbol e_{i_1},\ldots,\boldsymbol e_{i_n}).
-\end{equation}
-每项从每列取一个元素。只要两个下标重复，该项为0；下标互不重复时，它们恰好是 $1,\ldots,n$ 的一种\term{permutation}。
+本节的逐列展开思路与三个配套排列结论，参考谢启鸿、姚慕生、吴泉水《高等代数学（第四版）》的行列式等价定义内容。\cite{yao-xie-algebra4}下文保留引理1.6.1--1.6.3的标记，证明与配图用本讲义的语言重述。前文的“交替性”也称交错性；我们仍沿用多重线性、交替性、归一性这三条公理的名称。
 
-记 $\sigma=(\sigma(1),\ldots,\sigma(n))$，其中 $\sigma(j)$ 是第 $j$ 列所取元素的行号。\term{inversion-number} $N(\sigma)$ 是其中满足 $i<j$、$\sigma(i)>\sigma(j)$ 的数对个数。把一个排列通过相邻交换整理成标准次序，每交换一次，逆序数的奇偶与函数值的符号都翻转一次。因此标准基归一给出
+\subsection{把每条边拆开：从几何公理到标准基组合}
+
+\textbf{先不假定公式，而问：如果这样的函数存在，它的值还能自由选择吗？} 设 $D$ 是一个满足三条公理的候选函数。记 $A$ 的第 $j$ 列为 $\boldsymbol\alpha_j$，以 $|\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_n|$ 表示列向量的行列式；这里的竖线表示行列式，不是取绝对值。暂时用 $D$ 记这个读数，是为了分清“任何候选函数必须怎样算”和“我们确实造出了一个函数”。
+
+标准单位列向量 $\boldsymbol e_i$ 只有第 $i$ 个坐标为1，其余为0。每一列都可以写成
 \begin{equation}
- D(\boldsymbol e_{\sigma(1)},\ldots,\boldsymbol e_{\sigma(n)})
-      =(-1)^{N(\sigma)}.
+ \boldsymbol\alpha_j=\sum_{i=1}^n a_{ij}\boldsymbol e_i,
+ \qquad A=(\boldsymbol\alpha_1\ \cdots\ \boldsymbol\alpha_n).
+ \label{eq:six-column-basis-decomposition}
 \end{equation}
-所有可能的输出已被确定，任何候选函数都只能是
+这就是第1章的基展开：一条任意方向的边，由各个坐标方向的边组合而成。
+
+先拆第1列，再拆第2列。每次固定其余列，只在一个位置使用线性，得到
+\begin{align}
+ D(\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_n)
+ &=\sum_{k_1=1}^n a_{k_1\,1}
+ D(\boldsymbol e_{k_1},\boldsymbol\alpha_2,\ldots,\boldsymbol\alpha_n),\\
+ D(\boldsymbol e_{k_1},\boldsymbol\alpha_2,\ldots,\boldsymbol\alpha_n)
+ &=\sum_{k_2=1}^n a_{k_2\,2}
+ D(\boldsymbol e_{k_1},\boldsymbol e_{k_2},\boldsymbol\alpha_3,\ldots,\boldsymbol\alpha_n).
+\end{align}
+第一行选择第1列的一个坐标，第二行再选择第2列的一个坐标。下标 $a_{k_1\,1}$ 中，$k_1$ 是行号，末尾的1是列号。
+
+对后面的列重复同一操作，最终得到
 \begin{equation}
- \det(A)=\sum_{\sigma\in S_n}(-1)^{N(\sigma)}
-                  \prod_{j=1}^n a_{\sigma(j),j}.
+ D(\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_n)
+ =\sum_{k_1=1}^n\cdots\sum_{k_n=1}^n
+ \left(a_{k_1\,1}a_{k_2\,2}\cdots a_{k_n\,n}\right)
+ D(\boldsymbol e_{k_1},\ldots,\boldsymbol e_{k_n}).
+ \label{eq:six-all-basis-tuples}
+\end{equation}
+每列都有 $n$ 种行号可选，最初共有 $n^n$ 个组合。多重线性把整个问题拆成了最小的读数：一组标准基箭头放在不同位置时，$D$ 究竟读到什么？
+
+\textbf{如果同一支标准基箭头出现两次，会怎样？} 交换这两个位置，输入没有改变，交替性却要求输出变号。因此 $D=-D$，在实数范围只能有 $D=0$。这说明式\eqref{eq:six-all-basis-tuples}中凡有 $k_p=k_q$ 的项都归零。留下的行号互不相同，恰好把 $1,\ldots,n$ 各用一次。
+
+\DetFigure{树形图展示二阶逐列展开：先选第1列的标准基方向，再选第2列的方向，每条路径都带着相应坐标系数。两条重复方向的路径归零，另外两条由标准基归一与一次交换读出 $+1,-1$。因此几何公理留下熟悉的 $a_{11}a_{22}-a_{21}a_{12}$；高阶展开遵循同样的选择规则。}{fig:six-basis-expansion-tree}{%
+\begin{tikzpicture}[font=\footnotesize,
+ dbnode/.style={draw=DetBlue!50,fill=white,rounded corners=2pt,align=center,minimum height=.58cm}]
+ \draw[step=.5cm,DetGray!9,very thin] (-.3,-.9) grid (13.7,4.5);
+ \node[dbnode] (root) at (6.6,3.95) {$D(\boldsymbol\alpha_1,\boldsymbol\alpha_2)$};
+ \node[dbnode] (a) at (3.05,2.6) {$D(\boldsymbol e_1,\boldsymbol\alpha_2)$};
+ \node[dbnode] (b) at (10.05,2.6) {$D(\boldsymbol e_2,\boldsymbol\alpha_2)$};
+ \node[dbnode,draw=DetGray!45,fill=DetGray!5] (aa) at (1.4,1) {$D(\boldsymbol e_1,\boldsymbol e_1)$\\重复，读数0};
+ \node[dbnode,draw=DetGreen!60,fill=DetGreen!7] (ab) at (4.7,1) {$D(\boldsymbol e_1,\boldsymbol e_2)$\\标准顺序，读数 $+1$};
+ \node[dbnode,draw=DetRose!60,fill=DetRose!7] (ba) at (8.35,1) {$D(\boldsymbol e_2,\boldsymbol e_1)$\\交换顺序，读数 $-1$};
+ \node[dbnode,draw=DetGray!45,fill=DetGray!5] (bb) at (11.75,1) {$D(\boldsymbol e_2,\boldsymbol e_2)$\\重复，读数0};
+ \draw[detblue] (root)--node[above left] {$a_{11}$} (a);
+ \draw[detblue] (root)--node[above right] {$a_{21}$} (b);
+ \draw[detaxis] (a)--node[above left] {$a_{12}$} (aa);
+ \draw[detgreen] (a)--node[above right] {$a_{22}$} (ab);
+ \draw[detrose] (b)--node[above left] {$a_{12}$} (ba);
+ \draw[detaxis] (b)--node[above right] {$a_{22}$} (bb);
+ \node[font=\small] at (6.6,-.45) {$D(\boldsymbol\alpha_1,\boldsymbol\alpha_2)=a_{11}a_{22}-a_{21}a_{12}$};
+\end{tikzpicture}}
+
+\subsection{逆序数：用计数记录定向翻转}
+
+\textbf{不重复的行号有很多种次序，怎样统一记录它们的正负？} 把 $1,\ldots,n$ 按某种顺序排成 $(k_1,\ldots,k_n)$，就得到一个\term{permutation}。全部排列组成集合 $S_n$，共有 $n!$ 个；把排列看成下标的一一对应，按复合运算组织，就得到\term{symmetric-group}。这里不展开群论，只使用其中的排列、对换与符号。
+
+\begin{definition}[逆序数与排列奇偶性]
+排列 $(k_1,\ldots,k_n)$ 中，满足 $p<q$ 且 $k_p>k_q$ 的数对称为\term{inversion-pair}，其个数称为\term{inversion-number}，记作
+\begin{equation}
+ \tau(k_1,\ldots,k_n)
+ =\#\{(p,q):1\le p<q\le n,\ k_p>k_q\}.
+\end{equation}
+这里 $\#$ 表示集合中的元素个数：从左向右检查，前面的数比后面的数大，就记一次。逆序数的奇偶称为\term{permutation-parity}；$\tau$ 为偶数时称\term{even-permutation}，为奇数时称\term{odd-permutation}，相应符号为 $(-1)^\tau$。
+\end{definition}
+
+例如 $(3,1,2)$ 的逆序对是 $(3,1)$、$(3,2)$，所以 $\tau=2$，是偶排列；$(1,3,2)$ 只有 $(3,2)$ 一个逆序对，所以 $\tau=1$，是奇排列。“偶”并不表示已经排好，只表示整理过程中需要的符号翻转为偶数次。
+
+\DetFigure{上排按位置 $1,2,3$ 排列，下排按数值 $1,2,3$ 排列，每条线把一个位置连到该处的数值；两线交叉恰好表示一个逆序对。左图 $(3,1,2)$ 有两次交叉，右图交换前两个位置后成为 $(1,3,2)$，只有一次交叉。交叉数的奇偶翻转，为几何定向的变号提供了可数的记录。}{fig:six-inversion-crossings}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.4,-.55) grid (13.6,4.15);
+ \node at (3.05,3.75) {$(3,1,2)$};
+ \node at (10.1,3.75) {$(1,3,2)$};
+ \begin{scope}[shift={(1.05,1.05)}]
+  \foreach \i in {1,2,3} {
+   \node[above] at (\i,1.7) {$\i$};\node[below] at (\i,0) {$\i$};
+   \fill[DetGray!70] (\i,1.7) circle (1.6pt);\fill[DetGray!70] (\i,0) circle (1.6pt);}
+  \draw[DetBlue,line width=1.15pt] (1,1.7)--(3,0);
+  \draw[DetRose,line width=1.15pt] (2,1.7)--(1,0);
+  \draw[DetGreen,line width=1.15pt] (3,1.7)--(2,0);
+  \draw[DetGray!70] (1.6667,1.1333) circle (3pt);
+  \draw[DetGray!70] (2.3333,.5667) circle (3pt);
+  \node[anchor=east,font=\footnotesize,text=DetGray] at (.6,1.7) {位置};
+  \node[anchor=east,font=\footnotesize,text=DetGray] at (.6,0) {数值};
+ \end{scope}
+ \draw[detaxis] (5.3,1.8)--node[above,align=center,font=\footnotesize] {交换前\\两个位置} (7.25,1.8);
+ \begin{scope}[shift={(8.1,1.05)}]
+  \foreach \i in {1,2,3} {
+   \node[above] at (\i,1.7) {$\i$};\node[below] at (\i,0) {$\i$};
+   \fill[DetGray!70] (\i,1.7) circle (1.6pt);\fill[DetGray!70] (\i,0) circle (1.6pt);}
+  \draw[DetBlue,line width=1.15pt] (1,1.7)--(1,0);
+  \draw[DetRose,line width=1.15pt] (2,1.7)--(3,0);
+  \draw[DetGreen,line width=1.15pt] (3,1.7)--(2,0);
+  \draw[DetGray!70] (2.5,.85) circle (3pt);
+ \end{scope}
+ \node[text=DetGreen] at (3.05,.1) {$\tau=2$：偶，符号 $+1$};
+ \node[text=DetRose] at (10.1,.1) {$\tau=1$：奇，符号 $-1$};
+\end{tikzpicture}}
+
+\textbf{交换两个位置，为什么一定改变奇偶性？} 交换排列中的两个元素称为\term{transposition}；若两个位置相邻，称为\term{adjacent-transposition}。下面三条结论只谈数的次序，不依赖行列式，因此可以用来建立它的代数基础。
+
+\begin{thmBox}[before title={},title={引理 1.6.1（任意对换翻转排列奇偶性）}]{引理}{}
+对换一个排列中的任意两个不同位置，所得排列的逆序数与原排列的逆序数奇偶相反。
+\end{thmBox}
+\begin{proof}
+先看相邻位置。相邻两数与外部各数形成的逆序对总数不变：外部数要么在两数之前，要么在两数之后，交换只是调换这两份比较。只有这两个相邻数彼此的比较改变，所以逆序数恰好增加1或减少1，奇偶必翻转。
+
+再看位置 $p<q$ 的一次对换。先把第 $q$ 个元素向左移动 $q-p$ 步，放到位置 $p$；原来第 $p$ 个元素此时在 $p+1$，再把它向右移动 $q-p-1$ 步，放到位置 $q$。中间各元素最终回到原来的位置，合起来恰好交换两端，共用了
+\begin{equation}
+ (q-p)+(q-p-1)=2(q-p)-1
+\end{equation}
+次相邻对换。这个次数为奇数，每一步都翻转奇偶，所以任意一次对换也翻转奇偶。注意，非相邻对换不一定只改变一个逆序对；例如 $(1,2,3)$ 对换首尾成为 $(3,2,1)$，逆序数从0变为3，改变的仍是奇偶。
+\end{proof}
+
+\begin{thmBox}[before title={},title={引理 1.6.2（奇、偶排列各占一半）}]{引理}{}
+当 $n\ge2$ 时，$S_n$ 中奇排列、偶排列的个数均为 $n!/2$。
+\end{thmBox}
+\begin{proof}
+给每个排列配上“交换第1、2个位置”后的排列。两个位置的元素不同，所以配对没有把某个排列配回自身；再交换一次，就回到原排列。由引理1.6.1，每一对恰有一个奇排列、一个偶排列。全部 $n!$ 个排列因此分成 $n!/2$ 对，两类数量相等。$n=1$ 时只有一个偶排列，不属于这一结论的范围。
+\end{proof}
+
+\begin{thmBox}[before title={},title={引理 1.6.3（逆序数就是相邻整理的步数）}]{引理}{}
+排列 $(k_1,\ldots,k_n)$ 可以通过恰好 $\tau(k_1,\ldots,k_n)$ 次相邻对换，化为常序排列 $(1,2,\ldots,n)$。
+\end{thmBox}
+\begin{proof}
+只要排列没有排好，就必有相邻的两数前大后小；否则全部相邻比较都递增，整列已经是常序排列。交换这样一对相邻倒序元素，由引理1.6.1证明中的计数，逆序数恰好减少1。
+
+每次都这样做。逆序数是非负整数，从最初的 $\tau$ 降到0恰好需要 $\tau$ 步；为0时没有任何逆序，必为 $(1,2,\ldots,n)$。而每次相邻对换至多减少一个逆序对，所以也不可能用更少的相邻对换完成整理。
+\end{proof}
+
+\DetFigure{四组方格按顺序展示 $(3,1,4,2)$ 的整理过程，着色方格标出下一次交换的相邻倒序元素。每一步消去一个逆序对，逆序数从3降到0，排列符号依次为负、正、负、正。把每次交换读成列向量的交换，便看到计数奇偶与有向体积定向完全同步。}{fig:six-adjacent-sorting}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.25,-.7) grid (13.7,2.7);
+ \foreach \xx/\vals/\lo/\hi/\inv/\sgn in {0/{3,1,4,2}/1/2/3/{-1},3.5/{1,3,4,2}/3/4/2/{+1},7/{1,3,2,4}/2/3/1/{-1},10.5/{1,2,3,4}/0/0/0/{+1}} {
+  \begin{scope}[shift={(\xx,0)}]
+   \foreach \val [count=\j] in \vals {
+    \ifnum\j=\lo \def\fc{DetRose!17}\else\ifnum\j=\hi \def\fc{DetRose!17}\else\def\fc{white}\fi\fi
+    \draw[DetGray!50,fill=\fc] ({(\j-1)*.55},.75) rectangle ++(.55,.65);
+    \node at ({(\j-.5)*.55},1.075) {$\val$};
+   }
+   \node[font=\footnotesize] at (1.1,.15) {$\tau=\inv$};
+   \node[font=\footnotesize] at (1.1,-.35) {符号 $\sgn$};
+  \end{scope}
+ }
+ \foreach \xx in {2.3,5.8,9.3} {
+  \draw[detaxis] (\xx,1.075)--(\xx+.95,1.075);
+  \node[font=\scriptsize,align=center] at (\xx+.48,1.8) {一次相邻\\对换};
+ }
+\end{tikzpicture}}
+
+\textbf{计数与空间定向怎样接上？} 对标准基的排列，一次相邻对换就是交换两列，使 $D$ 变号；整理到常序需要 $\tau$ 次，而常序的读数由归一性固定为1。因此
+\begin{equation}
+ D(\boldsymbol e_{k_1},\ldots,\boldsymbol e_{k_n})
+ =(-1)^{\tau(k_1,\ldots,k_n)}.
+ \label{eq:six-permuted-basis-sign}
+\end{equation}
+正负号不再靠画图猜测。二维的顺、逆时针，三维的右、左手定向，到了高维都由同一个奇偶记录来表达。
+
+\DetFigure{两图画的是同一个单位立方体，颜色记录第1、2、3列的位置；左图按标准基次序读三条边，右图仅交换前两列。盒子的通常体积仍为1，但有向体积由 $+1$ 变为 $-1$，右手定向变为左手定向。这就是 $(-1)^\tau$ 在三维中的几何含义，奇偶性记录次序而不改变盒子的大小。}{fig:six-permutation-orientation}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.3,-.7) grid (13.6,4.4);
+ \node at (3.05,3.95) {常序：右手定向};
+ \node at (10.1,3.95) {交换两列：左手定向};
+ \foreach \xx in {3.05,10.1} {
+  \begin{scope}[shift={(\xx,1.3)},x={(1.15cm,-.45cm)},y={(-.95cm,-.45cm)},z={(0cm,1.5cm)}]
+   \fill[DetBlue!9] (0,0,0)--(1,0,0)--(1,1,0)--(0,1,0)--cycle;
+   \fill[DetGreen!7] (0,1,0)--(1,1,0)--(1,1,1)--(0,1,1)--cycle;
+   \draw[detguide] (0,0,1)--(1,0,1)--(1,1,1)--(0,1,1)--cycle;
+   \draw[detguide] (1,0,0)--(1,0,1);
+   \draw[detguide] (1,1,0)--(1,1,1);
+   \draw[detguide] (0,1,0)--(0,1,1);
+   \draw[detgreen] (0,0,0)--(0,0,1) node[above] {$\boldsymbol e_3$};
+  \end{scope}
+ }
+ \begin{scope}[shift={(3.05,1.3)},x={(1.15cm,-.45cm)},y={(-.95cm,-.45cm)},z={(0cm,1.5cm)}]
+  \draw[detblue] (0,0,0)--(1,0,0) node[below right] {$\boldsymbol e_1$};
+  \draw[detrose] (0,0,0)--(0,1,0) node[below left] {$\boldsymbol e_2$};
+ \end{scope}
+ \begin{scope}[shift={(10.1,1.3)},x={(1.15cm,-.45cm)},y={(-.95cm,-.45cm)},z={(0cm,1.5cm)}]
+  \draw[detrose] (0,0,0)--(1,0,0) node[below right] {$\boldsymbol e_1$};
+  \draw[detblue] (0,0,0)--(0,1,0) node[below left] {$\boldsymbol e_2$};
+ \end{scope}
+ \draw[detaxis] (5.25,1.7)--node[above,font=\footnotesize] {对换第1、2列} (7.65,1.7);
+ \node[font=\footnotesize,text=DetGreen] at (3.05,-.2) {$(1,2,3)$，$\tau=0$，读数 $+1$};
+ \node[font=\footnotesize,text=DetRose] at (10.1,-.2) {$(2,1,3)$，$\tau=1$，读数 $-1$};
+\end{tikzpicture}}
+
+\subsection{莱布尼茨公式：每行、每列恰好选一次}
+
+现在回到式\eqref{eq:six-all-basis-tuples}。重复行号的项归零，不重复的行号构成排列，标准基有序组的读数又由式\eqref{eq:six-permuted-basis-sign}确定。多重线性拆开的所有项，到这里都有了明确的去留与符号。
+
+\begin{theorem}[行列式完全展开式：莱布尼茨公式]
+任何满足多重线性、交替性与归一性的候选函数 $D$，都必须满足
+\begin{equation}
+ D(\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_n)
+ =\sum_{(k_1,\ldots,k_n)\in S_n}
+ (-1)^{\tau(k_1,\ldots,k_n)}
+ a_{k_1\,1}a_{k_2\,2}\cdots a_{k_n\,n}.
  \label{eq:six-permutation-existence}
 \end{equation}
-这里 $S_n$ 是全部排列的集合。公式不是新的几何定义，而是把多重线性逐列展开后，被交替性与单位基准留下的全部项。
+这个表达式称为\term{leibniz-formula}。每个排列项从每列取一个元素，行号也恰好各用一次，再乘上排列符号。
+\end{theorem}
 
-\DetHead{再看存在性：这个有限和确实满足公理}
-反过来，用式\eqref{eq:six-permutation-existence}定义一个函数。每一项从每列恰取一个元素，所以固定其他列时，它对剩下一列满足可加性与数乘性。
+证明已经包含在刚才的逐列展开与三个引理中：三条公理迫使任何候选函数都取上述值。此时我们证明的是\textbf{“如果存在，就只能这样”}；要得到“确实存在”，还需核对这个有限和本身满足公理。
 
-交换两列 $p,q$，等价于交换每项中排列的两个位置。把所有项按这个对应重新配对，乘积对应不变，而排列符号反转：一次非相邻交换也能分解成奇数次相邻交换，所以仍变号。于是新有限和是原有限和的负数，满足交替性。
+二阶有两个排列，留下 $a_{11}a_{22}-a_{21}a_{12}$；三阶有六个排列，留下
+\begin{align}
+ \det(A)={}&a_{11}a_{22}a_{33}+a_{21}a_{32}a_{13}+a_{31}a_{12}a_{23}\\
+ &-a_{11}a_{32}a_{23}-a_{21}a_{12}a_{33}-a_{31}a_{22}a_{13}.
+\end{align}
+这六项与6.1节的混合积展开、萨鲁斯法则完全一致。一般 $n$ 阶公式有 $n!$ 个\emph{形式上的排列项}；某些元素为0时，一些项还会归零，剩下的项也可能相互抵消。$n!$ 并不是说每个数值矩阵必有 $n!$ 个非零贡献。
 
-代入单位矩阵 $E_n$，只有恒等排列 $\sigma(j)=j$ 的乘积不为0，它的符号为正、乘积为1。所以函数也满足归一性。至此，我们已经构造出满足全部公理的函数，存在性得到证明；前一段则证明它只能有一个。
+\subsection{存在性与唯一性：把三条公理严格接合}
 
-若 $\beta$ 只满足交替性与多重线性，同样的标准基展开给出
+\begin{theorem}[行列式函数的存在性与唯一性]
+对每个正整数 $n$，实向量空间 $\mathbb R^n$ 上存在唯一一个满足多重线性、交替性及 $D(\boldsymbol e_1,\ldots,\boldsymbol e_n)=1$ 的 $n$ 重线性型。它就是行列式函数，取值由式\eqref{eq:six-permutation-existence}给出。
+\end{theorem}
+
+\DetHead{存在性证明：先造一个有限和，再逐条核对}
+\begin{proof}
+不借用任何尚待证明的行列式性质，直接对任意实矩阵 $A$ 定义
 \begin{equation}
- \beta(\boldsymbol a_1,\ldots,\boldsymbol a_n)
-   =\beta(\boldsymbol e_1,\ldots,\boldsymbol e_n)\det(A).
+ \Phi(A)=\sum_{\sigma\in S_n}(-1)^{\tau(\sigma)}
+ \prod_{j=1}^n a_{\sigma(j),\,j}.
+ \label{eq:six-constructed-determinant}
 \end{equation}
-这个推导没有除以单位基准的值，因而它为0时也成立。这就补齐了第6.1节陈述、第6.2节乘积法则使用的尺度结论。
+这里 $\sigma(j)$ 就是第 $j$ 列所选的行号，$\tau(\sigma)=\tau(\sigma(1),\ldots,\sigma(n))$。有限个实数相乘再相加，给出了一个确实有定义的函数；现在验证它是不是我们要的函数。
 
-$n=2$ 时，两个排列留下 $a_{11}a_{22}-a_{21}a_{12}$；$n=3$ 时，六个排列留下混合积的六项。高维中的严格定义与低维中看见的面积、体积由此接在一起：先看见几何，再理解结构，最后让符号替我们完成看不见的计算。
+\textbf{先验证多重线性。} 固定其余列，把第 $i$ 列换成 $c\boldsymbol u+d\boldsymbol v$。在每个排列项中，该列只贡献一个分量，其余列的乘积不变，所以
+\begin{align}
+ \Phi(\ldots,c\boldsymbol u+d\boldsymbol v,\ldots)
+ &=\sum_{\sigma\in S_n}(-1)^{\tau(\sigma)}
+ (c u_{\sigma(i)}+d v_{\sigma(i)})
+ \prod_{j\ne i}a_{\sigma(j),\,j}\\
+ &=c\Phi(\ldots,\boldsymbol u,\ldots)
+   +d\Phi(\ldots,\boldsymbol v,\ldots).
+\end{align}
+把该列的两份贡献分别加起来，就是可加性与数乘性；第 $i$ 列是任意选的，因此每个位置都线性。
+
+\textbf{再验证交替性。} 设 $B$ 是交换 $A$ 的第 $p,q$ 列得到的矩阵，$t$ 表示交换这两个位置的对换。于是 $b_{rj}=a_{r,t(j)}$。对一个排列 $\sigma$，令 $\rho=\sigma\circ t$，也就是交换 $\sigma$ 的第 $p,q$ 个位置。对应乘积满足
+\begin{equation}
+ \prod_{j=1}^n b_{\sigma(j),\,j}
+ =\prod_{j=1}^n a_{\sigma(j),\,t(j)}
+ =\prod_{k=1}^n a_{\sigma(t(k)),\,k}
+ =\prod_{k=1}^n a_{\rho(k),\,k}.
+\end{equation}
+中间一步只是把列号重新命名为 $k=t(j)$；对换两次回到原位置，因此 $j=t(k)$。$\sigma\mapsto\rho$ 把全部排列一一对应地重新排过，不遗漏也不重复。由引理1.6.1，两者奇偶相反，所以
+\begin{align}
+ \Phi(B)
+ &=\sum_{\sigma\in S_n}(-1)^{\tau(\sigma)}
+   \prod_{k=1}^n a_{\rho(k),\,k}\\
+ &=-\sum_{\rho\in S_n}(-1)^{\tau(\rho)}
+   \prod_{k=1}^n a_{\rho(k),\,k}
+ =-\Phi(A).
+\end{align}
+对应项的乘积相同，符号相反，整个有限和便变号。若两列本来相同，交换后 $B=A$，于是 $\Phi(A)=-\Phi(A)$，只能为0；也可把排列项配成乘积相同、符号相反的两两抵消。
+
+\textbf{最后验证归一性。} 单位矩阵 $E_n$ 的第 $j$ 列只在第 $j$ 行有1。非恒等排列至少选中一个非对角位置，乘积为0；常序排列的逆序数为0，乘积全为1。因此
+\begin{equation}
+ \Phi(E_n)=(-1)^0\underbrace{1\cdots1}_{n\text{ 个}}=1.
+\end{equation}
+三条公理全部成立，$\Phi$ 就是一个行列式函数，存在性得证。$n=1$ 时只有一个排列，公式给出 $\Phi((a_{11}))=a_{11}$，同样成立；交换两列的要求在这一维没有需要核对的情形。
+\end{proof}
+
+\DetHead{唯一性证明：公理不允许另一套读数}
+\begin{proof}
+设 $f$ 是任意另一个满足三条公理的函数。把每列按标准基分解，由多重线性，$f$ 必须展开成式\eqref{eq:six-all-basis-tuples}那样的和。交替性使所有重复下标项为0；对每个排列，依引理1.6.3整理次序，再用归一性，得到
+\begin{equation}
+ f(\boldsymbol e_{\sigma(1)},\ldots,\boldsymbol e_{\sigma(n)})
+ =(-1)^{\tau(\sigma)}f(\boldsymbol e_1,\ldots,\boldsymbol e_n)
+ =(-1)^{\tau(\sigma)}.
+\end{equation}
+每个标准基组合的读数已经固定，没有任何剩余选择。因此对任意 $A$，都有
+\begin{equation}
+ f(\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_n)
+ =\sum_{\sigma\in S_n}(-1)^{\tau(\sigma)}
+ \prod_{j=1}^n a_{\sigma(j),\,j}
+ =\Phi(A).
+\end{equation}
+任何候选函数都等于刚才构造的 $\Phi$，所以不可能有两个不同的行列式函数，唯一性得证。
+\end{proof}
+
+还有一个前文用过的结论，现在也能补齐。若 $\beta$ 只满足交替性与多重线性，令 $c=\beta(\boldsymbol e_1,\ldots,\boldsymbol e_n)$，同样的展开给出
+\begin{equation}
+ \beta(\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_n)=c\det(A).
+\end{equation}
+这次没有规定单位读数为1，所有值便统一乘上尺度 $c$。推导从未除以 $c$，所以 $c=0$ 时也成立。这正是6.1节陈述、6.2节乘积法则使用的尺度结论。
+
+\begin{note}
+也可以把莱布尼茨有限和直接作为行列式的定义，再从它推出全部性质，这是参考教材指出的另一条起点。本讲义先从体积提炼公理，再推出有限和，并验证它确实存在且唯一。两条路线给出同一个对象，几何与代数在这里完成了相互核对。
+\end{note}
+
+\subsection{组合结构的用处：先找允许的项，再计算}
+
+\textbf{有了 $n!$ 项公式，做题时就要列出全部项吗？} 不必。展开式最有用的地方，往往是每行、每列恰取一次的限制：想要某种次数，或想要一个非零项，先检查选取位置能否同时成立。许多不可能的项，在乘法开始以前就已经排除了。
+
+\begin{example}[经典例题：行列式多项式的项系数]
+求
+\begin{equation}
+ F(x)=\begin{vmatrix}x&1&2\\3&x&4\\5&6&x\end{vmatrix}
+\end{equation}
+中 $x^3$ 项与 $x^2$ 项的系数。
+
+\textbf{先找 $x^3$。} 三个位置都要选 $x$，只能取 $(1,1),(2,2),(3,3)$。它们不同行、不同列，对应常序排列 $(1,2,3)$，逆序数为0，因此
+\begin{equation}
+ x^3\text{ 项的系数}=(-1)^0\cdot1\cdot1\cdot1=1.
+\end{equation}
+三个对角坐标一起取，给出了唯一的三次项。
+
+\textbf{再找 $x^2$。} 若已经选了两个主对角线上的 $x$，便占用了两行、两列。第三个位置只剩下未使用的那一行、那一列，它们相交的位置仍在主对角线上，还是一个 $x$，无法改取常数。所以
+\begin{equation}
+ x^2\text{ 项的系数}=0.
+\end{equation}
+这次的零来自“没有允许的选取组合”，不是先算出一堆项再碰巧抵消。完整展开给出 $F(x)=x^3-37x+56$，与这两个系数一致。
+\end{example}
+
+\DetFigure{左图标出三个对角线 $x$，它们各占一行、一列，给出正号的 $x^3$ 项。右图先选两个对角线 $x$，灰色格子表示已被占用行、列排除的位置，绿色格子是唯一剩下的选择，却仍是 $x$。因此仅含两个 $x$ 的排列项不存在；系数的判断来自标准基展开中的位置限制。}{fig:six-polynomial-coefficient-selection}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.25,-.7) grid (13.7,4.2);
+ \node at (3,3.75) {选三个 $x$：允许};
+ \node at (10.1,3.75) {想选两个 $x$：第三个被迫仍取 $x$};
+ \begin{scope}[shift={(1.8,.8)}]
+  \foreach \i/\j/\val in {1/1/x,1/2/1,1/3/2,2/1/3,2/2/x,2/3/4,3/1/5,3/2/6,3/3/x} {
+   \ifnum\i=\j \def\fc{DetBlue!17}\else\def\fc{white}\fi
+   \draw[DetGray!45,fill=\fc] ({(\j-1)*.8},{(3-\i)*.8}) rectangle ++(.8,.8);
+   \node at ({(\j-.5)*.8},{(3.5-\i)*.8}) {$\val$};
+  }
+ \end{scope}
+ \node[text=DetBlue,font=\footnotesize] at (3,0) {排列 $(1,2,3)$，系数1};
+ \draw[detaxis] (5.2,2)--node[above,font=\footnotesize] {每行、每列只用一次} (7.2,2);
+ \begin{scope}[shift={(8.9,.8)}]
+  \foreach \i/\j/\val in {1/1/x,1/2/1,1/3/2,2/1/3,2/2/x,2/3/4,3/1/5,3/2/6,3/3/x} {
+   \def\fc{DetGray!12}
+   \ifnum\i=\j \ifnum\i=3 \def\fc{DetGreen!18}\else\def\fc{DetBlue!17}\fi\fi
+   \draw[DetGray!45,fill=\fc] ({(\j-1)*.8},{(3-\i)*.8}) rectangle ++(.8,.8);
+   \node at ({(\j-.5)*.8},{(3.5-\i)*.8}) {$\val$};
+  }
+  \draw[DetGreen,line width=1.2pt] (1.6,0) rectangle (2.4,.8);
+ \end{scope}
+ \node[text=DetGreen,font=\footnotesize] at (10.1,0) {只剩 $(3,3)$：不能形成 $x^2$ 项};
+\end{tikzpicture}}
+
+\Needspace{9\baselineskip}
+\begin{example}[补充例题：只有一个非零排列项]
+计算
+\begin{equation}
+ \det(A)=\begin{vmatrix}0&0&2&0\\3&0&0&0\\0&0&0&5\\0&7&0&0\end{vmatrix}.
+\end{equation}
+每列只有一个非零元素，行号依次被固定为 $(2,4,1,3)$，而且四个行号互不重复。因此只有一个非零排列项，取出的乘积为 $3\cdot7\cdot2\cdot5$。这个排列的逆序对是 $(2,1),(4,1),(4,3)$，共3个，故
+\begin{equation}
+ \det(A)=(-1)^3\cdot3\cdot7\cdot2\cdot5=-210.
+\end{equation}
+先由零元素锁定位置，再由排列奇偶决定符号，便完成了计算。
+\end{example}
+
+\Needspace{9\baselineskip}
+\begin{example}[补充例题：三列挤不进两行]
+不作消元，判断
+\begin{equation}
+ \det(B)=\begin{vmatrix}1&2&3&4\\2&1&5&6\\0&0&0&7\\0&0&0&8\end{vmatrix}
+\end{equation}
+是否为0。前三列的非零元素全部位于前两行，要让一个排列项不为0，就必须从这两行中为三列各选一个位置，且三次行号都不同。这不可能，因此每一个排列项都含有零元素，$\det(B)=0$。
+
+矩阵没有整行、整列为零，仍可从选取结构直接看出答案。几何上，前三列都在 $\operatorname{span}(\boldsymbol e_1,\boldsymbol e_2)$ 中，三支箭头只能张开二维底面，不能成为线性无关的三列；离散的选取限制与前文的体积塌缩给出了同一个判断。
+\end{example}
+
+从几何公理到排列展开，并没有换掉行列式的本质：多重线性把边拆成坐标方向，交替性排除重复并记录定向，归一性固定单位读数。莱布尼茨公式把这三件事组织为一个有限和，既完成任意维数的严格构造，也让我们能在计算前看清哪些项根本不会出现。至此，6.2节使用的公理体系有了完整的代数依据；面积、体积与离散组合，成为同一个结构的不同读法。
+% CHAPTER 6 PERMUTATION AXIOMS END
+
+% CHAPTER 6 UNITREE CASE BEGIN
+\section{应用案例：宇树机器人的运动控制与奇异性分析}
+\label{sec:six-unitree-control}
+
+\subsection*{从春晚舞台说起：机器人如何完成“转手绢”？}
+
+2025年蛇年春晚的《秧BOT》中，16台宇树H1人形机器人与16位舞蹈演员同台扭秧歌。扭胯、挑帘、甩手、转手绢，一串熟悉的舞蹈动作，被机器人做出了整齐的节奏；手绢抛出后又接回，尤其引人注目。新华社、光明网与央视的报道介绍了这场人机协同表演及其技术准备。\cite{unitree-yangbot-xinhua,unitree-yangbot-gmw,unitree-yangbot-cctv}
+
+H1的基本结构有19个驱动关节：两条腿各5个，两条手臂各4个，再加1个躯干关节。为表演手绢动作，春晚版本增加了手部机构；报道给出的自由度计数是“本体19个、手部6个”，相当于每侧增加3个。这里要区分\textbf{基本机型的关节配置与舞台版本的附加机构}，也不能把所有手部转动都理解成手的位置变化。\cite{unitree-h1-official,unitree-yangbot-cctv}
+
+\begin{figure}[htbp]
+ \centering
+ \includegraphics[width=.88\textwidth]{assets/unitree-h1-yangbot-stage.jpg}
+ \caption{2025年蛇年春晚《秧BOT》节目，宇树H1人形机器人正在表演手绢动作。图片来源于公开新闻报道：光明网所刊舞台配图（2025年1月30日，页面来源标注为中新社微信公众号）；画面保留央视台标，原报道链接见参考文献。\cite{unitree-yangbot-gmw}}
+ \label{fig:six-yangbot-stage}
+\end{figure}
+\FloatBarrier
+
+我们先把灯光与音乐放在一旁，只看机器人抬起的一只手。老师可以给出一个目标：“再向右移动一点。”电机却只认识各个关节的转动。机器人必须先回答：
+\begin{quote}
+ \textbf{当前姿态下，我的手臂还能往哪些方向运动？有没有某个方向突然动不了了？}
+\end{quote}
+这是“想做什么”与“此刻能做什么”之间的差别。关节数量多，并不自动保证每一种姿态都灵活；有时几根连杆恰好排成一条线，原本不同的关节作用就会变得重复。前四章的线性映射、秩与零空间，第五章的最小二乘，以及本章的行列式，恰好能把这个问题说清楚。
+
+\noindent\textbf{模型约定。}本节从真实表演提出问题，再用自拟的两关节平面手臂建立数学模型。连杆长度、角度、速度预算与控制流程都是教学设定，不是H1的实测参数，也不声称春晚控制系统采用了下文某一具体算法。真实转手绢还涉及手的朝向、手绢接触与全身平衡；下面先研究\textbf{手的位置怎样改变}，把最基本的方向问题看透。
+
+\DetFigure{H1 本体的关节数量示意：两臂各4个、两腿各5个、躯干1个，共19个。肩部、髋部的一组三个小圆表示三个转动自由度，未按真实转轴位置绘制；春晚版本每侧手部机构另增3个自由度，以腕部附近的虚线小圆示意。这些附加自由度未必都改变手的末端位置。此图按宇树官方模型的关节数量原创简化，不是机械装配图。\cite{unitree-h1-official,unitree-yangbot-cctv}}{fig:six-h1-joints}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small,
+  h1arm/.style={DetBlue,line width=2.5pt,line cap=round},
+  h1leg/.style={DetGreen,line width=2.5pt,line cap=round},
+  h1aj/.style={circle,draw=DetBlue,fill=white,line width=.9pt,inner sep=0pt,minimum size=3.7mm},
+  h1lj/.style={circle,draw=DetGreen,fill=white,line width=.9pt,inner sep=0pt,minimum size=3.7mm},
+  h1extra/.style={circle,draw=DetRose,densely dashed,fill=white,line width=.8pt,inner sep=0pt,minimum size=3.2mm},
+  h1info/.style={rounded corners=3pt,draw=DetGray!35,fill=DetGray!3,
+    text width=5.7cm,align=left,inner sep=6pt,
+    font=\linespread{1}\fontsize{10pt}{14pt}\selectfont}]
+  \node[font=\small\bfseries] at (2.5,6.2) {H1：关节数量示意};
+  % 头部仅用于辨认机器人形态，未标作额外自由度。
+  \draw[draw=DetGray!75,fill=DetGray!8,line width=1pt] (2.5,5.5) circle (.33);
+  \draw[DetGray!75,line width=1.5pt] (2.5,5.16)--(2.5,5.04);
+  \draw[draw=DetGray!75,fill=DetGray!5,rounded corners=5pt,line width=1pt]
+    (1.7,3.5) rectangle (3.3,5.05);
+  \draw[DetGray!75,line width=1.5pt] (2.5,3.5)--(2.5,3.04);
+  \node[circle,draw=DetRose,fill=white,line width=1pt,inner sep=0pt,
+    minimum size=5mm] at (2.5,3.25) {};
+  \draw[DetGray!75,line width=1.5pt] (2.08,3.02)--(2.92,3.02);
+  % 左右臂：肩部三个自由度 + 肘部一个自由度。
+  \draw[h1arm] (1.7,4.95)--(1.38,4.92)--(1.16,4.78)--(1.02,4.59)
+    --(.6,3.95)--(.25,3.08);
+  \draw[h1arm] (3.3,4.95)--(3.62,4.92)--(3.84,4.78)--(3.98,4.59)
+    --(4.4,3.95)--(4.75,3.08);
+  \foreach \p in {(1.38,4.92),(1.16,4.78),(1.02,4.59),(.6,3.95),
+    (3.62,4.92),(3.84,4.78),(3.98,4.59),(4.4,3.95)}
+    \node[h1aj] at \p {};
+  % 双腿：髋部三个自由度 + 膝部一个 + 踝部一个。
+  \draw[h1leg] (2.08,3.02)--(2.01,2.81)--(1.96,2.60)--(1.91,1.69)--(1.85,.51);
+  \draw[h1leg] (2.92,3.02)--(2.99,2.81)--(3.04,2.60)--(3.09,1.69)--(3.15,.51);
+  \foreach \p in {(2.08,3.02),(2.01,2.81),(1.96,2.60),(1.91,1.69),(1.85,.51),
+    (2.92,3.02),(2.99,2.81),(3.04,2.60),(3.09,1.69),(3.15,.51)}
+    \node[h1lj] at \p {};
+  \draw[draw=DetGray!70,fill=DetGray!9,rounded corners=2pt]
+    (1.47,.12) rectangle (2.12,.32);
+  \draw[draw=DetGray!70,fill=DetGray!9,rounded corners=2pt]
+    (2.88,.12) rectangle (3.53,.32);
+  % 新增关节仅画成腕部附近的虚线模块，区别于基型关节。
+  \draw[DetRose,densely dashed,line width=1pt] (.25,3.08)--(.25,2.21);
+  \draw[DetRose,densely dashed,line width=1pt] (4.75,3.08)--(4.75,2.21);
+  \foreach \p in {(.25,2.95),(.25,2.67),(.25,2.39),
+    (4.75,2.95),(4.75,2.67),(4.75,2.39)}
+    \node[h1extra] at \p {};
+  \node[font=\footnotesize,text=DetGray] at (2.5,-.35) {仅示意关节数量，不表示转轴的实际位置};
+  % 说明采用独立信息框，保证密集关节标记仍然清晰。
+  \node[h1info] at (8.6,4.88)
+    {\textcolor{DetBlue}{\textbf{双臂：$4\times2=8$ 个}}\\
+     每臂：肩部3个，肘部1个。};
+  \draw[detguide] (5.55,4.88)--(4.11,4.88);
+  \node[h1info] at (8.6,3.38)
+    {\textcolor{DetRose}{\textbf{躯干：1个}}\\
+     腰部：上身相对下身转向。};
+  \draw[detguide] (5.55,3.38)--(5.3,3.38)--(5.3,3.65)--(2.78,3.65);
+  \node[h1info] at (8.6,1.85)
+    {\textcolor{DetGreen}{\textbf{双腿：$5\times2=10$ 个}}\\
+     每腿：髋3个、膝1个、踝1个。};
+  \draw[detguide] (5.55,1.85)--(3.35,1.85);
+  \node[h1info,draw=DetRose!45,fill=DetRose!4] at (8.6,.15)
+    {\textcolor{DetRose}{\textbf{春晚：每侧手部另增3个自由度}}\\
+     虚线圈只表示自由度数量，\\未必都改变末端位置。};
+\end{tikzpicture}}
+
+\subsection*{关节速度如何变成手的速度：雅可比矩阵}
+
+\DetHead{先知道手在哪里，再问它将往哪里走}
+设手臂有$n$个转动关节，关节角按固定次序排成
+\[
+ \boldsymbol\theta=(\theta_1,\ldots,\theta_n)^{\mathrm T},
+ \qquad \boldsymbol x=(x,y,z)^{\mathrm T}=F(\boldsymbol\theta).
+\]
+给定关节角，计算末端位置，称为\term{forward-kinematics}。它在几何上只是把各段连杆的位置接起来。相关研究已对宇树G1手臂建立并核验这类模型；G1与这里的H1背景是不同机型，但“由关节状态计算末端”的问题相通。\cite{unitree-g1-forward}
+
+位置关系通常含有正弦、余弦，并非线性函数。我们此刻需要的却是一个更小的问题：\textbf{在当前姿态附近，关节转动多快，手就移动多快？}假设$F$在所考察姿态附近可微，关节角随时间可微，用大一微积分的链式法则逐个分量求导：
+\begin{equation}
+ \dot x_i=\sum_{j=1}^n\frac{\partial F_i}{\partial\theta_j}
+               (\boldsymbol\theta)\dot\theta_j.
+ \label{eq:six-robot-chain-components}
+\end{equation}
+上方的小点表示对时间求导。把$m$个输出分量放在一起，就得到
+\begin{equation}
+ \boxed{\dot{\boldsymbol x}=J(\boldsymbol\theta)\dot{\boldsymbol\theta}},
+ \qquad
+ J(\boldsymbol\theta)=
+ \begin{pmatrix}
+  \dfrac{\partial F_1}{\partial\theta_1}&\cdots&\dfrac{\partial F_1}{\partial\theta_n}\\
+  \vdots&&\vdots\\
+  \dfrac{\partial F_m}{\partial\theta_1}&\cdots&\dfrac{\partial F_m}{\partial\theta_n}
+ \end{pmatrix}.
+ \label{eq:six-robot-jacobian}
+\end{equation}
+这个$m\times n$矩阵就是\term{jacobian-matrix}；只取空间位置时$m=3$，取平面位置时$m=2$。元素$J_{ij}$记录末端第$i$个坐标对第$j$个关节角的变化率。
+
+把姿态固定后，$J$就是一个\textbf{从$n$维关节速度空间到$m$维末端速度空间的线性映射矩阵}。它的第$j$列，表示只让第$j$个关节以单位角速度转动、其余关节停住时的末端速度。多个关节同时转动，末端速度就是这些列向量的线性组合。这正是第三章“矩阵是线性映射的代数表示”；第四章的零空间与值域，现在分别回答“哪些关节动作不产生末端速度”与“哪些末端速度能够产生”。
+
+位置的小变化满足$\Delta\boldsymbol x\approx J(\boldsymbol\theta)\Delta\boldsymbol\theta$，是\term{local-linearization}的思想，也呼应第\ref{sec:six-jacobian-intuition}节。注意：小位移关系是近似，式\eqref{eq:six-robot-jacobian}在可微运动中是链式法则给出的\textbf{瞬时速度等式}；两者都没有把非线性的位置函数变成全局线性函数。
+
+\DetFigure{固定当前姿态后，雅可比矩阵把关节速度线性地变成末端速度。矩阵第 $j$ 列就是“仅第 $j$ 个关节以单位角速度转动，其余关节瞬时不动”所产生的末端速度；各关节的贡献按实际速度加权相加。}{fig:six-joint-task-map}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+  \node[rounded corners=4pt,draw=DetBlue!60,fill=DetBlue!5,
+    text width=2.55cm,align=center,minimum height=1.3cm] (joint) at (1.5,3.6)
+    {关节速度空间\\$\dot{\boldsymbol\theta}\in\mathbb R^n$};
+  \node[rounded corners=4pt,draw=DetGray!60,fill=DetGray!4,
+    text width=2.55cm,align=center,minimum height=1.3cm] (jac) at (6,3.6)
+    {当前姿态固定\\$J(\boldsymbol\theta)\in\mathbb R^{m\times n}$};
+  \node[rounded corners=4pt,draw=DetGreen!60,fill=DetGreen!5,
+    text width=2.55cm,align=center,minimum height=1.3cm] (task) at (10.5,3.6)
+    {末端速度空间\\$\dot{\mathbf x}\in\mathbb R^m$};
+  \draw[detblue] (joint.east)--(jac.west);
+  \draw[detgreen] (jac.east)--(task.west);
+  \node[font=\small\bfseries] at (6,5.0) {同一姿态下：$\dot{\mathbf x}=J\dot{\boldsymbol\theta}$};
+  % 矩阵用色块突出一列；每个单元格宽 .85、高 .52 cm。
+  \begin{scope}[shift={(3.72,.2)}]
+    \foreach \row in {0,1,2}
+      \foreach \col in {0,1,2,3,4}
+        \fill[DetGray!7] ({.85*\col},{.52*\row}) rectangle
+          ({.85*(\col+1)},{.52*(\row+1)});
+    \fill[DetBlue!16] (1.7,0) rectangle (2.55,1.56);
+    \draw[DetGray!75,line width=.8pt] (-.08,-.08)--(-.22,-.08)--(-.22,1.64)--(-.08,1.64);
+    \draw[DetGray!75,line width=.8pt] (4.33,-.08)--(4.47,-.08)--(4.47,1.64)--(4.33,1.64);
+    \node at (.425,1.3) {$J_{11}$};
+    \node at (1.275,1.3) {$\cdots$};
+    \node[text=DetBlue] at (2.125,1.3) {$J_{1j}$};
+    \node at (2.975,1.3) {$\cdots$};
+    \node at (3.825,1.3) {$J_{1n}$};
+    \foreach \cx in {.425,2.125,3.825}
+      \node at (\cx,.78) {$\vdots$};
+    \node at (.425,.26) {$J_{m1}$};
+    \node at (1.275,.26) {$\cdots$};
+    \node[text=DetBlue] at (2.125,.26) {$J_{mj}$};
+    \node at (2.975,.26) {$\cdots$};
+    \node at (3.825,.26) {$J_{mn}$};
+    \node[font=\footnotesize,text=DetGray] at (2.125,1.98) {$n$ 个关节对应 $n$ 列};
+    \node[font=\footnotesize,text=DetGray,align=center] at (-1.1,.78)
+      {$m$ 个\\坐标\\对应\\$m$ 行};
+  \end{scope}
+  \node[text width=3.55cm,align=left,font=\footnotesize] at (10.45,.98)
+    {$J\boldsymbol e_j=\boldsymbol j_j$：\\
+     仅第 $j$ 个关节以单位角速度转动时的末端速度。};
+  \draw[detblue] (6.36,.97)--(8.43,.97);
+  \node[font=\small,text=DetBlue] at (6,-.65)
+    {$\displaystyle\dot{\mathbf x}=\sum_{j=1}^{n}\dot\theta_j\boldsymbol j_j$};
+\end{tikzpicture}}
+
+\DetHead{把复杂手臂缩成两根连杆}
+取两根长度分别为$L_1,L_2>0$的刚性连杆，两个转动关节都在同一平面内，这样的模型简称2R手臂。角度以弧度计，$\theta_1$是第一根连杆相对$x$轴的角度，$\theta_2$是第二根相对第一根的角度，因此第二根相对$x$轴的角度是$\theta_1+\theta_2$。
+
+\DetFigure{两关节平面手臂：$\theta_2$从第一根连杆的延长方向量起。橙红箭头示意一种末端速度；它由关节速度共同决定，并不是第三个关节。连杆长度与图中姿态为自拟教学参数。}{fig:six-robot-2r-geometry}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \coordinate (O) at (0,0);
+ \coordinate (B) at ({3*cos(25)},{3*sin(25)});
+ \coordinate (P) at ({3*cos(25)+2.3*cos(85)},{3*sin(25)+2.3*sin(85)});
+ \draw[detaxis] (-.4,0)--(6,0) node[right] {$x$};
+ \draw[detaxis] (0,-.4)--(0,4.7) node[above] {$y$};
+ \draw[DetBlue,line width=3pt] (O)--node[midway,below] {$L_1$} (B);
+ \draw[DetGreen,line width=3pt] (B)--node[midway,right] {$L_2$} (P);
+ \draw[detguide] (B)--++(25:1.5);
+ \draw[detblue] (.95,0) arc[start angle=0,end angle=25,radius=.95];
+ \node at (1.35,.22) {$\theta_1$};
+ \draw[detgreen] ($(B)+(25:.85)$) arc[start angle=25,end angle=85,radius=.85];
+ \node at ($(B)+(55:1.2)$) {$\theta_2$};
+ \foreach \Q in {O,B,P}{\fill[white] (\Q) circle (3.7pt);\draw[DetGray,line width=.8pt] (\Q) circle (3.7pt);}
+ \node[below left] at (O) {$O$};
+ \node[above left] at (P) {$\boldsymbol x=(x,y)^{\mathrm T}$};
+ \draw[detrose] (P)--++(1.7,.35) node[right] {$\dot{\boldsymbol x}$};
+ \node[anchor=west,align=left] at (6.5,3.3)
+  {关节输入：$\theta_1,\theta_2$\\[7pt]位置输出：$x,y$\\[7pt]$J$是$2\times2$方阵};
+\end{tikzpicture}}
+
+两根连杆的水平、竖直投影相加，给出
+\begin{equation}
+ \begin{cases}
+ x=L_1\cos\theta_1+L_2\cos(\theta_1+\theta_2),\\
+ y=L_1\sin\theta_1+L_2\sin(\theta_1+\theta_2).
+ \end{cases}
+ \label{eq:six-robot-forward-2r}
+\end{equation}
+逐项求偏导数，不需要任何新的机器人学公式：
+\begin{equation}
+ J=\begin{pmatrix}
+ -L_1\sin\theta_1-L_2\sin(\theta_1+\theta_2)&-L_2\sin(\theta_1+\theta_2)\\
+ L_1\cos\theta_1+L_2\cos(\theta_1+\theta_2)&L_2\cos(\theta_1+\theta_2)
+ \end{pmatrix}.
+ \label{eq:six-robot-jacobian-2r}
+\end{equation}
+例如第一列同时包含两根连杆，因为肩部一转，后面的整条手臂都随之转动；第二列只含$L_2$，因为肘部一转，只有第二根连杆绕肘运动。矩阵中的每一项都有可指出来的几何来源。
+
+\subsection*{行列式告诉我们什么：奇异位形}
+
+\DetHead{两列张开面积，还是挤到同一条线上？}
+承接第6.1--6.4节，行列式衡量方阵所表示的线性映射的\textbf{有向面积或体积倍率}。倍率不为0，就没有把空间压扁；倍率为0，列向量线性相关，输出少了独立方向。对这个$2\times2$速度模型，结论是
+\[
+ \begin{array}{ccl}
+ \det J\ne0 &\Longleftrightarrow& \operatorname{rank}J=2
+       \Longleftrightarrow \operatorname{range}J=\mathbb R^2,\\[3pt]
+ \det J=0 &\Longleftrightarrow& \operatorname{rank}J<2
+       \Longleftrightarrow \operatorname{range}J\ne\mathbb R^2.
+ \end{array}
+\]
+前一种姿态下，每个末端速度向量都有唯一的关节速度解；说“可以向所有方向运动”，是指\textbf{忽略关节限位与速度上限时的瞬时运动方向}，不是保证任意大的速度都能执行。后一种姿态下，至少有一个方向不在列空间中，无论怎样组合关节速度，都产生不了该方向的非零瞬时速度。机器人学把雅可比秩低于该机构相应任务所能达到的最大秩的姿态称为\term{kinematic-singularity}。
+
+\noindent\textbf{不能把方阵条件直接搬到H1。}真实手臂常有$n>m$，雅可比是长方形矩阵，没有$\det J$。若所选任务通常可以达到$m$个独立方向，则应检查$\operatorname{rank}J=m$；后面还会用$m\times m$方阵$JJ^{\mathrm T}$的行列式读出是否缺少任务方向。如果一种机构本来就不能完成$m$维任务，须先确定最大可达秩，不能把每一种姿态都叫作奇异位形。
+
+\DetHead{亲手算出伸直姿态为什么奇异}
+把式\eqref{eq:six-robot-jacobian-2r}的两列代入二阶行列式，含$L_2^2$的两项相消，剩下
+\begin{align}
+ \det J
+ &=L_1L_2\bigl[\cos\theta_1\sin(\theta_1+\theta_2)
+              -\sin\theta_1\cos(\theta_1+\theta_2)\bigr]\notag\\
+ &=\boxed{L_1L_2\sin\theta_2}.
+ \label{eq:six-robot-det-2r}
+\end{align}
+第一关节改变整条手臂的朝向，却不改变两列张开的面积，所以行列式与$\theta_1$无关。肘角$\theta_2=0$时两根连杆完全伸直，$\theta_2=\pi$或$-\pi$时反向折叠；更一般地，$\theta_2$为$\pi$的整数倍时行列式都为0。
+
+最容易看清的姿态是$\theta_1=\theta_2=0$：
+\begin{equation}
+ J_0=\begin{pmatrix}0&0\\L_1+L_2&L_2\end{pmatrix},\qquad
+ \dot{\boldsymbol x}=
+ \begin{pmatrix}0\\(L_1+L_2)\dot\theta_1+L_2\dot\theta_2\end{pmatrix}.
+ \label{eq:six-robot-straight-jacobian}
+\end{equation}
+两列都竖直：两个关节虽能转，手的瞬时速度却都沿着与手臂垂直的方向。水平的径向速度没有了。此时秩是1，不是0；\textbf{奇异意味着丢失方向，并不意味着所有运动都停住}。
+
+\DetFigure{左图肘部弯曲，两列独立，末端具备所有平面瞬时方向；末端附近的小圆只示意方向齐全，不是整条手臂的工作空间或准确速度边界。右图完全伸直，两列共线，只剩切向速度，橙红虚线标出当前无法产生的径向瞬时速度。}{fig:six-robot-regular-singular}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \begin{scope}
+  \coordinate (A) at (0,0);\coordinate (B) at (2,0);\coordinate (P) at (3,1.73);
+  \draw[DetBlue,line width=2.7pt] (A)--(B);
+  \draw[DetGreen,line width=2.7pt] (B)--(P);
+  \foreach \Q in {A,B,P}{\fill[DetGray] (\Q) circle (2.5pt);}
+  \draw[DetBlue!60] (P) circle (.53);
+  \foreach \a in {0,60,...,300}{\draw[detblue] (P)--++(\a:.53);}
+  \node at (1.65,2.7) {弯曲：$\det J\ne0$};
+  \node[align=center] at (1.65,-.8) {方向齐全\\有速度上限时，各方向能力仍可能不同};
+ \end{scope}
+ \begin{scope}[shift={(7.2,0)}]
+  \coordinate (A) at (0,0);\coordinate (B) at (2,0);\coordinate (P) at (4,0);
+  \draw[DetBlue,line width=2.7pt] (A)--(B);
+  \draw[DetGreen,line width=2.7pt] (B)--(P);
+  \foreach \Q in {A,B,P}{\fill[DetGray] (\Q) circle (2.5pt);}
+  \draw[DetBlue,line width=1.1pt,{Stealth}-{Stealth}] (4,-1.15)--(4,1.35);
+  \draw[DetRose,dashed,line width=1pt,{Stealth}-{Stealth}] (2.95,0)--(5.25,0);
+  \draw[DetRose,line width=1pt] (4.65,-.16)--(4.9,.16) (4.65,.16)--(4.9,-.16);
+  \node[right,text=DetBlue] at (4.05,1.05) {切向};
+  \node[above,text=DetRose] at (5.05,.08) {径向};
+  \node at (2.1,2.7) {伸直：$\det J=0$};
+  \node[align=center] at (2.1,-1.65) {方向降为一维\\$\operatorname{range}J$是一条直线};
+ \end{scope}
+\end{tikzpicture}}
+
+\DetHead{瞬时受阻，不等于永远无法收回}
+伸直的手臂不能再向外增加长度，这是几何长度上限；但它可以先弯曲，再把手收回。两者不要混为一谈。取$L_1=L_2=1$，让两根连杆对称地弯曲，即$\theta_1=-a/2,\theta_2=a$，则
+\[
+ \boldsymbol x(a)=(2\cos(a/2),0)^{\mathrm T},\qquad
+ \left.\frac{\mathrm dx}{\mathrm da}\right|_{a=0}=0,
+ \qquad 2-x(a)=4\sin^2(a/4).
+\]
+开始弯曲时，径向的一阶变化率为0；只要$a\ne0$且足够小，端点已经向内移动。用$\sin t/t\to1$还可看出$2-x(a)\approx a^2/4$。\textbf{雅可比描述的是当前时刻的一阶能力，而不是所有有限时间路径。}
+
+\DetFigure{伸直时径向的一阶速度为零，并不表示手臂经过有限时间无法回收。取 $L_1=L_2=1$，令两关节协同变化为 $\theta_1=-a/2,\theta_2=a$，末端始终在水平轴上，位置为 $(2\cos(a/2),0)$。图中弯曲姿态为 $a=60^\circ$；右侧极限公式中 $a$ 用弧度计，近似由 $\sin t/t\to1$ 得到。}{fig:six-singular-second-order}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+  % 左栏放大模型三倍，仅图示比例变化，连杆实际长度仍为1。
+  \begin{scope}[x=2.8cm,y=2.8cm]
+    \draw[detaxis] (-.13,0)--(2.24,0) node[right] {$x$};
+    \draw[detaxis] (0,-.64)--(0,.5) node[above] {$y$};
+    \draw[DetGray!65,line width=2pt] (0,0)--(1,0)--(2,0);
+    \foreach \p in {(0,0),(1,0),(2,0)}
+      \filldraw[fill=white,draw=DetGray,line width=.8pt] \p circle (.034);
+    \node[font=\footnotesize,text=DetGray,above] at (.85,.64) {$a=0$：完全伸直};
+    % a=60 degrees，第一杆角 -30，第二杆绝对角 +30。
+    \draw[DetBlue,line width=2pt] (0,0)--({cos(30)},{-sin(30)})--({2*cos(30)},0);
+    \foreach \p in {(0,0),({cos(30)},{-sin(30)}),({2*cos(30)},0)}
+      \filldraw[fill=white,draw=DetBlue,line width=.8pt] \p circle (.034);
+    \draw[detguide] (1,0)--(1,-.54);
+    \node[font=\footnotesize,text=DetBlue,below] at ({cos(30)},-.52)
+      {弯曲：$a>0$};
+    \node[font=\footnotesize,text=DetBlue,above left] at ({2*cos(30)},.27)
+      {$(2\cos(a/2),0)$};
+    \node[font=\footnotesize,text=DetGray,above right] at (2,.03) {$(2,0)$};
+    \draw[DetRose,line width=1pt,-{Stealth[length=1.8mm]}]
+      (2,-.18)--({2*cos(30)},-.18);
+    \node[font=\footnotesize,text=DetRose,below] at (1.94,-.21) {内缩};
+  \end{scope}
+  % 右栏先给出精确公式，再给出一阶导数及极限近似。
+  \node[rounded corners=4pt,draw=DetGreen!60,fill=DetGreen!4,
+    text width=5.0cm,align=left,inner sep=8pt,font=\footnotesize] at (9.5,-.2)
+    {\textbf{沿这条协同弯曲路径}\\[4pt]
+     $x(a)=2\cos(a/2),\quad y(a)=0$\\[4pt]
+     $x'(a)=-\sin(a/2),\quad x'(0)=0$\\[4pt]
+     $2-x(a)=4\sin^2(a/4)$\\[4pt]
+     $\displaystyle\lim_{a\to0}\frac{2-x(a)}{a^2}=\frac14$\\[4pt]
+     因而小角度时 $2-x(a)\approx a^2/4$。};
+  \node[font=\footnotesize,text=DetGray,text width=12.6cm,align=center] at (6,-3.1)
+    {奇异性讨论的是当前姿态的瞬时速度；有限位移还取决于姿态随后怎样变化。};
+\end{tikzpicture}}
+
+\DetHead{为什么靠近奇异时，关节速度可能骤增？}
+给定末端目标速度$\boldsymbol v$，反求关节速度$\boldsymbol q=\dot{\boldsymbol\theta}$，称为\term{differential-inverse-kinematics}。它要解的就是$J\boldsymbol q=\boldsymbol v$。方阵可逆时，第\ref{sec:six-adjugate-inverse}节的公式给出
+\begin{equation}
+ \boldsymbol q=J^{-1}\boldsymbol v
+       =\frac{1}{\det J}\operatorname{adj}(J)\boldsymbol v.
+ \label{eq:six-robot-adjugate-ik}
+\end{equation}
+分母变小提示危险，但不能据此说“所有目标的关节速度都趋于无穷大”：分子也取决于目标。沿仍容易运动的方向，关节速度可以保持有限；沿正在丢失的方向，保持非零目标速度通常会要求很大的关节速度。
+
+例如令$\theta_1=0,\theta_2=\beta\ne0$且$\sin\beta\ne0$，要求$\boldsymbol v=(u,0)^{\mathrm T}$。用消元直接求解，可得
+\begin{equation}
+ \dot\theta_1=\frac{u\cos\beta}{L_1\sin\beta},\qquad
+ \dot\theta_2=-\frac{u(L_1+L_2\cos\beta)}{L_1L_2\sin\beta}.
+ \label{eq:six-robot-radial-speed}
+\end{equation}
+$u$固定且非零时，$\beta\to0$使两项的绝对值增大。下面取自拟参数$L_1=L_2=1\,\mathrm m$、$u=0.10\,\mathrm{m/s}$，只改变肘角：
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+肘角$\beta$ & $|\det J|\;(\mathrm{m}^2)$ & $\dot\theta_1\;(\mathrm{rad/s})$ & $\dot\theta_2\;(\mathrm{rad/s})$\\
+\midrule
+$30^\circ$ & $0.5000$ & $0.1732$ & $-0.3732$\\
+$5^\circ$  & $0.0872$ & $1.1430$ & $-2.2904$\\
+$1^\circ$  & $0.0175$ & $5.7290$ & $-11.4589$\\
+\bottomrule
+\end{tabular}
+\end{center}
+手只想以同样的速度向右移动，关节却必须越来越快，并互相抵消大部分切向作用。这既容易触及电机速度上限，也会放大测量与计算误差。到$\beta=0$时，非零水平速度根本不在列空间中，精确方程无解。
+
+真实研究已经把“怎样反求动作指令”作为控制器比较的对象：Li、Zhang等研究了混合视觉动作捕捉下的\term{inverse-kinematics}控制器与\term{inverse-dynamics}控制器。\cite{unitree-h1-ik-id}前者由期望末端运动反求关节运动，后者还要考虑质量、力与加速度，计算实现运动所需的力或关节力矩。逆动力学\textbf{为进阶概念，仅供了解}；本节引用控制器比较主题，不展开动力学推导。另有研究分别讨论人形机器人遥操作中的力引导奇异避免，以及全身到达运动的无奇异优化。\cite{humanoid-force-singularity,humanoid-reaching-singularity}
+
+\DetHead{把关节速度的圆盘映成末端速度的椭圆}
+仅知道“行列式是否为零”，还看不出哪个方向吃力。先给关节速度一个统一预算，在本教学模型中取
+\[
+ \|\boldsymbol q\|^2=\dot\theta_1^2+\dot\theta_2^2\le1.
+\]
+允许的关节速度组成一个单位圆盘。把每一点经$J$映到末端速度平面，就得到
+\begin{equation}
+ \mathcal V(\boldsymbol\theta)=
+       \{J(\boldsymbol\theta)\boldsymbol q:\|\boldsymbol q\|\le1\}.
+ \label{eq:six-robot-velocity-set}
+\end{equation}
+当$J$可逆时，这是一个椭圆盘：宽的方向意味着同样的关节速度预算能产生较大的末端速度，窄的方向意味着较难运动。它在机器人学中称为\term{manipulability-ellipsoid}，二维情形通常叫可操作性椭圆。实际关节速度上限可能各不相同，这里的单位圆盘是统一尺度后的简化预算，不能把它当作电机能耗模型。
+
+无需提前学习特征值或奇异值分解，就能准确画出边界：取$\boldsymbol q=(\cos t,\sin t)^{\mathrm T}$，计算$J\boldsymbol q$即可。正常姿态下椭圆有面积；接近奇异时越来越扁；在式\eqref{eq:six-robot-straight-jacobian}的姿态下，单位圆盘的像是竖直线段
+\[
+ \dot x=0,\qquad
+ |\dot y|\le\sqrt{(L_1+L_2)^2+L_2^2}.
+\]
+这条界由柯西--施瓦茨不等式得到，端点也确实能够达到。我们的图采用Lynch与Park《Modern Robotics》图5.3的“关节速度圆映成末端速度椭圆”思路，以本节公式和自拟姿态重新绘制。\cite{modern-robotics-manipulability}
+
+\DetFigure{同一单位关节速度预算的像：取$L_1=L_2=1$、$\theta_1=0$，依次令$\theta_2=90^\circ,10^\circ,0^\circ$。三栏坐标比例相同，蓝色图形由式\eqref{eq:six-robot-jacobian-2r}计算，而非任意画出的椭圆。末栏线段端点是$(0,\pm\sqrt5)$；图形表示速度集合，不表示末端位置的可达区域。}{fig:six-robot-velocity-ellipses}{%
+\begin{tikzpicture}[x=.78cm,y=.78cm,font=\small]
+ \foreach \b/\s/\title in {90/0/{弯曲},10/6/{接近伸直},0/12/{完全伸直}}{
+  \begin{scope}[shift={(\s,0)}]
+   \draw[detaxis] (-2.05,0)--(2.15,0) node[right] {$\dot x$};
+   \draw[detaxis] (0,-2.5)--(0,2.5) node[above] {$\dot y$};
+   \ifnum\b=0
+    \draw[DetBlue,line width=2pt] (0,{-sqrt(5)})--(0,{sqrt(5)});
+    \fill[DetBlue] (0,{-sqrt(5)}) circle (2pt) (0,{sqrt(5)}) circle (2pt);
+   \else
+    \filldraw[fill=DetBlue!12,draw=DetBlue,line width=1.1pt]
+     plot[domain=0:360,samples=101,variable=\t]
+     ({-sin(\b)*(cos(\t)+sin(\t))},{(1+cos(\b))*cos(\t)+cos(\b)*sin(\t)})--cycle;
+   \fi
+   \node[align=center] at (0,-3.15) {\title\\$\theta_2=\b^\circ$};
+  \end{scope}
+ }
+\end{tikzpicture}}
+
+\DetHead{面积读数可以做成姿态地图}
+由第6.4节的面积倍率，2R速度椭圆盘的面积为$\pi|\det J|$。一般$m\times n$位置雅可比（$m\le n$）常用\term{manipulability-measure}
+\begin{equation}
+ w=\sqrt{\det(JJ^{\mathrm T})}.
+ \label{eq:six-robot-manipulability}
+\end{equation}
+这个根号有意义：$JJ^{\mathrm T}$是行向量的点积矩阵，其行列式非负。满行秩时它大于0，缺少任务方向时它为0。用第五章的正交关系看，$JJ^{\mathrm T}\boldsymbol y=0$等价于$J^{\mathrm T}\boldsymbol y=0$，因为
+\[
+ \boldsymbol y^{\mathrm T}JJ^{\mathrm T}\boldsymbol y
+          =\|J^{\mathrm T}\boldsymbol y\|^2.
+\]
+这就把$w=0$与行不满秩联系起来。行满秩时，行列式为何为正也可用本章与微积分说明：令$H(t)=(1-t)E_m+tJJ^{\mathrm T}$，$0\le t\le1$。任取非零$\boldsymbol y$，有
+\[
+ \boldsymbol y^{\mathrm T}H(t)\boldsymbol y
+   =(1-t)\|\boldsymbol y\|^2+t\|J^{\mathrm T}\boldsymbol y\|^2>0.
+\]
+所以$H(t)$始终可逆，$\det H(t)$连续且从不为0；它从$\det H(0)=1$出发，不能经过0变成负数，故$\det(JJ^{\mathrm T})>0$。缺少任务方向时行列式为0，根号同样有效。对本节方阵，乘积与转置性质进一步给出
+\[
+ \det(JJ^{\mathrm T})=(\det J)^2,
+ \qquad w=|\det J|=L_1L_2|\sin\theta_2|.
+\]
+因此可把$(\theta_1,\theta_2)$平面涂成颜色地图。颜色越浅，速度图形越接近面积坍缩；中间与边缘的奇异带提醒规划者提前转弯。
+
+\DetFigure{2R姿态地图：颜色表示无量纲读数$w/(L_1L_2)=|\sin\theta_2|$，每条带用其中心角的读数着色。横向改变$\theta_1$只旋转手臂，故颜色不变；$\theta_2=0,\pm\pi$为奇异线。它是教学模型的可操作度热力图，不是H1实测数据。}{fig:six-robot-manipulability-map}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \foreach \j in {0,...,12}{
+  \pgfmathsetmacro{\ang}{-180+30*\j}
+  \pgfmathtruncatemacro{\shade}{100*abs(sin(\ang))}
+  \foreach \i in {0,...,11}{
+   \filldraw[fill=DetBlue!\shade!white,draw=white,line width=.3pt]
+       ({.7*\i},{.36*\j}) rectangle ++(.7,.36);
+  }
+ }
+ \draw[detaxis] (0,-.35)--(8.8,-.35) node[right] {$\theta_1$};
+ \draw[detaxis] (-.3,0)--(-.3,4.95) node[above] {$\theta_2$};
+ \foreach \x/\lab in {0/{-\pi},4.2/{0},8.4/{\pi}}{
+  \node[below] at (\x,-.4) {$\lab$};
+ }
+ \foreach \y/\lab in {.18/{-\pi},2.34/{0},4.5/{\pi}}{
+  \node[left] at (-.35,\y) {$\lab$};
+  \draw[DetRose,densely dashed,line width=.8pt] (0,\y)--(8.4,\y);
+ }
+ \foreach \j in {0,...,10}{
+  \pgfmathtruncatemacro{\shade}{10*\j}
+  \fill[DetBlue!\shade!white] (9.7,{.36*\j}) rectangle ++(.5,.36);
+ }
+ \draw[DetGray!40] (9.7,0) rectangle (10.2,3.96);
+ \node[right] at (10.3,0) {$0$};\node[right] at (10.3,3.96) {$1$};
+ \node[align=center] at (10,4.7) {$w/(L_1L_2)$};
+\end{tikzpicture}}
+
+\noindent\textbf{面积不是完整的灵活程度。}两个椭圆可以面积相同，却一个接近圆、另一个又长又窄。比如$A=E_2$与$B=\operatorname{diag}(4,1/4)$的行列式都为1，但后者对竖直速度的实现更吃力。改变长度单位也会改变$\det J$的数值，所以“是否接近0”的阈值必须结合单位、尺度和任务；实际控制不能只盯着一个未经归一化的行列式。
+
+\DetFigure{相同面积，不同方向能力。单位圆盘经$A=E_2$变成圆盘，经$B=\operatorname{diag}(4,1/4)$变成狭长椭圆盘；两者面积均为$\pi$。坐标比例相同，右图短半轴只有左图的四分之一，说明体积读数不能单独描述最困难方向。}{fig:six-robot-equal-area}{%
+\begin{tikzpicture}[x=.85cm,y=.85cm,font=\small]
+ \draw[detaxis] (-1.65,0)--(1.8,0);
+ \draw[detaxis] (0,-1.35)--(0,1.5);
+ \filldraw[fill=DetGreen!10,draw=DetGreen,line width=1pt] (0,0) circle (1);
+ \node[align=center] at (0,-2) {$A=E_2$\\$\det A=1$};
+ \begin{scope}[shift={(7,0)}]
+  \draw[detaxis] (-4.3,0)--(4.45,0);
+  \draw[detaxis] (0,-1.35)--(0,1.5);
+  \filldraw[fill=DetBlue!10,draw=DetBlue,line width=1pt] (0,0) ellipse[x radius=4,y radius=.25];
+  \node[align=center] at (0,-2) {$B=\operatorname{diag}(4,1/4)$\\$\det B=1$};
+ \end{scope}
+\end{tikzpicture}}
+
+\term{condition-number}可以进一步衡量敏感程度。在当前欧氏长度尺度下，对可逆方阵$J$定义
+\[
+ \kappa_2(J)=
+ \frac{\displaystyle\max_{\|\boldsymbol q\|=1}\|J\boldsymbol q\|}
+      {\displaystyle\min_{\|\boldsymbol q\|=1}\|J\boldsymbol q\|}.
+\]
+几何上，它是速度椭圆最长半轴与最短半轴之比；图中两者分别为1和16。奇异时分母为0，约定条件数为无穷大。最困难方向越短，反求输入时越可能放大误差；因此行列式的体积读数与条件数的形状读数应当配合使用。Togai研究了用\term{svd}分析机器人的可操作性和灵敏度，Harada等研究了手术机器人中的在线条件数优化。\cite{robot-togai-svd,robot-harada-condition}奇异值分解可以直观理解为：在输入、输出两侧选合适的垂直坐标方向，使矩阵作用成为各方向分别伸缩。\textbf{此为进阶概念，仅供了解}；本节只使用圆盘的像与长度比，不调用第11章的分解理论。
+
+\subsection*{工程中如何避开奇异位形？}
+
+\DetHead{第一步：允许小误差，换取有限的关节速度}
+机器人接近伸直时，如果仍坚持原来的径向目标速度，精确解可能过大；到了奇异点，精确解还可能不存在。这时可以问一个更实际的问题：\textbf{能否少跟上一点目标，同时不要让关节转得过快？}
+
+把第五章的最小二乘加入第三章已见过的正则化思想，就得到\term{damped-least-squares}。固定当前$J$与目标$\boldsymbol v$，选$\lambda>0$，使
+\begin{equation}
+ \Phi(\boldsymbol q)=\|J\boldsymbol q-\boldsymbol v\|^2
+                     +\lambda^2\|\boldsymbol q\|^2
+ \label{eq:six-robot-dls-objective}
+\end{equation}
+最小。第一项惩罚末端跟踪误差，第二项惩罚关节速度。它不是简单地“给$J$加一点数”，也不只是“精确解不存在时找最近的解”；\textbf{即使精确解存在，也主动在误差与速度大小之间折中}。
+
+只用多元函数求偏导与矩阵乘法，令各偏导为0，便得
+\begin{equation}
+ (J^{\mathrm T}J+\lambda^2E_n)\boldsymbol q=J^{\mathrm T}\boldsymbol v.
+ \label{eq:six-robot-dls-normal}
+\end{equation}
+为什么这一次不会遇到无解或多解？任取非零$\boldsymbol h$，有
+\[
+ \boldsymbol h^{\mathrm T}(J^{\mathrm T}J+\lambda^2E_n)\boldsymbol h
+        =\|J\boldsymbol h\|^2+\lambda^2\|\boldsymbol h\|^2>0.
+\]
+系数矩阵的零空间只有零向量，故可逆。若$\boldsymbol q_\lambda$满足式\eqref{eq:six-robot-dls-normal}，展开平方并消去交叉项可得
+\[
+ \Phi(\boldsymbol q_\lambda+\boldsymbol h)-\Phi(\boldsymbol q_\lambda)
+            =\|J\boldsymbol h\|^2+\lambda^2\|\boldsymbol h\|^2>0
+            \quad(\boldsymbol h\ne\boldsymbol0).
+\]
+所以它确为唯一的最小点，而非仅仅一个“偏导为0”的候选。利用
+$(J^{\mathrm T}J+\lambda^2E_n)J^{\mathrm T}
+ =J^{\mathrm T}(JJ^{\mathrm T}+\lambda^2E_m)$，得到等价表达
+\begin{equation}
+ \boxed{\boldsymbol q_\lambda
+   =J^{\mathrm T}(JJ^{\mathrm T}+\lambda^2E_m)^{-1}\boldsymbol v}.
+ \label{eq:six-robot-dls-dual}
+\end{equation}
+$E_n,E_m$是本讲义的单位矩阵记号，也常写成$I_n,I_m$。式中的逆表示理论解的存在；实际程序先解
+$(JJ^{\mathrm T}+\lambda^2E_m)\boldsymbol y=\boldsymbol v$，再算
+$\boldsymbol q_\lambda=J^{\mathrm T}\boldsymbol y$，不必形成逆矩阵。
+
+看看只含一个伸缩方向的标量模型$sq=v$：精确求解用$q=v/s$，阻尼求解用$q=sv/(s^2+\lambda^2)$。$s\to0$时，后一公式趋于0；由于$s^2+\lambda^2\ge2|s|\lambda$，其增益满足
+\[
+ \left|\frac{s}{s^2+\lambda^2}\right|\le\frac1{2\lambda}.
+\]
+这个小例子说明阻尼怎样压住小分母引起的放大；实际使用时，$\lambda$也需按所选关节角与任务坐标的单位、尺度选取。对矩阵问题，由最小点不比$\boldsymbol q=0$更差，还可直接得到
+$\lambda^2\|\boldsymbol q_\lambda\|^2\le\|\boldsymbol v\|^2$。增大$\lambda$通常更抑制速度，却牺牲跟踪精度；阻尼也不会凭空恢复已经丢失的运动方向。
+
+\DetFigure{一个标量伸缩方向的逆增益。横轴$s$、纵轴增益均采用归一化教学尺度，取$\lambda=0.2$；虚线$1/s$在$s\to0^+$时无界，蓝线$s/(s^2+\lambda^2)$保持有限并趋于0。它解释阻尼的作用，不需要奇异值分解。}{fig:six-robot-dls-gain}{%
+\begin{tikzpicture}
+\begin{axis}[width=11.5cm,height=5.3cm,axis lines=left,
+ xmin=0,xmax=1,ymin=0,ymax=8,
+ xlabel={$s$},ylabel={增益},grid=major,grid style={DetGray!15},
+ legend style={at={(.98,.98)},anchor=north east,draw=none,font=\small},
+ tick label style={font=\small}]
+ \addplot[DetRose,dashed,thick,domain=.126:1,samples=100] {1/x};
+ \addlegendentry{$1/s$}
+ \addplot[DetBlue,thick,domain=0:1,samples=150] {x/(x*x+.04)};
+ \addlegendentry{$s/(s^2+0.2^2)$}
+ \addplot[DetGray,densely dotted,domain=0:1] {2.5};
+\end{axis}
+\end{tikzpicture}}
+
+Setyawan等的改进阻尼最小二乘研究，在T-FLoW七自由度机械臂的关节限位实验中报告了100\%成功率。\cite{humanoid-improved-dls}这里的百分比属于论文所设定的测试与判据，不能理解成“任何机器人、任何目标与奇异姿态都保证成功”。本节得到的是阻尼线性方程始终有唯一解；至于是否满足目标、关节限位和整段轨迹要求，还要继续检查。
+
+\DetHead{第二步：有多个方案时，选关节速度最小的方案}
+在H1这类多关节系统中，末端任务可能只有$m$个分量，关节却有$n>m$个。只要$J$行满秩，同一末端速度通常有许多关节速度解。希望关节少动一些，就可以选其中长度最小的解。此时\term{moore-penrose-pseudoinverse}满足
+\begin{equation}
+ J^\dagger=J^{\mathrm T}(JJ^{\mathrm T})^{-1},\qquad
+ \boldsymbol q_*=J^\dagger\boldsymbol v
+ \quad\text{\textbf{条件：}$\operatorname{rank}J=m$。}
+ \label{eq:six-robot-full-row-pseudoinverse}
+\end{equation}
+因为$J\boldsymbol q_*=\boldsymbol v$，它确实实现目标；任意其他解可写成$\boldsymbol q_*+\boldsymbol z$，其中$J\boldsymbol z=0$。而$\boldsymbol q_*\in\operatorname{range}J^{\mathrm T}$，与$\operatorname{null}J$正交，所以
+\[
+ \|\boldsymbol q_*+\boldsymbol z\|^2
+      =\|\boldsymbol q_*\|^2+\|\boldsymbol z\|^2
+      \ge\|\boldsymbol q_*\|^2.
+\]
+第五章的行空间与零空间，就这样解释了最小范数的来源：\textbf{去掉不改变末端速度、却额外消耗关节速度预算的零空间分量}。
+
+\noindent\textbf{真正降秩时，上式不能照用。}这时$JJ^{\mathrm T}$也不可逆。一般的伪逆$J^\dagger$仍有意义：先在列空间中找到最接近目标的输出，再在产生这个输出的输入中选长度最小者。这完全呼应第\ref{sec:five-least-squares}节的最小二乘与正交分解。它不能在被压扁的方向上制造运动；也不能保证在接近奇异但尚未降秩时限制速度放大。
+
+仍用$L_1=L_2=1$的伸直姿态，$J_0=\bigl(\begin{smallmatrix}0&0\\2&1\end{smallmatrix}\bigr)$。给定$\boldsymbol v=(u,v_y)^{\mathrm T}$，末端输出只能是$(0,2q_1+q_2)^{\mathrm T}$。最小二乘先舍去无法实现的水平分量$u$，再令$2q_1+q_2=v_y$。将关节速度向量投到$(2,1)^{\mathrm T}$方向，便得到
+\[
+ \boldsymbol q_*=(2v_y/5,v_y/5)^{\mathrm T},\qquad
+ J_0^\dagger=\begin{pmatrix}0&2/5\\0&1/5\end{pmatrix}.
+\]
+这里的伪逆是直接由前五章的知识算出的，没有把不可逆矩阵偷偷放回求逆公式。一般数值计算常用奇异值分解处理伪逆；该分解的正式构造留到第11章，本节到此为止。
+
+\DetHead{第三步：把“不要伸得太直”放进整段动作规划}
+阻尼能够缓和数值问题，更主动的办法是\textbf{在规划阶段就给危险姿态留余量}。本节2R模型可以要求
+\[
+ \frac{|\det J|}{L_1L_2}=|\sin\theta_2|\ge\varepsilon,
+ \qquad 0<\varepsilon<1,
+\]
+并逐步检查路径中每个姿态，而非只检查起点与终点。这是教学模型中的归一化约束；真实多关节机器人会结合任务雅可比的秩、可操作度、条件数、关节限位与碰撞要求选择指标，不能把$\det J$作为长方形雅可比的通用判据。关于人形机器人的解析逆运动学与能量优化研究，也表明末端到达只是规划中的一项要求。\cite{unitree-g1-analytical-planning}
+
+想把手向前伸，可以只动手臂，也可以适当转动躯干、改变腿部姿态，让肩膀先靠近目标。这种把手臂、躯干与腿一起协调的思想，称为\term{whole-body-control}；它通过改变整体姿态，为手臂保留有利的运动方向。力引导奇异避免研究与Jeong等的全身到达研究，分别从交互引导和姿态调整讨论这一问题。\cite{humanoid-force-singularity,humanoid-reaching-singularity}
+
+\term{model-predictive-control}可以直观理解为：“先预测接下来几步，比较候选动作，只执行当前一步，再根据新状态重算。”\textbf{此为进阶概念，仅供了解}；其完整理论超出本节，我们只借用“看前几步、不断修正”的工程直觉。全身控制是一种协调任务的思路，模型预测控制是一类计算策略；它们并不等于给一个行列式加阈值。
+
+较新的高动态研究展示了更广阔的应用：Wang等的OmniXtreme在Unitree G1上使用“基于流模型的预训练”与“考虑驱动特性的残差强化学习后训练”两个阶段，展示托马斯全旋、后空翻等动作；KungfuBot也在G1上研究并部署了高动态全身技能。\cite{unitree-omnixtreme,unitree-kungfubot}这里的预训练可直观理解为先学一批动作规律，残差后训练可理解为再学一份适应真实电机的修正。\textbf{此为进阶概念，仅供了解}；我们不推导这些学习算法，也不把它们写成本文二维雅可比控制器或行列式约束的实机验证。
+
+\DetHead{落到程序中：先解方程，再检查能否执行}
+下面把当前知识能支持的2R流程画出来。一般机器人并不只检查行列式；这里只用方阵模型说明“诊断、选方法、复检”的顺序。
+
+\DetFigure{2R 平面教学模型的速度指令流程。先用无量纲量 $s=|\det J|/(L_1L_2)$ 判断是否接近奇异位形，再解相应的线性方程组。阻尼只能缓和速度放大；输出前仍需限速并复检实际末端速度和后续轨迹。}{fig:six-robot-dls-flow}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small,
+  robotstep/.style={rounded corners=3pt,draw=DetGray!60,fill=DetGray!4,
+    text width=5cm,align=center,minimum height=.7cm,inner sep=5pt},
+  robotbranch/.style={rounded corners=3pt,draw=DetBlue!65,fill=DetBlue!5,
+    text width=4.65cm,align=center,minimum height=1.15cm,inner sep=6pt},
+  robotarrow/.style={DetGray!85,line width=.9pt,-{Stealth[length=2mm]}}]
+  \node[robotstep] (v) at (6,8.35) {给定当前末端目标速度 $\boldsymbol v$};
+  \node[robotstep,minimum height=1cm] (j) at (6,6.85)
+    {由当前关节角计算 $J$\\计算 $s=|\det J|/(L_1L_2)$};
+  % 自绘菱形以避免 shapes.geometric 依赖。
+  \draw[draw=DetRose!65,fill=DetRose!5,line width=.9pt]
+    (6,5.95)--(8.1,5.12)--(6,4.29)--(3.9,5.12)--cycle;
+  \node[align=center,font=\footnotesize] (condition) at (6,5.12)
+    {$s<\varepsilon$？\\（$\varepsilon>0$ 为阈值）};
+  \node[robotbranch] (dls) at (2.72,3.18)
+    {\textcolor{DetBlue}{\textbf{阻尼求解，取 $\lambda>0$}}\\
+     解 $(JJ^{\mathrm T}+\lambda^2E_2)\boldsymbol y=\boldsymbol v$\\
+     再算 $\boldsymbol q=J^{\mathrm T}\boldsymbol y$};
+  \node[robotbranch,draw=DetGreen!65,fill=DetGreen!5] (plu) at (9.28,3.18)
+    {\textcolor{DetGreen}{\textbf{选主元的消元法 / PLU}}\\
+     解 $J\boldsymbol q=\boldsymbol v$\\
+     其中 $\boldsymbol q=\dot{\boldsymbol\theta}$};
+  \node[robotstep,minimum height=1cm] (check) at (6,1.25)
+    {按关节速度上限处理 $\boldsymbol q$\\复检 $J\boldsymbol q$ 与后续轨迹};
+  \node[robotstep,fill=DetGreen!5,draw=DetGreen!60] (out) at (6,-.15)
+    {输出关节速度指令};
+  \draw[robotarrow] (v.south)--(j.north);
+  \draw[robotarrow] (j.south)--(6,5.95);
+  \draw[robotarrow] (3.9,5.12)--(2.72,5.12)--(dls.north);
+  \node[font=\footnotesize,text=DetBlue,fill=white,inner sep=2pt] at (3.22,5.32) {是};
+  \draw[robotarrow] (8.1,5.12)--(9.28,5.12)--(plu.north);
+  \node[font=\footnotesize,text=DetGreen,fill=white,inner sep=2pt] at (8.78,5.32) {否};
+  \draw[robotarrow] (dls.south)--(2.72,1.25)--(check.west);
+  \draw[robotarrow] (plu.south)--(9.28,1.25)--(check.east);
+  \draw[robotarrow] (check.south)--(out.north);
+  \node[font=\footnotesize,text=DetGray] at (6,-1.0)
+    {此行列式判据只用于本图的 $2\times2$ 雅可比矩阵。};
+\end{tikzpicture}}
+
+流程中的常规分支是解$J\boldsymbol q=\boldsymbol v$，可使用第\ref{sec:three-lu}节的LU分解；有必要时采用第\ref{sec:three-plu}节的选主元方法。阻尼分支则解式\eqref{eq:six-robot-dls-normal}或\eqref{eq:six-robot-dls-dual}中的线性方程组。\textbf{数值线性代数的核心习惯是：为了求解方程组，采用分解或正则化方法，不先显式求出逆矩阵。}选主元能改善消元过程，却不能消除机构本身的奇异性；阻尼能使计算温和，却不能保证原目标精确实现。
+
+还要把解出的速度与关节速度上限比较，必要时降低目标速度、改变目标方向或重新规划。若对指令作了限速，必须重新计算$J\boldsymbol q$，确认实际末端速度改变了多少。控制器不应把“算出了一个数”误当成“机器人一定能执行”；每走一小步，都要更新姿态与雅可比，把新的几何条件重新纳入判断。
+
+\Needspace{18\baselineskip}
+\subsection*{案例小结：机器人怎样知道自己的能力边界？}
+
+回到春晚舞台，一只手能否把手绢转得流畅，背后既有复杂的工程系统，也有一条我们已经读懂的数学线索。关节角决定位置，链式法则把当前位置关系变成速度矩阵；矩阵的列空间描述此刻能产生的速度，零空间描述不改变末端速度的关节组合；行列式告诉方阵模型的独立方向是否坍缩，速度椭圆进一步让困难方向显形；最小二乘与阻尼则帮助系统在目标、误差与关节速度之间作有根据的取舍。
+
+从第6.1节的有向体积，到第6.4节的局部面积倍率，再到本案例的奇异性分析，行列式不是“算完就扔的数”，而是一个有明确适用条件的\textbf{诊断指标}。它能报告速度映射是否失去独立方向，却不能单独代表机器人的全部健康状态。把这个数同秩、尺度、限位和实际任务一起读，数学才成为可靠的工程判断。
+
+\begin{quote}
+ \textbf{线性代数不是试卷上的符号，它是机器人知道自己能做什么、不能做什么的数学语言。}
+\end{quote}
+% CHAPTER 6 UNITREE CASE END
 
 
 \section*{本章小结}
@@ -18320,6 +19728,11 @@ Shankar R. \textit{Principles of Quantum Mechanics}[M]. 2nd ed. New York: Plenum
 
 
 % CHAPTER 4 REFERENCES BEGIN
+% 第6.5节的逐列展开与排列结论参考资料。
+\bibitem{yao-xie-algebra4}
+谢启鸿, 姚慕生, 吴泉水. \textit{高等代数学}[M]. 4版. 上海: 复旦大学出版社, 2022. 第1章，行列式的等价定义.
+\newblock 教材版本信息见编者课程介绍：\url{https://www.cnblogs.com/torsor/p/14340076.html}.
+
 \bibitem{openvg-transforms}
 Khronos Group. \textit{OpenVG Lite Specification}, sec. 6.5: Transformations[EB/OL]. 齐次坐标与二维仿射变换 [2026-09-26].
 \newblock \url{https://registry.khronos.org/OpenVG/specs/openvg_lite_spec.pdf}.
@@ -18436,6 +19849,72 @@ Strang G, Herman E J. \textit{Calculus Volume 3}[M/OL]. OpenStax, 2016. 第6.5�
 Zhang A, Lipton Z C, Li M, Smola A J. \textit{Dive into Deep Learning}[M/OL]. 在线版1.0.3，第5.3节：Forward Propagation, Backward Propagation, and Computational Graphs. 链式法则、反向计算与转置矩阵乘法 [2026-10-03].
 \newblock \url{https://d2l.ai/chapter_multilayer-perceptrons/backprop.html}.
 % APPENDIX B REFERENCES END
+
+% CHAPTER 6 UNITREE REFERENCES BEGIN
+\bibitem{unitree-yangbot-xinhua}
+刘铭翔. 一起来看，春晚机器人扭秧歌的科技“秘籍”！[N/OL]. 新华社，2025-01-29 [2026-10-04].
+\newblock \url{https://www.xinhuanet.com/20250129/8f1c1fd07b5e46bfb4601e6d95f2f065/c.html}.
+
+\bibitem{unitree-yangbot-gmw}
+光明网（页面来源：中新社微信公众号）. 机器人春晚扭秧歌，为什么不穿裤子？科技团队揭秘[N/OL]. 2025-01-30 [2026-10-04]. 本节舞台图片取自该页配图，原图保留央视台标，页面未列单独摄影者。
+\newblock \url{https://culture.gmw.cn/2025-01/30/content_37827196.htm}.
+
+\bibitem{unitree-yangbot-cctv}
+中央广播电视总台研究院，CMG观察. 一项接一项！总台春晚年年都有“黑科技”[N/OL]. 页面标注2025-01-29 [2026-10-04]. 本体19个自由度与手部6个自由度的舞台版本说明。
+\newblock \url{https://www.cctv.com/2025/03/17/ARTIgD5wWgkKadHCkY7sGsE9250313.shtml}.
+
+\bibitem{unitree-h1-official}
+Unitree Robotics. \textit{Unitree H1: Product Specifications; H1 Description}[EB/OL]. 官方产品规格与官方机器人模型仓库 [2026-10-04]. 基本H1每臂4个、每腿5个、躯干1个关节；区别于H1-2。
+\newblock \url{https://www.unitree.com/cn/h1/};
+\url{https://github.com/unitreerobotics/unitree_ros/blob/master/robots/h1_description/README.md}.
+
+\bibitem{unitree-h1-ik-id}
+Li D, Sun W, Liu J, et al. \textit{A Comparative Study of IK and ID Controllers for Motion Capture Using a Hybrid Vision System}[C]. 2025 5th International Conference on Electrical Engineering and Mechatronics Technology (ICEEMT), 2025: 332--335. Jindi Zhang为共同作者；本节引用控制器比较主题。
+\newblock \url{https://doi.org/10.1109/ICEEMT66565.2025.11281356}.
+
+\bibitem{unitree-g1-forward}
+He M, Zhong Q, Xu J, Pan X. \textit{Forward Kinematic Modeling and Verification of the Unitree G1 Left Arm Based on the Denavit-Hartenberg Method}[C]. Proceedings of the 2026 6th International Conference on Applied Mathematics, Modelling and Intelligent Computing, 2026: 935--940.
+\newblock \url{https://doi.org/10.1145/3817124.3817266}.
+
+\bibitem{unitree-g1-analytical-planning}
+Liu J, Wu X, Liao Y, Ayinuremu T. \textit{A Systematic Framework for Motion Planning and Energy Optimization of Humanoid Robots Based on Analytical Inverse Kinematics}[C]. Proceedings of the 2026 International Conference on Artificial Intelligence and Control (CAIC), 2026: 841--846.
+\newblock \url{https://doi.org/10.1145/3807246.3807376}.
+
+\bibitem{unitree-omnixtreme}
+Wang Y, Zhu S, Zhi P, et al. \textit{OmniXtreme: Breaking the Generality Barrier in High-Dynamic Humanoid Control}[EB/OL]. arXiv:2602.23843, 2026 [2026-10-04]. 王云申、王兴兴等；论文实机平台为Unitree G1。
+\newblock \url{https://arxiv.org/abs/2602.23843}.
+
+\bibitem{unitree-kungfubot}
+Xie W, Han J, Zheng J, et al. \textit{KungfuBot: Physics-Based Humanoid Whole-Body Control for Learning Highly-Dynamic Skills}[C/OL]. Advances in Neural Information Processing Systems, 38, 2025 [2026-10-04].
+\newblock \url{https://papers.neurips.cc/paper_files/paper/2025/hash/5a0e51901cff2b42d379ec7869603e91-Abstract-Conference.html}.
+
+\bibitem{humanoid-force-singularity}
+Yoshioka H, Himeno T, Kojima K, Okada K. \textit{Indirect Torso Posture Control and Force-Guided Singularity Avoidance for Humanoid Teleoperation System using Exoskeleton Cockpit}[C]. 2026 IEEE/SICE International Symposium on System Integration (SII), 2026: 333--338.
+\newblock \url{https://doi.org/10.1109/SII64115.2026.11404718}.
+
+\bibitem{humanoid-reaching-singularity}
+Jeong H, Lee I. \textit{Optimization for Whole Body Reaching Motion Without Singularity}[J]. International Journal of Precision Engineering and Manufacturing, 2022, 23(6): 639--651.
+\newblock \url{https://doi.org/10.1007/s12541-022-00623-4}.
+
+\bibitem{humanoid-improved-dls}
+Setyawan M R H, Dewanto S, Marta B S, Pramadihanto D. \textit{Improved Damped Least Squares Inverse Kinematics with Joint limits for 7-DOF ``T-FLoW'' Humanoid Robot Manipulator}[C]. 2021 International Electronics Symposium (IES), 2021: 464--469. 实验结果范围另见作者机构研究页。
+\newblock \url{https://doi.org/10.1109/IES53407.2021.9593970};
+\url{https://priet.pens.ac.id/user/research/3}.
+
+\bibitem{robot-togai-svd}
+Togai M. \textit{An Application of the Singular Value Decomposition to Manipulability and Sensitivity of Industrial Robots}[J]. SIAM Journal on Algebraic Discrete Methods, 1986, 7(2): 315--320.
+\newblock \url{https://doi.org/10.1137/0607034}.
+
+\bibitem{robot-harada-condition}
+Marinho M M, Harada K, Sugita N, Mitsuishi M. \textit{Reduced errors in robot-aided minimally invasive surgery through online condition number optimization}[C]. 2016 6th IEEE International Conference on Biomedical Robotics and Biomechatronics (BioRob), 2016: 347--352.
+\newblock \url{https://doi.org/10.1109/BIOROB.2016.7523650}.
+
+\bibitem{modern-robotics-manipulability}
+Lynch K M, Park F C. \textit{Modern Robotics: Mechanics, Planning, and Control}[M/OL]. Cambridge University Press, 2017. 图5.3及第5.4节：关节速度圆与可操作性椭圆 [2026-10-04]. 本节以自拟姿态和2R公式原创重绘，未复制原书插图。
+\newblock \url{https://hades.mech.northwestern.edu/images/2/25/MR-v2.pdf};
+\url{https://modernrobotics.northwestern.edu/nu-gm-book-resource/5-4-manipulability/}.
+% CHAPTER 6 UNITREE REFERENCES END
+
 
 \end{thebibliography}
 \par\clearpage

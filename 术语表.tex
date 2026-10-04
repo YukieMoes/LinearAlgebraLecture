@@ -8,7 +8,9 @@
 \GlossaryEntry{映射的加法}{Addition of Maps}{对同定义域、同目标空间的映射逐点相加，$(S+T)(\boldsymbol x)=S(\boldsymbol x)+T(\boldsymbol x)$。}
 \GlossaryEntry{相反向量}{Additive Inverse}{与原向量相加得到零向量的向量，记为 $-\boldsymbol v$。}
 \GlossaryEntry{可加性}{Additivity}{映射保持向量加法的性质，即 $T(\boldsymbol x+\boldsymbol y)=T(\boldsymbol x)+T(\boldsymbol y)$。}
+\GlossaryEntry{相邻对换}{Adjacent Transposition}{交换排列中相邻两个位置的元素；逆序数恰好增加1或减少1，交换相邻倒序元素时减少1。}
 \GlossaryEntry{伴随矩阵}{Adjugate Matrix}{代数余子式数表的转置，记作 $\operatorname {adj}(A)$；其第 $i$ 列是第 $i$ 行对应的代数余子式向量，满足 $A\operatorname {adj}(A)=\det (A)E$。}
+\GlossaryEntry{仿射不变性}{Affine Invariance}{在可逆仿射变换下保持的结构关系，如共线、平行、交点对应与同一直线上的有向分点比例；一般不包括长度、夹角、面积和斜率。}
 \GlossaryEntry{仿射映射}{Affine Map}{由线性作用与固定平移组成的映射 $\boldsymbol x\mapsto A\boldsymbol x+\boldsymbol a$；在原向量空间中，只有 $\boldsymbol a=\boldsymbol 0$ 时才是线性映射。}
 \GlossaryEntry{仿射子空间}{Affine Subspace}{子空间的一次平移 $\boldsymbol p+W$；其维数为 $\dim W$，当 $\boldsymbol p\notin W$ 时不经过原点。}
 \GlossaryEntry{交替最小二乘法}{Alternating Least Squares}{交替固定一组参数、对另一组参数求解最小二乘问题的方法；第3章以它说明推荐教学模型中的矩阵求解。}
@@ -58,6 +60,7 @@
 \GlossaryEntry{复向量空间}{Complex Vector Space}{以复数作为数乘系数的向量空间；讨论线性关系时必须允许复系数。}
 \GlossaryEntry{分量}{Component}{有序数组中某个固定位置的数，位置次序是向量表示的一部分。}
 \GlossaryEntry{复合}{Composition}{把一个映射的输出作为另一个映射的输入；$(S\circ T)(\boldsymbol x)=S(T(\boldsymbol x))$，先作右侧映射。}
+\GlossaryEntry{条件数}{Condition Number}{本节欧氏尺度下，可逆方阵把单位输入向量伸缩的最大倍率与最小倍率之比；等于像椭圆的长短半轴比，反映求解对扰动的敏感程度；奇异时约定为无穷大。}
 \GlossaryEntry{保守力}{Conservative Force}{可由单值势能函数的负梯度表示的力；力的方向指向势能下降的方向。}
 \GlossaryEntry{有解}{Consistent}{线性方程组至少有一个公共解，也称相容。}
 \GlossaryEntry{常数项}{Constant Term}{线性方程中不含未知数的已知量；本书通常将其放在等号右端。}
@@ -70,6 +73,7 @@
 \GlossaryEntry{叉乘}{Cross Product}{两支三维向量所确定的法向量，长度为平行四边形面积，方向按右手法则；共线时为零向量。}
 \GlossaryEntry{旋度}{Curl}{三维向量场横向偏导数按叉乘结构成对作差得到的向量，描述局部旋转倾向；刚体旋转场的旋度为角速度向量的两倍。}
 \GlossaryLetter{D}
+\GlossaryEntry{阻尼最小二乘法}{Damped Least Squares}{最小化$\|J\boldsymbol q-\boldsymbol v\|^2+\lambda ^2\|\boldsymbol q\|^2$（$\lambda >0$），在跟踪误差与输入大小之间折中；即使$J$降秩，阻尼线性方程仍有唯一解，但不保证原目标精确可达。}
 \GlossaryEntry{棣莫弗定理}{De Moivre's Theorem}{对整数 $n$，$(\cos \theta +i\sin \theta )^n=\cos (n\theta )+i\sin (n\theta )$。}
 \GlossaryEntry{自由度}{Degrees of Freedom}{表示全部解所需的独立自由参数个数；线性方程组有解时等于相应零空间的维数。}
 \GlossaryEntry{导数}{Derivative}{函数相对于自变量的瞬时变化率，记作 $f'$；求导保持函数的加法与实数数乘。}
@@ -77,6 +81,8 @@
 \GlossaryEntry{行列式}{Determinant}{与方阵对应的标量，绝对值是线性变换的体积缩放倍数，符号记录方向是否翻转；为零时方阵不可逆。第6章展开。}
 \GlossaryEntry{对角矩阵}{Diagonal Matrix}{主对角线以外的元素全为零的方阵，对应各坐标分量分别缩放。}
 \GlossaryEntry{矩阵对角化}{Diagonalization}{选择适当的基，使某个线性变换的矩阵表示成为对角矩阵；并非所有方阵都能对角化。第9章展开。}
+\GlossaryEntry{微分形式}{Differential Form}{在各点给有序位移作交替多重线性测量的对象；本章选读仅以有向体积元为例，不展开完整理论。}
+\GlossaryEntry{微分逆运动学}{Differential Inverse Kinematics}{固定当前姿态，由期望末端速度反求关节速度的问题；其线性模型为$J\dot {\boldsymbol \theta }=\boldsymbol v$，不同于直接由目标位置求完整关节角。}
 \GlossaryEntry{维数}{Dimension}{有限维空间中任意一组基所含的向量个数，记为 $\dim V$；零子空间的维数为0。}
 \GlossaryEntry{维数公式}{Dimension Formula}{有限维子空间满足 $\dim (U+V)=\dim U+\dim V-\dim (U\cap V)$。}
 \GlossaryEntry{直和}{Direct Sum}{当 $U\cap V=\{\boldsymbol 0\}$ 时的子空间和，记作 $U\oplus V$；等价地，每个和向量的分解唯一。}
@@ -109,6 +115,7 @@
 \GlossaryEntry{模长}{Euclidean Length}{实向量各分量平方和的平方根，等于向量与自身点积的平方根；也称向量的长度。}
 \GlossaryEntry{欧拉角}{Euler Angles}{以约定轴序的三次旋转描述姿态的角度参数；须说明转轴固定还是随动。某些姿态可由不同角度组表示，本书也以此广义称呼三个不同轴的角度参数。}
 \GlossaryEntry{欧拉公式}{Euler's Formula}{对实数 $\theta $，$e^{i\theta }=\cos \theta +i\sin \theta $，将单位圆上的旋转与复指数联系起来。}
+\GlossaryEntry{偶排列}{Even Permutation}{逆序数为偶数的排列，其符号为 $+1$；不要求各元素已经按递增次序排列。}
 \GlossaryEntry{指数形式}{Exponential Form}{用 $z=re^{i\theta }$ 表示非零复数的形式，其中 $r=|z|$，$\theta $ 是其一个辐角。}
 \GlossaryLetter{F}
 \GlossaryEntry{特征向量（数据表示）}{Feature Vector}{按约定顺序记录对象各项特征的向量；此处不是后续特征值理论中的特征向量。}
@@ -120,6 +127,7 @@
 \GlossaryEntry{有限维空间}{Finite-Dimensional Space}{具有有限基的向量空间，零空间也属于有限维空间。}
 \GlossaryEntry{形式行列式}{Formal Determinant}{含标准基向量的一行仅作为按行展开的记号，用于把各个标量余子式组成一个向量；不是普通的标量行列式，其定向符号取决于标准基行所在的位置。}
 \GlossaryEntry{向前消元}{Forward Elimination}{逐列选择主元并消去其下方元素，将方程组或增广矩阵化成阶梯形的过程。}
+\GlossaryEntry{正运动学}{Forward Kinematics}{由关节角等状态计算机器人末端位置或姿态的过程；本节2R模型用两根连杆的坐标投影相加计算平面位置。}
 \GlossaryEntry{前代}{Forward Substitution}{从下三角方程组的第1行开始，自上而下依次求出未知量的方法。}
 \GlossaryEntry{四个基本子空间}{Four Fundamental Subspaces}{矩阵的列空间、行空间、零空间与左零空间；行空间和零空间位于输入空间，列空间和左零空间位于输出空间。第3.5节铺垫，后续研究维数与正交关系。}
 \GlossaryEntry{自由变量}{Free Variable}{系数矩阵非主元列对应的未知数；有解时可独立指定其值，再求主元变量。}
@@ -159,16 +167,20 @@
 \GlossaryEntry{内积}{Inner Product}{用于定义长度、夹角及正交性的一种向量配对运算；第7章正式定义。}
 \GlossaryEntry{内积空间}{Inner Product Space}{配有指定内积的向量空间，使长度与正交性有准确含义；第7章展开。}
 \GlossaryEntry{子空间的交}{Intersection of Subspaces}{同时属于两个子空间的向量全体，仍是子空间，记为 $U\cap V$。}
+\GlossaryEntry{逆动力学}{Inverse Dynamics}{根据期望运动以及质量等动力学信息计算所需力或关节力矩的过程；第6.6节仅作进阶概念预告，不展开动力学推导。}
 \GlossaryEntry{反函数}{Inverse Function}{在指定定义域与目标集合之间，双射函数把输出唯一还原为输入的函数；它与原函数两个方向的复合均为相应集合的恒等映射。}
+\GlossaryEntry{逆运动学}{Inverse Kinematics}{由期望末端位置、姿态或运动反求相应关节状态或运动的过程；位置逆运动学求关节角，微分逆运动学在当前姿态求关节速度，两者不可混同。}
 \GlossaryEntry{逆映射}{Inverse Map}{双射把每个输出反查为唯一输入的映射；双射线性映射的逆仍是线性映射。}
 \GlossaryEntry{逆矩阵}{Inverse Matrix}{满足 $AB=BA=E$ 的方阵 $B$，记为 $A^{-1}$，表示撤销 $A$ 对应线性作用的映射。}
-\GlossaryEntry{逆序数}{Inversion Number}{排列中前项大于后项的数对个数；行列式项的符号为 $(-1)^{N(\sigma )}$。}
+\GlossaryEntry{逆序数}{Inversion Number}{排列中前项大于后项的数对个数；行列式项的符号为 $(-1)^{\tau (\sigma )}$。}
+\GlossaryEntry{逆序对}{Inversion Pair}{排列中满足位置 $p<q$ 而数值 $k_p>k_q$ 的数对；前面的数比后面的数大，逆序数就是这样的数对总数。}
 \GlossaryEntry{可逆矩阵}{Invertible Matrix}{存在双侧逆的方阵；等价于对应线性映射为双射。}
 \GlossaryLetter{J}
 \GlossaryEntry{雅可比行列式}{Jacobian Determinant}{输入与输出维数相同时，雅可比矩阵的行列式；绝对值表示局部的面积或体积缩放倍率，正负记录方向。}
 \GlossaryEntry{雅可比矩阵}{Jacobian Matrix}{按输出分量为行、输入坐标为列排列偏导数的矩阵；在固定一点，把输入小变化映到输出的一阶变化。}
 \GlossaryLetter{K}
 \GlossaryEntry{键}{Key}{注意力计算中与查询配对、用来计算关联分数的向量，常按行组成矩阵 $K$。}
+\GlossaryEntry{奇异位形}{Kinematic Singularity}{所选任务雅可比的秩低于该机构在此任务下可达到的最大秩的姿态；典型表现是末端丢失独立的瞬时运动方向，不意味着所有有限时间路径均不可行。}
 \GlossaryLetter{L}
 \GlossaryEntry{拉普拉斯展开}{Laplace Expansion}{沿固定的一行或一列，将元素与对应代数余子式的乘积求和，得到整个行列式的计算公式。}
 \GlossaryEntry{隐因子}{Latent Factor}{模型用于表示潜在联系的向量分量；本章以少量隐因子展示用户与内容的匹配。}
@@ -177,6 +189,7 @@
 \GlossaryEntry{最小二乘法}{Least Squares}{通过使误差平方和尽可能小来确定参数的方法；第3章先应用其线性方程形式，第5.7节用正交直和说明最优近似与解的结构。}
 \GlossaryEntry{最小二乘解}{Least-Squares Solution}{使 $\|\boldsymbol b-A\boldsymbol x\|^2$ 最小的输入；等价于正规方程的解，最优输出唯一，输入是否唯一取决于 $A$ 的零空间。}
 \GlossaryEntry{左零空间}{Left Null Space}{转置矩阵的零空间，即满足 $A^{\mathrm T}\boldsymbol y=\boldsymbol 0$ 的全部向量；等价地有 $\boldsymbol y^{\mathrm T}A=\boldsymbol 0^{\mathrm T}$。若 $A$ 为 $m\times n$，它是 $\mathbb R^m$ 的子空间。}
+\GlossaryEntry{莱布尼茨公式}{Leibniz Formula}{把行列式写成全部排列项的带符号有限和：每项从每行、每列恰取一个元素，其符号由逆序数奇偶决定。}
 \GlossaryEntry{等高线}{Level Curve}{二元标量函数中具有相同函数值的输入点组成的曲线；非零梯度垂直于经过该点的等高线切向。}
 \GlossaryEntry{线性代数}{Linear Algebra}{研究向量的线性关系、向量空间与线性映射及其代数表示的数学分支。}
 \GlossaryEntry{线性组合}{Linear Combination}{对给定向量分别作数乘后相加得到的向量。}
@@ -199,6 +212,8 @@
 \GlossaryEntry{LU分解}{LU Factorization}{将矩阵写成 $A=LU$，其中 $L$ 为单位下三角矩阵，$U$ 为上三角矩阵，用来保存并复用无换行消元。}
 \GlossaryLetter{M}
 \GlossaryEntry{主对角线}{Main Diagonal}{矩阵中行下标与列下标相等的位置，即 $A_{1,1},A_{2,2},\ldots $ 所在的对角线。}
+\GlossaryEntry{可操作性椭球}{Manipulability Ellipsoid}{单位关节速度球经当前雅可比映射形成的末端速度图形；二维为椭圆，降秩时退化；使用实心球时讨论的是包含内部的速度集合，须说明速度尺度与预算。}
+\GlossaryEntry{可操作度}{Manipulability Measure}{本节对$m\le n$的位置任务采用$w=\sqrt {\det (JJ^{\mathrm T})}$；行满秩时为正，行不满秩时为0，方阵情形等于$|\det J|$；数值依赖尺度，不能单独描述最困难的方向。}
 \GlossaryEntry{映射}{Mapping}{给每个输入指定唯一输出的对应规则。}
 \GlossaryEntry{矩阵}{Matrix}{按固定行列次序排列的矩形数表，可组织方程系数或记录线性映射的信息。}
 \GlossaryEntry{矩阵加法}{Matrix Addition}{同型矩阵按对应位置元素相加的运算，表示相应线性映射输出的逐点叠加。}
@@ -209,7 +224,9 @@
 \GlossaryEntry{极大线性无关组}{Maximal Linearly Independent Subset}{从原向量组中选出的无关部分组，并能线性表示原组的全部向量。}
 \GlossaryEntry{度量结构}{Metric Structure}{用于刻画长度、夹角等几何量的附加结构；本书第0章从实向量的标准点积出发建立直观。}
 \GlossaryEntry{余子式}{Minor}{删去指定元素所在的一行和一列，保留其余行列次序得到的低一阶行列式，记作 $M_{ij}$；约定0阶行列式为1。}
+\GlossaryEntry{模型预测控制}{Model Predictive Control}{依据模型预测接下来若干步并比较候选动作，只执行当前一步，再用新状态重新计算的控制策略；本节仅作进阶概念预告，不展开其完整理论。}
 \GlossaryEntry{模}{Modulus}{复数 $z=a+bi$ 对应点到原点的距离，$|z|=\sqrt {a^2+b^2}$。}
+\GlossaryEntry{伪逆}{Moore-Penrose Pseudoinverse}{将任意目标送到其最小二乘解中范数最小者的矩阵，记为$J^\dagger $；$J^{\mathrm T}(JJ^{\mathrm T})^{-1}$只适用于行满秩，不得在真正降秩时照用。}
 \GlossaryEntry{多重线性型}{Multilinear Form}{实向量空间上的实数值多输入函数，对每个输入位置分别保持加法与数乘；固定其他位置才考察该位置的线性。}
 \GlossaryEntry{多重线性}{Multilinearity}{多输入函数固定其他输入后，对每一个输入分别保持加法与数乘；不是要求所有输入同时改变时仍整体线性。}
 \GlossaryLetter{N}
@@ -228,10 +245,12 @@
 \GlossaryEntry{数值稳定性}{Numerical Stability}{描述算法控制有限精度误差影响的性质；选主元可避免过小主元造成过大的消元倍数，但不保证一切误差消失。}
 \GlossaryLetter{O}
 \GlossaryEntry{斜投影}{Oblique Projection}{沿与目标子空间不垂直的互补方向投到该子空间、并保持其上的向量不动的线性映射；本章以沿 $(1,1,1)^{\mathrm T}$ 投到 $xy$ 平面为例。}
+\GlossaryEntry{奇排列}{Odd Permutation}{逆序数为奇数的排列，其符号为 $-1$。}
 \GlossaryEntry{一一对应}{One-to-One Correspondence}{两类对象之间互相唯一确定、没有遗漏的配对关系；固定标准基后，$\mathbb R^n$ 到 $\mathbb R^m$ 的线性映射与 $m\times n$ 矩阵一一对应。}
 \GlossaryEntry{有序基}{Ordered Basis}{指定了基向量先后次序的一组基，坐标必须按该次序排列。}
 \GlossaryEntry{有向面积}{Oriented Area}{按两条边的先后次序记录正负的平行四边形面积；平面标准定向中逆时针为正，共线时为0。}
 \GlossaryEntry{有向体积}{Oriented Volume}{按有序边的定向记录正负的体积；三维中由混合积给出，通常体积为其绝对值。}
+\GlossaryEntry{有向体积元}{Oriented Volume Element}{在一点将有序小位移测为有向体积的交替多重线性对象，记作 $\mathrm dx_1\wedge \cdots \wedge \mathrm dx_n$；坐标变换时乘带符号的雅可比行列式。}
 \GlossaryEntry{正交补向量}{Orthogonal Complement Vector}{本章指按长度和定向选定的垂直向量，区别于由所有垂直向量组成的正交补子空间；二维标准正交基下取逆时针转90度的像，高维由有向底面体积与定向确定。}
 \GlossaryEntry{正交互补子空间}{Orthogonal Complementary Subspaces}{在给定实向量空间中互相正交，且直和等于整个空间的两个子空间；每个向量均有唯一分解，二者维数之和等于环境空间的维数，并不要求维数相等。}
 \GlossaryEntry{正交直和}{Orthogonal Direct Sum}{互相正交的子空间所构成的直和；其中每个向量的分量分解唯一。}
@@ -249,6 +268,7 @@
 \GlossaryEntry{被动旋转}{Passive Rotation}{向量不动，转动描述它的坐标架；新坐标由对应主动旋转矩阵的逆矩阵换算。}
 \GlossaryEntry{排列}{Permutation}{把 $1,\ldots ,n$ 的全部下标按某一顺序重排，或相应的下标一一对应；行列式排列式中每行每列恰取一个元素。}
 \GlossaryEntry{置换矩阵}{Permutation Matrix}{单位矩阵的行重新排列所得矩阵，每行每列恰有一个1；左乘它可重排行，且 $P^{-1}=P^{\mathrm T}$。}
+\GlossaryEntry{排列奇偶性}{Permutation Parity}{由排列逆序数的奇偶决定的分类；任意一次对换都会翻转它，排列符号记为 $(-1)^\tau $。}
 \GlossaryEntry{状态平面}{Phase Plane}{用二维状态的两个分量作为坐标形成的平面；点代表状态，曲线代表状态演化，不一定是物体运动的实际空间。}
 \GlossaryEntry{主元}{Pivot}{阶梯形非零行的首个非零元素，用于组织消元与确定主元变量。}
 \GlossaryEntry{主元列}{Pivot Column}{阶梯形中含主元的列；原矩阵对应列号的列可用于选取极大无关组。}
@@ -336,6 +356,7 @@
 \GlossaryEntry{充分条件}{Sufficient Condition}{满足该条件就能推出相应结论的条件；与必要条件须加以区别。仅把零向量送到零向量不足以保证映射线性。}
 \GlossaryEntry{子空间的和}{Sum of Subspaces}{所有 $\boldsymbol u+\boldsymbol v$ 构成的子空间，其中 $\boldsymbol u\in U$、$\boldsymbol v\in V$，记为 $U+V$。}
 \GlossaryEntry{满射}{Surjection}{目标空间的每个元素都至少能由一个输入得到的映射。}
+\GlossaryEntry{对称群}{Symmetric Group}{集合 $\{1,\ldots ,n\}$ 上全部排列按复合运算组成的群，记作 $S_n$；本讲义只使用排列、对换与奇偶符号，不展开群论。}
 \GlossaryEntry{对称矩阵}{Symmetric Matrix}{满足 $A^{\mathrm T}=A$ 的实方阵，对称位置的元素相等。}
 \GlossaryEntry{对称性}{Symmetry}{某种关系成立时交换两个对象，关系仍成立；如向量组等价关系。}
 \GlossaryLetter{T}
@@ -346,6 +367,7 @@
 \GlossaryEntry{暂态响应}{Transient Response}{在本书选读的衰减模型中，由初始状态偏离特解所产生、并随时间消失的齐次响应；一般齐次偏离未必衰减。}
 \GlossaryEntry{传递性}{Transitivity}{若对象一与二、二与三具有某种关系，则对象一与三也具有该关系。}
 \GlossaryEntry{转置}{Transpose}{对偶映射在原标准基所对应的对偶基下的矩阵，满足 $\boldsymbol y\cdot (A\boldsymbol x)=(A^{\mathrm T}\boldsymbol y)\cdot \boldsymbol x$；行列互换是其坐标计算形式，通常不是逆矩阵。向量横排与竖排的转换也沿用上标 $\mathrm T$。}
+\GlossaryEntry{对换}{Transposition}{交换排列中两个不同位置的元素，其他位置保持不变的操作；它改变排列奇偶性。}
 \GlossaryEntry{三角形定则}{Triangle Rule}{把两个向量首尾相接，从第一支起点指向第二支终点的向量表示它们的和。}
 \GlossaryEntry{三对角矩阵}{Tridiagonal Matrix}{除主对角线及其上、下两条次对角线以外的元素均为零的方阵；常见于相邻节点耦合的线性模型，其行列式可利用带状结构降阶递推。}
 \GlossaryEntry{三重积分}{Triple Integral}{对空间区域上小体积的函数贡献进行累积的积分；如把体密度乘体积微元后相加得到总质量。}
@@ -372,8 +394,10 @@
 \GlossaryEntry{黏性阻尼}{Viscous Damping}{采用阻力与速度成正比、方向相反的线性近似；在一维教学模型中写为 $-c\dot x$。}
 \GlossaryEntry{体积缩放倍数}{Volume Scale Factor}{实方阵表示的线性变换对区域体积的乘数，等于行列式的绝对值；退化变换的倍数为0。}
 \GlossaryLetter{W}
+\GlossaryEntry{外积}{Wedge Product}{组合线性测量的交替多重线性运算，记作 $\wedge $；交换两个一阶微分的次序变号，用于记录有向面积或体积，不同于列向量乘行向量的 Outer Product。}
 \GlossaryEntry{权重矩阵}{Weight Matrix}{包含模型可训练系数、用于线性映射的矩阵；注意力中的 $A$ 也称权重矩阵，但它由当前输入计算得到，与可训练投影参数 $W_Q,W_K,W_V$ 不同。}
 \GlossaryEntry{全空间}{Whole Space}{所讨论的整个向量空间，它也是自身的子空间。}
+\GlossaryEntry{全身控制}{Whole-Body Control}{协调机器人手臂、躯干与腿部等部位完成任务的控制思想；本节以整体姿态改变肩部位置、保留手臂有利方向作直观说明。}
 \GlossaryLetter{Z}
 \GlossaryEntry{零矩阵}{Zero Matrix}{所有元素都为0的矩阵。}
 \GlossaryEntry{零子空间}{Zero Subspace}{只含零向量的子空间 $\{\boldsymbol 0\}$，其基可取空组，维数为0。}
