@@ -16640,7 +16640,287 @@ One tricky point: here $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i
 \end{note}
 
 \Needspace{6\baselineskip}
-回到最初的目标：我们只是想从输出读回输入。为此，每个评分器必须屏蔽其余列；叉乘与广义叉乘提供了这样的法向量，混合积又给出了统一的体积读数。把列的法向量按行摆好、再除以非零总体积，逆矩阵便自然出现。消元通过切变整理体积，展开通过坐标分量拆开体积，伴随矩阵则利用底面法向量区分各条边；三条路径由同一套体积几何与行列式公理贯通。下一节再问：若变换把直线弯曲，局部还能不能用行列式度量它？
+回到最初的目标：我们只是想从输出读回输入。为此，每个评分器必须屏蔽其余列；叉乘与广义叉乘提供了这样的法向量，混合积又给出了统一的体积读数。把列的法向量按行摆好、再除以非零总体积，逆矩阵便自然出现。消元通过切变整理体积，展开通过坐标分量拆开体积，伴随矩阵则利用底面法向量区分各条边；三条路径由同一套体积几何与行列式公理贯通。接下来把这些评分器用于方程组的目标向量，看看解的每一个分量怎样变成有向体积之比。
+
+% CHAPTER 6 CRAMER RULE BEGIN
+\Needspace{9\baselineskip}
+\subsection{克拉默法则：解的体积比意义}
+\label{sec:six-cramer-rule}
+
+\textbf{刚才造出的逆矩阵，怎样读出一个具体未知数？} 第5章告诉我们：可逆方阵的方程组有唯一解。上一节进一步看见，逆矩阵中的每一行都来自其余列张成底面的法向评分器。现在只需把这份评分器作用于目标向量，就能把解的坐标读成一个有向体积比。这就是\term{cramer-rule}，也是正交补构造的一个直接推论。
+
+\DetHead{从逆矩阵公式，读出一个分量}
+设 $M=(\boldsymbol\alpha_1\ \cdots\ \boldsymbol\alpha_n)$ 为实方阵，且 $\det(M)\ne0$。沿用6.3.3节的记号，$\overline M=\operatorname{adj}(M)$ 的第 $i$ 行为 $\boldsymbol\alpha_{iR}^{\mathrm T}$；这支法向量垂直于\emph{其余各列}，对第 $i$ 列的点积则为 $\det(M)$。于是
+\begin{align}
+ M\boldsymbol x&=\boldsymbol b
+ \quad\Longrightarrow\quad
+ \boldsymbol x=M^{-1}\boldsymbol b
+ =\frac{\overline M\boldsymbol b}{\det(M)},\\
+ x_i&=\frac{\boldsymbol\alpha_{iR}\cdot\boldsymbol b}{\det(M)}.
+ \label{eq:six-cramer-normal-score}
+\end{align}
+第一行恢复整个输入，第二行只取其中一个坐标：先对目标作一次法向评分，再除以原矩阵的总体积。
+
+\textbf{这个分子能不能也读成体积？} 把 $M$ 的第 $i$ 列换成 $\boldsymbol b$，其余列和次序都保持不变，得到
+\begin{equation}
+ M_i=(\boldsymbol\alpha_1\ \cdots\ \boldsymbol\alpha_{i-1}\
+ \boldsymbol b\ \boldsymbol\alpha_{i+1}\ \cdots\ \boldsymbol\alpha_n).
+\end{equation}
+上一节的法向量只用其余列构造，替换第 $i$ 列不会改变它。按这一列展开，便有
+\begin{equation}
+ \det(M_i)=\boldsymbol\alpha_{iR}\cdot\boldsymbol b,
+ \qquad
+ \boxed{x_i=\frac{\det(M_i)}{\det(M)}}\quad(i=1,\ldots,n).
+ \label{eq:six-cramer-rule}
+\end{equation}
+这就是克拉默法则：\textbf{一个组合系数，等于替换对应列后的有向体积，除以原来的有向体积。} 三维时，分子是法向量与目标向量的混合积；任意维数时，同一关系由列展开给出。分母必须非零，不能把它用于不可逆方程组。
+
+\textbf{为什么替换边之后，体积比就是这个系数？} 在三维中先看第1列：由 $\boldsymbol\alpha_2,\boldsymbol\alpha_3$ 张成的底面固定不动，法向量为 $\boldsymbol n=\boldsymbol\alpha_2\times\boldsymbol\alpha_3$。记底面积 $S=\|\boldsymbol n\|$，沿 $\boldsymbol n$ 的单位方向读出带符号的高度 $h_1,h_b$，则
+\begin{equation}
+ \det(M)=S h_1,\qquad \det(M_1)=S h_b,
+ \qquad x_1=\frac{S h_b}{S h_1}=\frac{h_b}{h_1}.
+\end{equation}
+底面积约掉了，只剩高度比。目标沿底面内的分量不贡献体积；它在法向上的高度，才决定需要多少份第1条边。
+
+\DetFigure{蓝色边 $\boldsymbol\alpha_1$ 与红色目标 $\boldsymbol b$ 共用由其余两列张成的浅蓝底面，绿色箭头是底面法向量；虚线读出两支向量在法向上的高度。替换第1列，底面积 $S$ 不变，所以 $x_1=h_b/h_1=\det(M_1)/\det(M)$。图中两高同向；若目标落在底面的另一侧，带符号高度和系数都要变号。}{fig:six-cramer-fixed-base}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.6,-.25) grid (13.3,4.8);
+ \begin{scope}[shift={(2.25,1.5)},x={(.85cm,-.40cm)},y={(-.70cm,-.35cm)},z={(0cm,1.10cm)}]
+  \filldraw[fill=DetBlue!12,draw=DetBlue!55] (0,0,0)--(1.8,0,0)--(1.8,1.4,0)--(0,1.4,0)--cycle;
+  \fill[DetBlue!5] (0,1.4,0)--(1.8,1.4,0)--(2.15,1.8,1)--(.35,1.8,1)--cycle;
+  \draw[detguide] (.35,.4,1)--(2.15,.4,1)--(2.15,1.8,1)--(.35,1.8,1)--cycle;
+  \draw[detguide] (1.8,0,0)--(2.15,.4,1);
+  \draw[detguide] (0,1.4,0)--(.35,1.8,1);
+  \draw[detguide] (1.8,1.4,0)--(2.15,1.8,1);
+  \draw[DetRose!45,densely dashed] (.8,.2,1.9)--(2.6,.2,1.9)--(2.6,1.6,1.9)--(.8,1.6,1.9)--cycle;
+  \draw[detrose] (0,0,0)--(1.8,0,0) node[below right] {$\boldsymbol\alpha_2$};
+  \draw[detgreen] (0,0,0)--(0,1.4,0) node[below left] {$\boldsymbol\alpha_3$};
+  \draw[detblue] (0,0,0)--(.35,.4,1) node[left] {$\boldsymbol\alpha_1$};
+  \draw[detrose] (0,0,0)--(.8,.2,1.9) node[right] {$\boldsymbol b$};
+  \draw[detgreen] (0,0,0)--(0,0,2.52) node[above] {$\boldsymbol n$};
+  \draw[detguide] (.35,.4,1)--(0,0,1);
+  \draw[detguide] (.8,.2,1.9)--(0,0,1.9);
+  \draw[DetBlue,|-|] (-.75,0,0)--(-.75,0,1) node[midway,left] {$h_1$};
+  \draw[DetRose,|-|] (-1.35,0,0)--(-1.35,0,1.9) node[midway,left] {$h_b$};
+  \node[font=\footnotesize] at (.85,.8,0) {底面积 $S$};
+ \end{scope}
+ \node[anchor=west,align=left] at (6,3.65)
+  {其余两列固定：底面不变\\[6pt]
+   第1列换成 $\boldsymbol b$：高度改变\\[10pt]
+   $\displaystyle x_1=\frac{S h_b}{S h_1}=\frac{h_b}{h_1}$};
+ \node[anchor=west,text=DetGray,font=\footnotesize] at (6,1.1)
+  {沿底面的分量不贡献体积。};
+\end{tikzpicture}}
+
+还可以直接用线性组合核对。把 $\boldsymbol b=\sum_{j=1}^n x_j\boldsymbol\alpha_j$ 代入替换列，利用多重线性展开：$j\ne i$ 的项出现两列相同，全部为0；只剩 $x_i\det(M)$。因此 $\det(M_i)=x_i\det(M)$。我们看到，6.1节的体积、6.2节的交替性与第5章的解坐标，说的是同一件事。
+
+\DetFigure{四栏从一维线段、二维平行四边形、三维平行六面体，走向 $n$ 维的有序边组；灰色虚线表示原边界，实线表示替换一条边后的边界。各栏都保持其余边不变，读出有向长度、面积或体积的比值；最后一栏是高维概念示意，未把高维图形当作三维物体绘制。}{fig:six-cramer-dimension-ladder}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.3,-.75) grid (13.7,3.9);
+ \foreach \xx/\tt in {1.4/一维,4.7/二维,8.1/三维,11.6/{$n$维}} {
+  \node at (\xx,3.5) {\tt};
+ }
+ \draw[DetGray!60,densely dashed,line width=3pt] (.2,1.85)--(1.15,1.85);
+ \draw[detblue] (.2,1.45)--(2.1,1.45);
+ \draw[DetGray!50] (.2,1.15)--(.2,2.15);
+ \node[font=\footnotesize] at (1.4,.6) {有向长度比};
+ \begin{scope}[shift={(3.55,1.1)}]
+  \draw[detguide] (0,0) rectangle (1,1);
+  \filldraw[fill=DetBlue!8,draw=DetBlue] (0,0) rectangle (2,1);
+  \draw[detguide] (1,0)--(1,1);
+  \draw[detblue] (0,0)--(2,0);
+ \end{scope}
+ \node[font=\footnotesize] at (4.7,.6) {有向面积比};
+ \begin{scope}[shift={(7.7,1.35)},x={(.70cm,-.30cm)},y={(-.50cm,-.28cm)},z={(0cm,.65cm)}]
+  \filldraw[fill=DetBlue!8,draw=DetGray!45] (0,0,0)--(1,0,0)--(1,1,0)--(0,1,0)--cycle;
+  \draw[detguide] (0,0,1)--(1,0,1)--(1,1,1)--(0,1,1)--cycle;
+  \draw[DetBlue] (0,0,2)--(1,0,2)--(1,1,2)--(0,1,2)--cycle;
+  \foreach \xx/\yy in {0/0,1/0,1/1,0/1} {\draw[DetBlue!70] (\xx,\yy,0)--(\xx,\yy,2);}
+  \draw[detblue] (0,0,0)--(0,0,2);
+ \end{scope}
+ \node[font=\footnotesize] at (8.1,.6) {有向体积比};
+ \node[draw=DetGray!45,fill=white,minimum width=2.4cm,minimum height=1.35cm,align=center] at (11.6,1.85)
+  {$\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_n$\\[5pt]$\boldsymbol\alpha_i\longrightarrow\boldsymbol b$};
+ \node[font=\footnotesize] at (11.6,.6) {有向 $n$ 维体积比};
+ \draw[decorate,decoration={brace,mirror,amplitude=4pt},DetGray!60] (.2,.15)--(13.1,.15);
+ \node at (6.65,-.45) {$\displaystyle x_i=\frac{\text{替换第 }i\text{ 条边后的有向体积}}{\text{原来的有向体积}}$};
+\end{tikzpicture}}
+
+\DetHead{二维验证：两个面积比，读回两个未知数}
+\begin{example}[二阶方程组的面积比]
+解方程组
+\begin{equation}
+ \begin{cases}x_1+2x_2=5,\\3x_1+x_2=5,\end{cases}
+ \qquad M=\DetMat{rr}{1&2\\3&1},\quad
+ \boldsymbol b=\begin{pmatrix}5\\5\end{pmatrix}.
+\end{equation}
+两列 $\boldsymbol\alpha_1=(1,3)^{\mathrm T}$、$\boldsymbol\alpha_2=(2,1)^{\mathrm T}$ 顺时针定向，因此
+\begin{equation}
+ \det(M)=1\cdot1-2\cdot3=-5.
+\end{equation}
+通常面积为5，有向面积为 $-5$。依次替换两列，得到
+\begin{align}
+ M_1&=\DetMat{rr}{5&2\\5&1},
+ &\det(M_1)&=5\cdot1-2\cdot5=-5,
+ &x_1&=\frac{-5}{-5}=1,\\
+ M_2&=\DetMat{rr}{1&5\\3&5},
+ &\det(M_2)&=1\cdot5-5\cdot3=-10,
+ &x_2&=\frac{-10}{-5}=2.
+\end{align}
+代回原式，$1+2\cdot2=5$、$3\cdot1+2=5$，所以 $\boldsymbol x=(1,2)^{\mathrm T}$。这也说明目标向量等于 $\boldsymbol\alpha_1+2\boldsymbol\alpha_2$。
+\end{example}
+
+\DetFigure{左图的蓝、红两列围出原平行四边形，右图把蓝色第1列换成目标 $\boldsymbol b=(5,5)^{\mathrm T}$；两栏使用相同的单位长度。形状虽然改变，通常面积都为5，有向面积都为 $-5$，因此 $x_1=(-5)/(-5)=1$。一般情况下必须保留定向，普通面积比只能给出 $|x_1|$。}{fig:six-cramer-area-ratio}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.5,-.8) grid (13.6,5.6);
+ \node at (1.5,5.1) {原矩阵 $M$};
+ \node at (9.7,5.1) {替换第1列：$M_1$};
+ \begin{scope}[shift={(.35,.25)},x=.75cm,y=.75cm]
+  \draw[detaxis] (-.3,0)--(3.8,0);
+  \draw[detaxis] (0,-.3)--(0,4.9);
+  \filldraw[fill=DetBlue!12,draw=DetBlue!55] (0,0)--(1,3)--(3,4)--(2,1)--cycle;
+  \draw[detblue] (0,0)--(1,3) node[above left] {$\boldsymbol\alpha_1$};
+  \draw[detrose] (0,0)--(2,1) node[below right] {$\boldsymbol\alpha_2$};
+  \node[font=\footnotesize,fill=white,inner sep=1pt] at (1.5,2.2) {面积5};
+  \node[font=\footnotesize] at (1.6,-.65) {$\det(M)=-5$};
+ \end{scope}
+ \node[align=center] at (4.8,2.45)
+  {$\displaystyle x_1=\frac{-5}{-5}=1$\\[8pt]有向面积比};
+ \draw[detaxis] (3.7,1.6)--(5.85,1.6);
+ \begin{scope}[shift={(7,.25)},x=.75cm,y=.75cm]
+  \draw[detaxis] (-.3,0)--(7.7,0);
+  \draw[detaxis] (0,-.3)--(0,6.4);
+  \filldraw[fill=DetBlue!12,draw=DetBlue!55] (0,0)--(5,5)--(7,6)--(2,1)--cycle;
+  \draw[detblue] (0,0)--(5,5) node[above left] {$\boldsymbol b$};
+  \draw[detrose] (0,0)--(2,1) node[below right] {$\boldsymbol\alpha_2$};
+  \node[font=\footnotesize,fill=white,inner sep=1pt] at (3.7,3.2) {面积5};
+  \node[font=\footnotesize] at (3.5,-.65) {$\det(M_1)=-5$};
+ \end{scope}
+\end{tikzpicture}}
+
+这次三个行列式同为负，两个系数都是正的。若把目标改成 $-\boldsymbol\alpha_1$，则 $\det(M_1)=-\det(M)$，读出 $x_1=-1$，而普通面积仍相等。\textbf{大小说明需要多少份，正负说明沿哪一个方向组合。}
+
+\Needspace{10\baselineskip}
+\DetHead{三维验证：把替换列的操作完整写出来}
+\begin{example}[回到三元方程组]
+第2章已经解过
+\begin{equation}
+ \begin{cases}
+ x_1+x_2+x_3=6,\\
+ 2x_1-x_2+x_3=3,\\
+ x_1+2x_2-x_3=2.
+ \end{cases}
+ \qquad M=\DetMat{rrr}{1&1&1\\2&-1&1\\1&2&-1},\quad
+ \boldsymbol b=\begin{pmatrix}6\\3\\2\end{pmatrix}.
+\end{equation}
+按第1行展开原行列式：
+\begin{equation}
+ \det(M)=1(1-2)-1(-2-1)+1(4+1)=7.
+\end{equation}
+原体积非零，因此有唯一解。每次只替换一列，其他两列不动：
+\begin{align}
+ \det(M_1)&=\begin{vmatrix}6&1&1\\3&-1&1\\2&2&-1\end{vmatrix}
+ =6(-1)-(-5)+8=7,\\
+ \det(M_2)&=\begin{vmatrix}1&6&1\\2&3&1\\1&2&-1\end{vmatrix}
+ =-5-6(-3)+1=14,\\
+ \det(M_3)&=\begin{vmatrix}1&1&6\\2&-1&3\\1&2&2\end{vmatrix}
+ =-8-1+6\cdot5=21.
+\end{align}
+每一行都先写清换列后的数表，再沿第1行计算，避免把“替换列”误做成“替换行”。于是
+\begin{equation}
+ x_1=\frac77=1,\qquad x_2=\frac{14}7=2,\qquad
+ x_3=\frac{21}7=3.
+\end{equation}
+代回原式，依次得到 $1+2+3=6$、$2-2+3=3$、$1+4-3=2$，与高斯消元的结果完全相同。
+\end{example}
+
+\DetFigure{两图保留相同的蓝、红底边，即本例的第1、2列；右图只把绿色第3条边换成目标 $\boldsymbol b$，浅绿色侧面显示新盒子的伸展。两图使用同一三维投影和坐标比例，原有向体积为7，新有向体积为21，所以第3个组合系数为3。替换的是一条边对应的列，底面保持不变。}{fig:six-cramer-volume-replacement}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.5,-.8) grid (13.8,4.9);
+ \node at (2.15,4.45) {原矩阵：$\det(M)=7$};
+ \node at (8.1,4.45) {换第3列：$\det(M_3)=21$};
+ \begin{scope}[shift={(.9,1.45)},x={(.48cm,.30cm)},y={(.264cm,-.144cm)},z={(0cm,.504cm)}]
+  \filldraw[fill=DetBlue!10,draw=DetBlue!55] (0,0,0)--(1,2,1)--(2,1,3)--(1,-1,2)--cycle;
+  \fill[DetGreen!12] (1,-1,2)--(2,1,3)--(3,2,2)--(2,0,1)--cycle;
+  \draw[DetGray!60] (1,1,-1)--(2,3,0)--(3,2,2)--(2,0,1)--cycle;
+  \draw[detguide] (1,2,1)--(2,3,0);
+  \draw[detguide] (2,1,3)--(3,2,2);
+  \draw[DetGray!60] (1,-1,2)--(2,0,1);
+  \draw[detblue] (0,0,0)--(1,2,1) node[below right] {$\boldsymbol\alpha_1$};
+  \draw[detrose] (0,0,0)--(1,-1,2) node[above left] {$\boldsymbol\alpha_2$};
+  \draw[detgreen] (0,0,0)--(1,1,-1) node[below right] {$\boldsymbol\alpha_3$};
+ \end{scope}
+ \draw[detaxis] (4.05,2.1)--(5.6,2.1);
+ \node[font=\footnotesize,align=center] at (4.8,2.9) {只换第3列\\$\boldsymbol\alpha_3\to\boldsymbol b$};
+ \begin{scope}[shift={(6.7,.4)},x={(.48cm,.30cm)},y={(.264cm,-.144cm)},z={(0cm,.504cm)}]
+  \filldraw[fill=DetBlue!10,draw=DetBlue!55] (0,0,0)--(1,2,1)--(2,1,3)--(1,-1,2)--cycle;
+  \fill[DetGreen!12] (1,-1,2)--(2,1,3)--(8,4,5)--(7,2,4)--cycle;
+  \fill[DetGreen!6] (1,2,1)--(2,1,3)--(8,4,5)--(7,5,3)--cycle;
+  \draw[DetGreen!65] (6,3,2)--(7,5,3)--(8,4,5)--(7,2,4)--cycle;
+  \draw[detguide] (1,2,1)--(7,5,3);
+  \draw[detguide] (2,1,3)--(8,4,5);
+  \draw[DetGreen!65] (1,-1,2)--(7,2,4);
+  \draw[detblue] (0,0,0)--(1,2,1) node[below right] {$\boldsymbol\alpha_1$};
+  \draw[detrose] (0,0,0)--(1,-1,2) node[above left] {$\boldsymbol\alpha_2$};
+  \draw[detgreen] (0,0,0)--(6,3,2) node[right] {$\boldsymbol b$};
+ \end{scope}
+ \node at (3.25,-.3) {固定底面};
+ \node at (10.1,-.3) {$\displaystyle x_3=\frac{\text{新有向体积}}{\text{原有向体积}}=\frac{21}7=3$};
+\end{tikzpicture}}
+
+\DetHead{理论看体积，工程看计算代价}
+\textbf{既然公式这么整齐，为什么不都用它解方程组？} 因为一个简洁的表达式，不一定对应省力的算法。若不利用稀疏结构，也不复用中间结果，逐层递归余子式展开一个稠密行列式，需要阶乘级的工作；对克拉默法则中的 $n+1$ 个行列式分别这样计算，总量约为 $O(n\,n!)$。相比之下，消元或LU求解的工作量为 $O(n^3)$，并且能为多个右端项复用分解。
+
+\DetFigure{蓝线取模型 $C_{\mathrm G}(n)=n^3$，红线取模型 $C_{\mathrm C}(n)=n\,n!$，纵轴使用对数刻度，比较三次增长与直接递归展开的阶乘级增长。$n=20$ 时两个模型值为8000与约 $4.87\times10^{19}$；这些数用于说明增长速度，不是实测运算次数或耗时。红线不代表用LU计算各行列式的代价。}{fig:six-cramer-cost-model}{%
+\begin{tikzpicture}
+ \begin{semilogyaxis}[
+  width=13.7cm,height=5.6cm,
+  xmin=4,xmax=21,ymin=1e2,ymax=1e21,
+  xtick={5,10,15,20},ytick={1e2,1e6,1e10,1e14,1e18},
+  xlabel={矩阵阶数 $n$},ylabel={运算量模型值},
+  grid=major,grid style={DetGray!13},axis line style={DetGray!65},
+  tick label style={font=\footnotesize},label style={font=\small},
+  legend style={font=\footnotesize,draw=none,fill=white,at={(.02,.97)},anchor=north west},
+  legend cell align=left]
+  \addplot[DetBlue,line width=1.2pt,mark=*] coordinates {(5,125)(10,1000)(15,3375)(20,8000)};
+  \addlegendentry{消元增长模型：$n^3$}
+  \addplot[DetRose,line width=1.2pt,mark=square*] coordinates {(5,600)(10,36288000)(15,19615115520000)(20,48658040163532800000)};
+  \addlegendentry{直接递归展开模型：$n\,n!$}
+  \draw[detguide] (axis cs:20,1e2)--(axis cs:20,1e21);
+  \node[anchor=east,font=\footnotesize,text=DetRose,fill=white,inner sep=2pt] at (axis cs:19.5,8e19) {$n\,n!\approx4.87\times10^{19}$};
+  \node[anchor=east,font=\footnotesize,text=DetBlue,fill=white,inner sep=2pt] at (axis cs:19.5,9e4) {$n^3=8000$};
+ \end{semilogyaxis}
+\end{tikzpicture}}
+
+这里要分清\textbf{公式与计算行列式的方法}。若改用消元，以 $O(n^3)$ 的代价分别计算这些行列式，直接重复 $n+1$ 次的总体代价是 $O(n^4)$，便不再是阶乘级。因此不能说克拉默法则本身必然需要 $O(n\,n!)$。不过，这种重复计算仍比直接解一个方程组多做许多工作；真实的大规模数值求解通常采用带选主元的LU等方法。LAPACK也把分解与利用分解求解分成相应例程，正好呼应第3章的一次分解、多次回代。\cite{lapack-linear}
+
+\textbf{那么，克拉默法则留下的是什么？} 它把解的分量、逆矩阵和有向体积，连成了同一个比值式。小阶手算可以用它核对结果；理论分析可以用它看清目标如何影响各个坐标。以后在微分方程、动力系统或控制问题里再看到 $M\boldsymbol x=\boldsymbol b$，除了消元步骤，还可以想到：目标替换一条边，所得有向体积与原体积的比值，读出了这条边的组合系数。
+
+\DetHead{6.3节回望：四条路径，各自回答什么问题？}
+高斯消元通过切变把体积整理成三角形式，适合实际求值与数值求解；代数余子式把体积分解到坐标方向，遇到零元素较多的行、列或三对角递推时尤其清楚；正交补构造解释伴随矩阵如何读回输入；克拉默法则则把这些读数写成解的有向体积比。它们来自同一套几何与公理，只是要回答的问题不同。
+
+\DetFigure{左侧先问当前的任务，右侧给出相应工具：大规模求值与求解用消元或LU，稀疏展开与低阶递推用余子式，理解逆矩阵用法向评分器，读出显式组合系数用克拉默法则。箭头表示选择的理由，而非四种方法之间的先后次序。几何帮助我们理解这些工具，计算任务决定如何使用它们。}{fig:six-determinant-method-map}{%
+\begin{tikzpicture}[font=\footnotesize,
+ task/.style={draw=DetGray!45,fill=white,rounded corners=2pt,text width=3.15cm,align=center,minimum height=.65cm},
+ tool/.style={draw=DetBlue!55,fill=DetBlue!6,rounded corners=2pt,text width=4.15cm,align=center,minimum height=.7cm}]
+ \draw[step=.5cm,DetGray!9,very thin] (-.35,-.65) grid (13.65,4.8);
+ \node[task,text width=2.2cm,fill=DetGreen!7,draw=DetGreen!55] (root) at (1.25,2.1) {现在要回答\\什么问题？};
+ \node[task] (a) at (5.05,4.1) {大规模求行列式或解方程};
+ \node[task] (b) at (5.05,2.75) {小阶、稀疏行列或结构递推};
+ \node[task] (c) at (5.05,1.4) {为什么伴随矩阵能恢复输入？};
+ \node[task] (d) at (5.05,.05) {一个组合系数怎样读成体积？};
+ \node[tool] (aa) at (11.05,4.1) {6.3.1 消元三角化\\LU/PLU，复用计算};
+ \node[tool] (bb) at (11.05,2.75) {6.3.2 代数余子式展开\\沿少量非零项降阶};
+ \node[tool] (cc) at (11.05,1.4) {6.3.3 正交补构造\\法向评分器组成伴随矩阵};
+ \node[tool] (dd) at (11.05,.05) {6.3.4 克拉默法则\\解的有向体积比};
+ \foreach \p/\q in {a/aa,b/bb,c/cc,d/dd} {
+  \draw[detaxis] (root.east)--(2.8,2.1)|-(\p.west);
+  \draw[detblue] (\p.east)--(\q.west);
+ }
+\end{tikzpicture}}
+
+从6.1节看见有向体积，到6.2节提炼几何性质，再到本节计算行列式、构造逆矩阵、读出方程组的解，我们走完了“几何直觉 $\to$ 公理体系 $\to$ 计算工具 $\to$ 方程求解”的一圈。行列式始终在度量列向量张开的盒子，也在度量空间变换的缩放。下一节把观察范围缩小，再问：若变换把直线弯曲，局部还能不能用这把尺子量面积？
+% CHAPTER 6 CRAMER RULE END
 
 \section{几何形式的深化：微积分思想下的体积度量}
 \label{sec:six-jacobian-intuition}
