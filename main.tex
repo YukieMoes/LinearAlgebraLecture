@@ -16240,211 +16240,407 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 
 第6.1节的萨鲁斯法则，也可以在这里认回原貌：三阶拉普拉斯展开把三个二阶行列式拆开，恰好得到六项乘积；萨鲁斯把同样六项重新排成对角线口诀。口诀适合速算，但三阶以外不能照抄，它也不能替代“分量乘有向投影面积”的理解。接下来不再只用法向量读体积，而要把它们按列组织起来，构造能恢复输入的逆矩阵。
 
+\Needspace{9\baselineskip}
 \subsection{伴随矩阵与逆矩阵公式}
 \label{sec:six-adjugate-inverse}
 
-第三章求逆时，我们寻找每个标准基的原像。现在已有另一种材料：其余行张成底面，法向量对它们的点积全为0，只与被留下的一行读出总体积。\textbf{如果把这份体积读数调成1，岂不就能得到一个标准基的原像？} R. Shankar 在《Principles of Quantum Mechanics（量子力学原理）》第二版附录A.1（第655--657页）用叉乘与行向量的构造解释余子式转置及求逆。\cite{shankar-matrix-geometry}我们沿用这条几何路线，并把各行与法向量的对应、任意维的定向符号写清。
+\textbf{我们想要逆矩阵，先不问它叫什么，而问它必须做到什么。} 已知 $M\boldsymbol x=\boldsymbol y$，能不能从输出 $\boldsymbol y$ 读回输入的每个坐标？第三章把这个问题写成寻找 $M^{-1}$。现在，6.1节的混合积和刚学的余子式展开，给了我们另一条构造路径：找一组线性评分器，分别读出输入的一个坐标，并屏蔽其他坐标。
 
-\DetHead{三维先构造：其余两行给出一支法向量}
-把三阶矩阵 $A$ 的各行竖排为 $\boldsymbol r_1,\boldsymbol r_2,\boldsymbol r_3$。式\eqref{eq:six-three-cofactor-vectors}已经给出三支叉乘 $\boldsymbol c_1,\boldsymbol c_2,\boldsymbol c_3$：例如 $\boldsymbol c_1=\boldsymbol r_2\times\boldsymbol r_3$。它的长度等于第2、3行张成的底面积，方向由右手定则决定。它\emph{不必}与第1行垂直；恰恰是第1行沿这个法向的带符号高度，使点积读出体积。
+记 $M$ 的列为 $\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_n$。它们是各个输入标准基的像；对输出作一次点积评分，相当于第3.5.1节所说的评价反向传递。假设待构造矩阵 $\overline M$ 的第 $i$ 行为 $\boldsymbol r_i^{\mathrm T}$，则
+\begin{equation*}
+ (\overline M M)_{ij}=\boldsymbol r_i\cdot\boldsymbol\alpha_j.
+\end{equation*}
+这里必须是\textbf{评分行向量在左、原矩阵的列向量在右}。要让乘积成为对角矩阵，$\boldsymbol r_i$ 就得垂直于除 $\boldsymbol\alpha_i$ 之外的所有列；与 $\boldsymbol\alpha_i$ 的点积则留下一个共同的非零读数。若这个读数先取总体积 $\det(M)$，最后再除以体积，就能把它调成1。
 
-\DetFigure{蓝色两行张成底面，绿色叉乘 $\boldsymbol c_1=\boldsymbol r_2\times\boldsymbol r_3$ 垂直于它们，长度等于底面积。红色第1行一般斜向穿出底面，与绿色法向量的点积为 $\det(A)$。这支法向量属于“其余两行的正交补”，不是第1行本身的垂直方向。}{fig:six-cofactor-normal}{%
+这段推导采用 R. Shankar《Principles of Quantum Mechanics（量子力学原理）》第二版附录A.1（第655--657页）行向量构造法的\textbf{列向量等价形式}。\cite{shankar-matrix-geometry}原法为每一行寻找其余行的法向量，再把法向量按列放置；这里从本章一直使用的“列向量张开平行体”出发，为每一列寻找其余列的法向量，再把法向量按行放置。两种排列构造的是同一个伴随矩阵。下文用 $\overline M$ 记这份矩阵，$I$ 表示前文的单位矩阵 $E_n$；上横线在这里不表示复共轭。
+
+\DetHead{一、三维突围：用叉乘造出需要的评分方向}
+在三维里，怎样找到一支同时垂直于另外两条边的箭头？6.1节的叉乘正好解决这个问题。设三阶方阵的三列为
+\begin{equation*}
+ M=\DetMat{ccc}{\alpha_1&\beta_1&\gamma_1\\
+ \alpha_2&\beta_2&\gamma_2\\\alpha_3&\beta_3&\gamma_3}
+ =(\boldsymbol\alpha\ \boldsymbol\beta\ \boldsymbol\gamma).
+\end{equation*}
+先留下第1列 $\boldsymbol\alpha$，让另两列 $\boldsymbol\beta,\boldsymbol\gamma$ 张成底面。我们需要的正交补向量属于\emph{这个底面的正交补}，并不要求垂直于 $\boldsymbol\alpha$。于是构造
+\begin{equation*}
+ \boldsymbol\alpha_R=\boldsymbol\beta\times\boldsymbol\gamma,\qquad
+ \boldsymbol\beta_R=\boldsymbol\gamma\times\boldsymbol\alpha,\qquad
+ \boldsymbol\gamma_R=\boldsymbol\alpha\times\boldsymbol\beta.
+\end{equation*}
+循环排列保证三支箭头使用同一体积定向，而不是随意选择叉乘次序。
+
+\DetFigure{蓝色两列 $\boldsymbol\beta,\boldsymbol\gamma$ 张成底面，绿色 $\boldsymbol\alpha_R=\boldsymbol\beta\times\boldsymbol\gamma$ 垂直于它们，长度等于底面积。红色 $\boldsymbol\alpha$ 把底面推成平行六面体，它与绿色法向量的点积读出总体积。法向量垂直的是其余两列，不能误读成它与红色边也垂直。}{fig:six-cofactor-normal}{%
 \begin{tikzpicture}[font=\small]
  \draw[step=.5cm,DetGray!9,very thin] (-1.2,-.7) grid (12.4,5.1);
- \begin{scope}[shift={(1.8,1.4)},x={(.9cm,-.52cm)},y={(-.9cm,-.52cm)},z={(0cm,1.04cm)}]
-  \filldraw[fill=DetBlue!8,draw=DetBlue!50] (0,0,0)--(1.8,0,0)--(1.8,1.4,0)--(0,1.4,0)--cycle;
-  \draw[detblue] (0,0,0)--(1.8,0,0) node[below right] {$\boldsymbol r_2$};
-  \draw[detblue] (0,0,0)--(0,1.4,0) node[left] {$\boldsymbol r_3$};
-  \draw[detgreen] (0,0,0)--(0,0,2.52) node[above] {$\boldsymbol c_1$};
-  \draw[detrose] (0,0,0)--(.7,.3,1.1) node[right] {$\boldsymbol r_1$};
-  \draw[detguide] (.7,.3,1.1)--(.7,.3,0);
+ \begin{scope}[shift={(1.6,1.5)},x={(.9cm,-.52cm)},y={(-.9cm,-.52cm)},z={(0cm,1.04cm)}]
+  \filldraw[fill=DetBlue!9,draw=DetBlue!55] (0,0,0)--(1.8,0,0)--(1.8,1.4,0)--(0,1.4,0)--cycle;
+  \fill[DetRose!5] (0,1.4,0)--(1.8,1.4,0)--(2.4,1.7,1.2)--(.6,1.7,1.2)--cycle;
+  \fill[DetRose!7] (1.8,0,0)--(1.8,1.4,0)--(2.4,1.7,1.2)--(2.4,.3,1.2)--cycle;
+  \draw[detguide] (.6,.3,1.2)--(2.4,.3,1.2)--(2.4,1.7,1.2)--(.6,1.7,1.2)--cycle;
+  \draw[detguide] (1.8,0,0)--(2.4,.3,1.2);
+  \draw[detguide] (1.8,1.4,0)--(2.4,1.7,1.2);
+  \draw[detguide] (0,1.4,0)--(.6,1.7,1.2);
+  \draw[detblue] (0,0,0)--(1.8,0,0) node[below right] {$\boldsymbol\beta$};
+  \draw[detblue] (0,0,0)--(0,1.4,0) node[left] {$\boldsymbol\gamma$};
+  \draw[detgreen] (0,0,0)--(0,0,2.52) node[above] {$\boldsymbol\alpha_R$};
+  \draw[detrose] (0,0,0)--(.6,.3,1.2) node[above right] {$\boldsymbol\alpha$};
   \draw[DetGreen] (0,.22,0)--(0,.22,.22)--(0,0,.22);
  \end{scope}
- \node[anchor=west,align=left] at (5.2,3.5)
-  {$\boldsymbol r_2\cdot\boldsymbol c_1=0$\\[5pt]
-   $\boldsymbol r_3\cdot\boldsymbol c_1=0$\\[9pt]
-   $\boldsymbol r_1\cdot\boldsymbol c_1=\det(A)$};
- \node[anchor=west,align=left,font=\footnotesize,text=DetGray] at (5.2,1.1)
-  {绿色箭头：底面积与法向\\[4pt]红色箭头：留下来读高度的边};
+ \node[anchor=west,align=left] at (5.1,3.6)
+  {$\boldsymbol\beta\cdot\boldsymbol\alpha_R=0$\\[5pt]
+   $\boldsymbol\gamma\cdot\boldsymbol\alpha_R=0$\\[9pt]
+   $\boldsymbol\alpha\cdot\boldsymbol\alpha_R=\det(M)$};
+ \node[anchor=west,align=left,font=\footnotesize,text=DetGray] at (5.1,1.15)
+  {所需方向：屏蔽其余两列\\[4pt]所需读数：保留对应列的有向体积};
 \end{tikzpicture}}
 
-同样构造另外两支法向量，就得到统一关系
+先检查它是否满足刚才提出的需求。叉乘天然垂直于参与构造的两列，所以
 \begin{equation*}
- \boldsymbol r_k\cdot\boldsymbol c_i=
- \begin{cases}\det(A),&k=i,\\0,&k\ne i.\end{cases}
+ \boldsymbol\beta\cdot\boldsymbol\alpha_R=0,\qquad
+ \boldsymbol\gamma\cdot\boldsymbol\alpha_R=0.
 \end{equation*}
-同位置读出体积，别的位置读出0。它正好符合“行点列”产生对角矩阵的要求。
+对另外两支正交补同样检查，就有 $\boldsymbol\alpha\cdot\boldsymbol\beta_R=0$、$\boldsymbol\alpha\cdot\boldsymbol\gamma_R=0$，其余异位置的点积也全为0。各自对应的位置则由混合积给出
+\begin{equation*}
+ \boldsymbol\alpha\cdot\boldsymbol\alpha_R
+ =\boldsymbol\alpha\cdot(\boldsymbol\beta\times\boldsymbol\gamma)
+ =\det(M),\qquad
+ \boldsymbol\beta\cdot\boldsymbol\beta_R
+ =\boldsymbol\gamma\cdot\boldsymbol\gamma_R=\det(M).
+\end{equation*}
+这正是“底面积乘带符号高度”。同位置读出体积，异位置读出0；当体积本身为0时，同位置的读数也为0。
 
-\DetHead{把法向量放在哪里：矩阵乘法决定排列方式}
-想让第 $i$ 行与自己的法向量相遇，就必须把 $\boldsymbol c_i$ 放在右侧矩阵的第 $i$ \emph{列}。按列放好，主对角线上每个点积都是 $\det(A)$，其余位置都为0。现在才给这份数表命名。
+\DetFigure{左栏是三列张开的斜平行六面体，中栏取蓝色底面的叉乘，得到绿色法向量。右栏把法向量转成评分行，与原矩阵的三列分别相遇，只在自己的位置读出体积。构造的目标是 $\overline M M=\det(M)I$；要垂直于的是其余列，而不是所有列。}{fig:six-adjugate-construction-reasoning}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.4,-.8) grid (13.8,4.2);
+ \node at (1.65,3.75) {目标：把三列区分开};
+ \node at (6.3,3.75) {工具：底面的法向量};
+ \node at (11.35,3.75) {检验：只亮自己的位置};
+ \begin{scope}[shift={(1.55,1.05)},x={(.68cm,-.393cm)},y={(-.68cm,-.393cm)},z={(0cm,.786cm)}]
+  \fill[DetBlue!10] (0,0,0)--(1.8,0,0)--(1.8,1.4,0)--(0,1.4,0)--cycle;
+  \draw[detguide] (.6,.3,1.2)--(2.4,.3,1.2)--(2.4,1.7,1.2)--(.6,1.7,1.2)--cycle;
+  \draw[detguide] (1.8,0,0)--(2.4,.3,1.2);
+  \draw[detguide] (0,1.4,0)--(.6,1.7,1.2);
+  \draw[detguide] (1.8,1.4,0)--(2.4,1.7,1.2);
+  \draw[detblue] (0,0,0)--(1.8,0,0) node[right] {$\boldsymbol\beta$};
+  \draw[detblue] (0,0,0)--(0,1.4,0) node[left] {$\boldsymbol\gamma$};
+  \draw[detrose] (0,0,0)--(.6,.3,1.2) node[above right] {$\boldsymbol\alpha$};
+ \end{scope}
+ \begin{scope}[shift={(6.25,1.05)},x={(.68cm,-.393cm)},y={(-.68cm,-.393cm)},z={(0cm,.786cm)}]
+  \filldraw[fill=DetBlue!10,draw=DetBlue!45] (0,0,0)--(1.8,0,0)--(1.8,1.4,0)--(0,1.4,0)--cycle;
+  \draw[detblue] (0,0,0)--(1.8,0,0);
+  \draw[detblue] (0,0,0)--(0,1.4,0);
+  \draw[detgreen] (0,0,0)--(0,0,2.52) node[above] {$\boldsymbol\beta\times\boldsymbol\gamma$};
+  \draw[DetGreen] (0,.22,0)--(0,.22,.22)--(0,0,.22);
+ \end{scope}
+ \draw[detaxis] (3.3,1.5)--(4.2,1.5);
+ \draw[detaxis] (8,1.5)--(8.85,1.5);
+ \foreach \xx/\lab/\val/\fc in {9.45/{\boldsymbol\alpha}/{\det(M)}/{DetRose!12},10.95/{\boldsymbol\beta}/{0}/{DetGreen!7},12.45/{\boldsymbol\gamma}/{0}/{DetGreen!7}} {
+  \node at (\xx,2.7) {$\lab$};
+  \draw[DetGray!40,fill=\fc] (\xx-.7,1.3) rectangle (\xx+.7,2.15);
+  \node at (\xx,1.725) {$\val$};
+ }
+ \node[font=\footnotesize] at (11, .75) {评分行 $\boldsymbol\alpha_R^{\mathrm T}$};
+ \node[font=\footnotesize,text=DetGray] at (1.6,-.35) {保留一列，留下另外两列作底面};
+ \node[font=\footnotesize,text=DetGray] at (6.3,-.35) {垂直底面，保存底面积};
+\end{tikzpicture}}
+
+\Needspace{8\baselineskip}
+\DetHead{自然构造：列的法向量为什么要按行排列？}
+我们已找到三个评分器。要让第1个评分器与 $M$ 的第1列相遇，就把它放在左侧矩阵的第1行；另两支同理。于是把 $\boldsymbol\alpha_R,\boldsymbol\beta_R,\boldsymbol\gamma_R$ 转成行向量，得到
+\begin{equation*}
+ \overline M=\begin{pmatrix}
+ \boldsymbol\alpha_R^{\mathrm T}\\
+ \boldsymbol\beta_R^{\mathrm T}\\
+ \boldsymbol\gamma_R^{\mathrm T}
+ \end{pmatrix}.
+\end{equation*}
+这一排列不是为了凑一个“转置口诀”，而是为了让矩阵乘法恰好计算需要的点积。由6.3.2节的投影面积解释，$\boldsymbol\alpha_R$ 的三个分量就是第1列的代数余子式；另两支分别对应第2、3列。所以这份矩阵已经有一个通用的代数名称。
 
 \begin{definition}[伴随矩阵]
-把每一行的代数余子式向量\textbf{按列排列}，得到矩阵
+设 $A_{ij}$ 表示矩阵 $M$ 的第 $i$ 行第 $j$ 列的代数余子式。将第 $j$ 列的代数余子式向量转成第 $j$ 行，得到
 \begin{equation}
- \operatorname{adj}(A)
- =(\boldsymbol c_1\ \cdots\ \boldsymbol c_n)
- =\DetMat{cccc}{
- A_{11}&A_{21}&\cdots&A_{n1}\\
+ \overline M=\operatorname{adj}(M)
+ =\DetMat{cccc}{A_{11}&A_{21}&\cdots&A_{n1}\\
  A_{12}&A_{22}&\cdots&A_{n2}\\
  \vdots&\vdots&\ddots&\vdots\\
  A_{1n}&A_{2n}&\cdots&A_{nn}},
  \label{eq:six-adjugate-definition}
 \end{equation}
-称为 $A$ 的\term{adjugate-matrix}。它是代数余子式数表的转置，不是原矩阵 $A$ 的转置。
+称为 $M$ 的\term{adjugate-matrix}，即代数余子式数表的转置。它不是原矩阵 $M$ 的转置；这里的 $A_{ij}$ 是代数余子式记号，不是另一矩阵的元素。
 \end{definition}
 
-“为什么要转置”至此有了构造上的回答：行的法向量必须按列参与矩阵乘法。若仍把它们按行摆放，刚才的点积关系就接不上。为了不与矩阵本身的转置混淆，本书只用 $\operatorname{adj}(A)$ 表示这份数表。
-
-\DetFigure{左侧三行分别留下自己的位置，取另外两行的叉乘，得到中间的三支绿色法向量。右侧把它们放成伴随矩阵的三列，各列颜色和来源一一对应。这是 Shankar 的叉乘构造思路在本讲义记号下的呈现；转置排列来自行点列的运算要求。}{fig:six-adjugate-column-construction}{%
+\DetFigure{左侧竖条是 $M$ 的三列，中间用其余两列构造各自的正交补向量，右侧把这些向量转成伴随矩阵的三行。每一行负责对原矩阵的一列读出体积，同时对其余列读出0。Shankar 的原法从行出发、把法向量放成列；这里交换观察侧，排列方向随之反转。}{fig:six-adjugate-column-construction}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
- \draw[step=.5cm,DetGray!9,very thin] (-.4,-.9) grid (14,3.9);
- \node at (1.3,3.45) {原矩阵的行};\node at (6.1,3.45) {由其余行构造};
- \node at (11.4,3.45) {$\operatorname{adj}(A)$ 的列};
- \foreach \yy/\ii/\expr in {2.6/1/{\boldsymbol r_2\times\boldsymbol r_3},1.5/2/{\boldsymbol r_3\times\boldsymbol r_1},.4/3/{\boldsymbol r_1\times\boldsymbol r_2}} {
-  \node[draw=DetRose!55,fill=DetRose!5,minimum width=2.1cm,minimum height=.65cm] at (1.3,\yy) {第 $\ii$ 行 $\boldsymbol r_{\ii}$};
-  \node[draw=DetGreen!60,fill=DetGreen!6,minimum width=3.1cm,minimum height=.65cm] at (6.1,\yy) {$\boldsymbol c_{\ii}=\expr$};
-  \draw[detgreen] (2.6,\yy)--(4.35,\yy);
+ \draw[step=.5cm,DetGray!9,very thin] (-.4,-.8) grid (13.8,4.15);
+ \node at (1.3,3.7) {$M$ 的列};
+ \node at (6.1,3.7) {由其余两列构造};
+ \node at (11.55,3.7) {$\overline M$ 的行};
+ \foreach \xx/\lab in {.4/{\alpha},1.3/{\beta},2.2/{\gamma}} {
+  \draw[DetBlue!60,fill=DetBlue!7] (\xx-.36,.15) rectangle (\xx+.36,2.95);
+  \node at (\xx,1.55) {$\boldsymbol\lab$};
  }
- \foreach \xx/\ii in {10/1,11.3/2,12.6/3} {
-  \draw[DetGreen!60,fill=DetGreen!7] (\xx-.45,.1) rectangle (\xx+.45,2.9);
-  \node at (\xx,1.6) {$\boldsymbol c_{\ii}$};
-  \node[font=\scriptsize] at (\xx,-.3) {第 $\ii$ 列};
+ \foreach \yy/\lab/\expr in {2.65/{\alpha}/{\boldsymbol\beta\times\boldsymbol\gamma},1.55/{\beta}/{\boldsymbol\gamma\times\boldsymbol\alpha},.45/{\gamma}/{\boldsymbol\alpha\times\boldsymbol\beta}} {
+  \node[draw=DetGreen!60,fill=DetGreen!6,minimum width=3.5cm,minimum height=.68cm] at (6.1,\yy) {$\boldsymbol\lab_R=\expr$};
+  \node[draw=DetGreen!60,fill=DetGreen!6,minimum width=2.8cm,minimum height=.68cm] at (11.5,\yy) {$\boldsymbol\lab_R^{\mathrm T}$};
+  \draw[detgreen] (8.05,\yy)--(9.95,\yy);
  }
- \draw[detblue] (7.85,2.6)--(9.55,2.6);
- \draw[detblue] (7.85,1.5)--(9.1,1.5)--(9.1,3.08)--(11.3,3.08)--(11.3,2.9);
- \draw[detblue] (7.85,.4)--(9.1,.4)--(9.1,-.65)--(12.6,-.65)--(12.6,.1);
+ \draw[detblue] (2.8,1.55)--(4.05,1.55);
+ \node[font=\footnotesize,text=DetGray] at (11.5,-.4) {正交补按行排列};
 \end{tikzpicture}}
+
+\DetHead{结论落地：体积读数调成1，就得到逆矩阵}
+先把三维的点积关系写成矩阵乘积。乘法方向必须沿着刚才的评分路径：
+\begin{equation*}
+ \overline M M=
+ \DetMat{ccc}{
+ \boldsymbol\alpha_R\cdot\boldsymbol\alpha&\boldsymbol\alpha_R\cdot\boldsymbol\beta&\boldsymbol\alpha_R\cdot\boldsymbol\gamma\\
+ \boldsymbol\beta_R\cdot\boldsymbol\alpha&\boldsymbol\beta_R\cdot\boldsymbol\beta&\boldsymbol\beta_R\cdot\boldsymbol\gamma\\
+ \boldsymbol\gamma_R\cdot\boldsymbol\alpha&\boldsymbol\gamma_R\cdot\boldsymbol\beta&\boldsymbol\gamma_R\cdot\boldsymbol\gamma}
+ =\det(M)I.
+\end{equation*}
+非对角元由正交性变成0，对角元由混合积变成同一体积。下面的结论把这幅图景推广到任意阶，同时说明另一侧的乘积也成立。
 
 \begin{theorem}[伴随矩阵恒等式与逆矩阵公式]
 任意 $n$ 阶方阵都满足
 \begin{equation}
- A\operatorname{adj}(A)=\operatorname{adj}(A)A=\det(A)E_n.
+ M\overline M=\overline M M=\det(M)I.
  \label{eq:six-adjugate-identity}
 \end{equation}
-当且仅当 $\det(A)\ne0$ 时矩阵可逆，并有
+当且仅当 $\det(M)\ne0$ 时矩阵可逆，并有
 \begin{equation}
- A^{-1}=\frac{1}{\det(A)}\operatorname{adj}(A).
+ M^{-1}=\frac{\overline M}{\det(M)}.
  \label{eq:six-adjugate-inverse}
 \end{equation}
-先用底面法向量隔开各行，再用总体积把同位置的读数调整为1，就得到逆矩阵的各列。
+先用法向评分器区分各列，再把共同的体积读数调成1，就构造出了逆矩阵。
 \end{theorem}
 
-\DetFigure{左边每行与右边每列组成一个点积：同位置的红色读数为 $\det(A)$，其余绿色读数为0。因此乘积只在主对角线留下体积。三阶图示对应式\eqref{eq:six-adjugate-identity}，任意阶的证明使用完全相同的行列对应。}{fig:six-adjugate-product-diagonal}{%
+\DetFigure{左侧绿色行是列的法向评分器，右侧蓝色列是原矩阵的各输入基像。行点列后，同位置的红色读数为 $\det(M)$，其余绿色读数为0，所以 $\overline M M$ 成为对角矩阵。这张图解释的是先构造出来的左乘恒等式；$M\overline M$ 的恒等式还需下文的行展开验证。}{fig:six-adjugate-product-diagonal}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
  \draw[step=.5cm,DetGray!9,very thin] (-.5,-.8) grid (14.4,3.65);
- \node at (1,3.15) {$A$：行向量};\node at (5.25,3.15) {$\operatorname{adj}(A)$：列向量};
- \foreach \yy/\ii in {2.2/1,1.35/2,.5/3} {
-  \node[draw=DetBlue!60,fill=DetBlue!6,minimum width=2.1cm,minimum height=.68cm] at (1,\yy) {$\boldsymbol r_{\ii}^{\mathrm T}$};
+ \node at (1,3.15) {$\overline M$：评分行};\node at (5.25,3.15) {$M$：原列};
+ \foreach \yy/\lab in {2.2/{\alpha},1.35/{\beta},.5/{\gamma}} {
+  \node[draw=DetGreen!60,fill=DetGreen!6,minimum width=2.1cm,minimum height=.68cm] at (1,\yy) {$\boldsymbol\lab_R^{\mathrm T}$};
  }
  \node at (2.8,1.35) {$\times$};
- \foreach \xx/\ii in {4.25/1,5.25/2,6.25/3} {
-  \draw[DetGreen!55,fill=DetGreen!7] (\xx-.4,.1) rectangle (\xx+.4,2.65);
-  \node at (\xx,1.35) {$\boldsymbol c_{\ii}$};
+ \foreach \xx/\lab in {4.25/{\alpha},5.25/{\beta},6.25/{\gamma}} {
+  \draw[DetBlue!55,fill=DetBlue!7] (\xx-.4,.1) rectangle (\xx+.4,2.65);
+  \node at (\xx,1.35) {$\boldsymbol\lab$};
  }
  \node at (7.45,1.35) {$=$};
  \foreach \i in {1,2,3} {\foreach \j in {1,2,3} {
-  \ifnum\i=\j \def\fc{DetRose!12}\def\val{$\det(A)$}\else\def\fc{DetGreen!6}\def\val{$0$}\fi
+  \ifnum\i=\j \def\fc{DetRose!12}\def\val{$\det(M)$}\else\def\fc{DetGreen!6}\def\val{$0$}\fi
   \draw[DetGray!35,fill=\fc] (8.45+\j*1.28-1.28,2.85-\i*.85) rectangle ++(1.28,.85);
   \node[font=\footnotesize] at (8.45+\j*1.28-.64,3.275-\i*.85) {\val};
  }}
- \node[anchor=west,font=\footnotesize,text=DetGray] at (8.45,-.4) {同位置读体积，其余位置读0};
+ \node[anchor=west,font=\footnotesize,text=DetGray] at (8.45,-.4) {自己的列读体积，其余列读0};
 \end{tikzpicture}}
 
 \begin{proof}
-对第 $i$ 列逐一看：$A\boldsymbol c_i$ 的各分量，就是各行与 $\boldsymbol c_i$ 的点积。第 $i$ 行由拉普拉斯展开给出行列式，其余行由式\eqref{eq:six-cofactor-orthogonality}给出0，即
+在三维里，上面的叉乘已经完成左乘验证。任意阶用代数余子式表达同一过程：$\overline M$ 的第 $i$ 行是第 $i$ 列的代数余子式，故与 $M$ 的第 $k$ 列点乘时，
 \begin{equation}
- \sum_{j=1}^n a_{kj}A_{ij}
- =\begin{cases}\det(A),&k=i,\\0,&k\ne i.\end{cases}
+ (\overline M M)_{ik}=\sum_{j=1}^n A_{ji}m_{jk}
+ =\begin{cases}\det(M),&k=i,\\0,&k\ne i.\end{cases}
 \end{equation}
-于是 $A\boldsymbol c_i=\det(A)\mathbf e_i$，把所有列合起来便是左乘恒等式。
+$k=i$ 时，这是按第 $i$ 列的拉普拉斯展开；$k\ne i$ 时，把第 $i$ 列换成第 $k$ 列，原第 $i$ 列的代数余子式不变，展开后得到两列相同的行列式，因而为0。合起来便有 $\overline M M=\det(M)I$。
 
-右乘也须核对，而不能仅凭箭头方向猜测。$\operatorname{adj}(A)A$ 的第 $i$ 行第 $k$ 列为 $\sum_j A_{ji}a_{jk}$；$i=k$ 时是按第 $i$ 列展开，$i\ne k$ 时则是把第 $i$ 列替换成第 $k$ 列后的展开，有两列相同，所以为0。这就得到右乘恒等式。
+\Needspace{8\baselineskip}
+另一侧也要验证，而不能把列向量点积误认成 $M\overline M$ 的元素。后者第 $k$ 行第 $i$ 列为
+\begin{equation*}
+ (M\overline M)_{ki}=\sum_{j=1}^n m_{kj}A_{ij}.
+\end{equation*}
+$k=i$ 时按第 $i$ 行展开，$k\ne i$ 时把第 $i$ 行换成第 $k$ 行，有两行相同，结果为0。于是 $M\overline M=\det(M)I$；两个恒等式对行列式为0的矩阵也成立。
 
-若 $\det(A)\ne0$，两边同时除以它，左右乘积都成为 $E_n$，故所构造的矩阵就是逆矩阵。若 $\det(A)=0$，第6.2节的可逆性判据已经排除逆矩阵，不能使用有零分母的公式。
+若 $\det(M)\ne0$，同时除以它，左右乘积都成为 $I$，所以 $\overline M/\det(M)$ 就是逆矩阵。若 $\det(M)=0$，6.2节的可逆性判据说明逆矩阵不存在，不能使用有零分母的公式。
 \end{proof}
 
-这里的归一化不是把各列变成单位长度，而是把\textbf{对应行的点积读数变成1}。总体积为0时，行向量不能独立张开完整空间，输入信息丢失；伴随矩阵仍有定义，但不能用它恢复全部输入。若恰有 $n-1$ 行独立，一些法向量还可能非零，所以也不能从 $\det(A)=0$ 推出伴随矩阵必为零。
-
-\DetHead{任意维怎样定向：广义叉乘给出同一构造}
-第6.1节已经从底面体积与定向定义了\term{generalized-cross-product}。现在可以把这支法向量算出来。对 $n-1$ 个有序向量 $\boldsymbol v_1,\ldots,\boldsymbol v_{n-1}$，把它们的坐标按行放好，最后一行放标准基，作形式展开：
+这也回答了开篇的计算问题。将 $M\boldsymbol x=\boldsymbol y$ 左乘评分矩阵，得到
 \begin{equation*}
- \boldsymbol N=
+ \boldsymbol x=\frac{\overline M\boldsymbol y}{\det(M)}.
+\end{equation*}
+它的第 $i$ 行对输出作一次点积，就读回输入的第 $i$ 个坐标。这里除以总体积，调成1的是\textbf{对应列的点积读数}，并不是把法向量变成单位长度。
+
+\DetHead{二、任意维：把几何需求写成显式坐标构造}
+三维由叉乘完成了任务，四维、五维怎么办？6.1节已经给出了广义叉乘的几何角色：$n-1$ 条边确定一支法向量，保存底面的大小与定向。现在需要把它写成能计算的分量。我们沿用 Shankar 的形式记号，但把定向位置说明白。
+
+给定 $n-1$ 个 $n$ 维列向量 $\boldsymbol v_1,\ldots,\boldsymbol v_{n-1}$，把它们的坐标\emph{按行}放入下面的数表，第一行放标准基，定义
+\begin{equation*}
+ G(\boldsymbol v_1,\ldots,\boldsymbol v_{n-1})=
  \begin{vmatrix}
- v_{11}&\cdots&v_{1n}\\
- \vdots&&\vdots\\
- v_{n-1,1}&\cdots&v_{n-1,n}\\
- \mathbf e_1&\cdots&\mathbf e_n
+ \vec e_1&\vec e_2&\cdots&\vec e_n\\
+ v_{11}&v_{12}&\cdots&v_{1n}\\
+ \vdots&\vdots&&\vdots\\
+ v_{n-1,1}&v_{n-1,2}&\cdots&v_{n-1,n}
  \end{vmatrix}
- :=\sum_{\ell=1}^n(-1)^{n+\ell}
- \det(V_{\widehat\ell})\mathbf e_\ell.
+ :=\sum_{\ell=1}^n(-1)^{1+\ell}\det(V_{\widehat\ell})\vec e_\ell.
 \end{equation*}
-这里 $V_{\widehat\ell}$ 是删去第 $\ell$ 个坐标后的 $(n-1)$ 阶方阵。左侧含向量的一行只是右侧分量公式的简记，不是把原来的实数值行列式定义改成了向量值运算。
+这是\term{formal-determinant}：含标准基的一行是右侧分量公式的简记，不是普通的实数值行列式。$V_{\widehat\ell}$ 表示删去第 $\ell$ 个坐标后的 $(n-1)$ 阶方阵；因此第 $\ell$ 个分量就是 $(-1)^{1+\ell}\det(V_{\widehat\ell})$。它完全可以写成分量多项式，只是这种记号能一次看清所有分量的来源。
 
-对任意 $\boldsymbol w$，最后一行展开给出 $\boldsymbol N\cdot\boldsymbol w=\det(\boldsymbol v_1,\ldots,\boldsymbol v_{n-1},\boldsymbol w)$。取 $\boldsymbol w=\boldsymbol v_k$，重复行使读数为0，故 $\boldsymbol N$ 与所有底面向量正交。底面独立时，它的长度等于底面体积，方向使“底面有序边、最后接法向量”为正向，与6.1节的定义一致；底面相关时，它为零。
-
-对第 $i$ 行，按\emph{原次序}留下其余行，构造 $\boldsymbol N_i$。将第 $i$ 行移到末尾需要 $n-i$ 次交换，所以必须取
+为什么这些分量恰好满足几何需求？与任意 $\boldsymbol w$ 点乘，相当于把第一行的标准基换成 $\boldsymbol w$ 的坐标：
 \begin{equation*}
- \boldsymbol c_i=(-1)^{n-i}\boldsymbol N_i,
- \qquad \boldsymbol r_i\cdot\boldsymbol c_i=\det(A).
+ G(\boldsymbol v_1,\ldots,\boldsymbol v_{n-1})\cdot\boldsymbol w
+ =\det\begin{pmatrix}\boldsymbol w^{\mathrm T}\\
+ \boldsymbol v_1^{\mathrm T}\\\vdots\\\boldsymbol v_{n-1}^{\mathrm T}\end{pmatrix}.
 \end{equation*}
-这个位置符号保证任意维都对。三维时恰好得到前面的循环叉乘；一般维数不能只照抄循环次序而省略符号。例如二维第1行对应的是其余行的\emph{顺时针}垂直向量，第2行对应的才是逆时针向量。把这些 $\boldsymbol c_i$ 按列排好，就再次得到同一个 $n$ 阶伴随矩阵。
+若 $\boldsymbol w$ 是底面中的任一向量，出现两行相同，点积便为0。因此 $G$ 与全部底面向量正交。它的长度仍是底面体积，相关时为零；但\textbf{标准基放第一行与放最后一行有定向差别}。从首行移到末行要交换 $n-1$ 次，所以这里的 $G=(-1)^{n-1}\boldsymbol N$，其中 $\boldsymbol N$ 是6.1节“底面之后接法向量”的约定。三维两者相同，二维与四维则相反。
 
-\begin{note}
-本节讨论实数矩阵，这些箭头是真正的实坐标向量，点积就是第0章的分量相乘求和。Shankar 的书还讨论复数矩阵；若仅把上述数表公式用于复数，须注意：这里的点积只是形式化的分量相乘求和，并非复向量空间中的共轭内积；这些“向量”是辅助记忆的虚构对象，仅用于以更直观的方式表示矩阵乘法和行列式公式。实数图形中的垂直与体积解释，不能原样搬到复数情形。本节不展开那部分理论。
-\end{note}
+\DetHead{每一列的正交补：位置符号把定向接回原矩阵}
+要为第 $j$ 列造评分器，先按原次序留下其余列，再定义
+\begin{equation*}
+ \boldsymbol\alpha_{jR}=(-1)^{j-1}
+ G(\boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_{j-1},
+ \boldsymbol\alpha_{j+1},\ldots,\boldsymbol\alpha_n).
+\end{equation*}
+因为 $G$ 的点积把待评分向量放在第一位置，将原第 $j$ 列移到这里要交换 $j-1$ 次，前面的符号恰好抵消定向变化。于是对所有列都有
+\begin{equation*}
+ \boldsymbol\alpha_{jR}\cdot\boldsymbol\alpha_k
+ =\begin{cases}\det(M),&k=j,\\0,&k\ne j.\end{cases}
+\end{equation*}
+同位置恢复原来的总体积，异位置出现重复向量，读数为0。这样就完成了任意维的几何构造。
 
-\DetHead{二维验证：两次垂直旋转，符号各有方向}
-令 $J(a,b)^{\mathrm T}=(-b,a)^{\mathrm T}$，它是6.1节的逆时针 $90^\circ$ 旋转。对 $A=\DetMat{cc}{a&b\\c&d}$，行坐标为 $\boldsymbol r_1=(a,b)^{\mathrm T}$、$\boldsymbol r_2=(c,d)^{\mathrm T}$。前面的定向规则要求 $\boldsymbol c_1=-J\boldsymbol r_2$，$\boldsymbol c_2=J\boldsymbol r_1$，因此
-\begin{equation}
- \boldsymbol c_1=(d,-c)^{\mathrm T},\qquad
- \boldsymbol c_2=(-b,a)^{\mathrm T},\qquad
- \operatorname{adj}(A)=\DetMat{rr}{d&-b\\-c&a}.
-\end{equation}
-第一列垂直于第2行，第二列垂直于第1行；各自与对应行的点积都是 $ad-bc$。一顺一逆的旋转保证了同一有向面积，除以它就得到标准二阶逆矩阵。
+三维时可以简写成循环叉乘；一般维数若也用循环次序，就必须写成
+\begin{equation*}
+ \boldsymbol\alpha_{jR}=(-1)^{(n-1)(j-1)}
+ G(\boldsymbol\alpha_{j+1},\ldots,\boldsymbol\alpha_n,
+ \boldsymbol\alpha_1,\ldots,\boldsymbol\alpha_{j-1}).
+\end{equation*}
+奇数维的这个符号全为正，偶数维则随位置交替。$G$ 接收的是全部 $n-1$ 个向量，不能把它误读成依次进行普通的双向量叉乘。
 
-\DetFigure{红色箭头为矩阵 $A=\left(\begin{smallmatrix}2&1\\1&3\end{smallmatrix}\right)$ 的两行，蓝色箭头为伴随矩阵的两列。第2行顺时针转 $90^\circ$ 得到第1列，第1行逆时针转 $90^\circ$ 得到第2列；两种方向不可混用。各列与对应行的点积都为5，除以5后满足 $A(\boldsymbol c_i/5)=\mathbf e_i$。}{fig:six-adjugate-perpendicular}{%
+再检查它与代数余子式是否对上。删去第 $j$ 条边、再删去第 $i$ 个坐标，留下的低维数表是余子式 $M_{ij}$ 对应矩阵的转置，6.2节保证两者行列式相等。因此
+\begin{equation*}
+ (\boldsymbol\alpha_{jR})_i
+ =(-1)^{j-1}(-1)^{1+i}M_{ij}
+ =(-1)^{i+j}M_{ij}=A_{ij}.
+\end{equation*}
+第 $j$ 列的法向量，果然由第 $j$ 列的代数余子式组成；转成第 $j$ 行，就是式\eqref{eq:six-adjugate-definition}的 $\overline M$。\textbf{转置排列来自评分行与被评分列的相遇，不是额外规定。}
+
+\DetFigure{上栏在三维里由两条边生成一支法向量，下栏用四维的形式数表说明同一个构造。三个四维向量张成三维底面，删去一个坐标便留下一个三阶行列式，四个这样的体积读数组成法向量。右侧特别标出首行展开的符号；高维图是坐标构造示意，不是假装能画出四维箭头。}{fig:six-generalized-cross-construction}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
- \draw[step=.5cm,DetGray!9,very thin] (-1.8,-1.7) grid (12.2,4.2);
- \draw[detaxis] (-1.6,0)--(3.9,0) node[right] {$x$};
- \draw[detaxis] (0,-1.5)--(0,3.8) node[above] {$y$};
- \draw[detrose] (0,0)--(2,1) node[right] {$\boldsymbol r_1$};
- \draw[detrose] (0,0)--(1,3) node[right] {$\boldsymbol r_2$};
- \draw[detblue] (0,0)--(3,-1) node[below right] {$\boldsymbol c_1=-J\boldsymbol r_2$};
- \draw[detblue] (0,0)--(-1,2) node[above left] {$\boldsymbol c_2=J\boldsymbol r_1$};
- \draw[detgreen] (.5367,.2683) arc[start angle=26.565,end angle=116.565,radius=.6];
- \draw[detblue] (.3004,.9012) arc[start angle=71.565,end angle=-18.435,radius=.95];
- \node[anchor=west,align=left] at (5.4,2.7)
-  {$\operatorname{adj}(A)=\DetMat{rr}{3&-1\\-1&2}$\\[9pt]
-   $\boldsymbol r_2\cdot\boldsymbol c_1=0,\quad\boldsymbol r_1\cdot\boldsymbol c_2=0$\\[9pt]
-   $\boldsymbol r_1\cdot\boldsymbol c_1=\boldsymbol r_2\cdot\boldsymbol c_2=5$};
- \node[anchor=west,font=\footnotesize,text=DetGray] at (5.4,.3) {法向量按列摆放，再把体积读数调成1。};
+ \draw[step=.5cm,DetGray!9,very thin] (-.4,-.5) grid (13.8,5.4);
+ \node[anchor=west] at (.1,4.95) {三维：两条边 $\longrightarrow$ 底面法向量};
+ \begin{scope}[shift={(1.7,3.35)},x={(.65cm,-.375cm)},y={(-.65cm,-.375cm)},z={(0cm,.75cm)}]
+  \filldraw[fill=DetBlue!10,draw=DetBlue!50] (0,0,0)--(1.5,0,0)--(1.5,1,0)--(0,1,0)--cycle;
+  \draw[detblue] (0,0,0)--(1.5,0,0);\draw[detblue] (0,0,0)--(0,1,0);
+  \draw[detgreen] (0,0,0)--(0,0,1.5) node[right] {$G(\boldsymbol v_1,\boldsymbol v_2)$};
+ \end{scope}
+ \node[anchor=west,align=left] at (6,3.95)
+  {二维底面 $\longrightarrow$ 三个二阶投影面积\\[5pt]
+   三个分量拼成底面法向量};
+ \draw[DetGray!25] (0,2.7)--(13.5,2.7);
+ \node[anchor=west] at (.1,2.35) {四维：三条边 $\longrightarrow$ 四个三阶体积读数};
+ \foreach \i in {1,2,3,4} {\foreach \j in {1,2,3,4} {
+  \ifnum\j=2 \def\fc{DetRose!14}\else\ifnum\i=1 \def\fc{DetGreen!9}\else\def\fc{DetBlue!5}\fi\fi
+  \draw[DetGray!35,fill=\fc] (.2+\j*.72-.72,1.9-\i*.42) rectangle ++(.72,.42);
+  \ifnum\i=1
+   \node[font=\scriptsize] at (.2+\j*.72-.36,2.11-\i*.42) {$\vec e_{\j}$};
+  \else
+   \pgfmathtruncatemacro{\vi}{\i-1}
+   \node[font=\scriptsize] at (.2+\j*.72-.36,2.11-\i*.42) {$v_{\vi\j}$};
+  \fi
+ }}
+ \draw[detaxis] (3.4,1)--(4.5,1);
+ \node[draw=DetRose!55,fill=DetRose!5,minimum width=2.45cm,minimum height=1.05cm,align=center] at (6.1,1)
+  {$\det(V_{\widehat2})$\\[3pt]删第2个坐标};
+ \draw[detgreen] (7.55,1)--(8.7,1);
+ \node[anchor=west,align=left] at (9,1.3)
+  {$G$ 的分量符号：$+,-,+,-$\\[5pt]
+   第 $j$ 列再乘 $(-1)^{j-1}$};
+ \node[font=\footnotesize,text=DetGray,anchor=west] at (.1,-.25)
+  {列的正交补分量为 $A_{ij}$，按行排列后，$\overline M$ 的 $(j,i)$ 元为 $A_{ij}$。};
 \end{tikzpicture}}
 
-\begin{example}[三维验证：叉乘按列排成逆矩阵]
-继续使用 $A=\DetMat{rrr}{1&2&0\\0&1&1\\2&0&1}$。由式\eqref{eq:six-three-cofactor-vectors}，三支叉乘向量为
+\DetHead{【选读】四维验一次：少一个符号，就会读出负体积}
+四维首行展开的符号为 $+,-,+,-$。若为第4列构造正交补，就要再乘 $(-1)^3=-1$，故
+\begin{equation*}
+ \boldsymbol\alpha_{4R}
+ =-G(\boldsymbol\alpha_1,\boldsymbol\alpha_2,\boldsymbol\alpha_3)
+ =(-M_{14},M_{24},-M_{34},M_{44})^{\mathrm T}
+ =(A_{14},A_{24},A_{34},A_{44})^{\mathrm T}.
+\end{equation*}
+例如取
+\begin{equation*}
+ M=\DetMat{rrrr}{1&0&0&1\\0&1&0&2\\0&0&1&3\\0&0&0&4}.
+\end{equation*}
+前三列是 $\vec e_1,\vec e_2,\vec e_3$，其形式叉乘为 $-\vec e_4$；补上位置符号，得到 $\boldsymbol\alpha_{4R}=\vec e_4$。与第4列 $(1,2,3,4)^{\mathrm T}$ 点乘，结果为4，恰好等于对角线乘积。若漏掉负号，就会错误地得到 $-4$。
+
+对照 Shankar 的行构造也一样：若第4行是 $\boldsymbol r_4^{\mathrm T}$，其法向量应为 $-G(\boldsymbol r_1,\boldsymbol r_2,\boldsymbol r_3)=(-M_{41},M_{42},-M_{43},M_{44})^{\mathrm T}$，把它放在伴随矩阵的第4列。删除一行后其余行的次序并没有自动改变，位置符号必须明确写出。
+
+\begin{note}
+这里的 $\vec e_1,\ldots,\vec e_n$ 是真正的实空间标准基向量；“形式”指它们暂时作为展开记号，不能把含向量的表格当成普通标量行列式。Shankar 讨论复数矩阵时另有提醒：
+\begin{quote}\small
+One tricky point: here $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i\beta_i$ but not $\boldsymbol\alpha\cdot\boldsymbol\beta\equiv\sum\alpha_i^*\beta_i$, for the ``vectors'' $\boldsymbol\alpha_1\cdots\boldsymbol\alpha_n$ are fictitious objects that enter a mnemonic and not the elements of $V(\mathbb C)$.
+\end{quote}
+即：这里的点积只是形式化的分量相乘求和，并非复向量空间中的共轭内积；这些“向量”是辅助记忆的虚构对象，仅用于以更直观的方式表示矩阵乘法和行列式公式。这段提醒针对复数数表的形式使用；本节实数图形中的箭头并不是虚构对象，垂直与体积也都有真实的几何含义。本节不展开复数情形。
+\end{note}
+
+\DetHead{三、二维验证：一顺一逆，把面积读数对齐}
+二维广义叉乘只接收一个向量。按本节“标准基在首行”的约定，
+\begin{equation*}
+ G(\boldsymbol v)=\begin{vmatrix}\vec e_1&\vec e_2\\v_1&v_2\end{vmatrix}
+ =v_2\vec e_1-v_1\vec e_2.
+\end{equation*}
+它把 $(v_1,v_2)^{\mathrm T}$ \textbf{顺时针}转过 $90^\circ$。6.1节采用的逆时针垂直向量则是 $-G(\boldsymbol v)$；方向差异来自标准基行的位置，不能忽略。
+
+\Needspace{10\baselineskip}
+设 $M=\DetMat{cc}{\alpha_1&\beta_1\\\alpha_2&\beta_2}$，列向量为 $\boldsymbol\alpha,\boldsymbol\beta$。为两列构造评分器，分别取 $\boldsymbol\alpha_R=G(\boldsymbol\beta)$、$\boldsymbol\beta_R=-G(\boldsymbol\alpha)$，于是
 \begin{equation}
- \boldsymbol c_1=(1,2,-2)^{\mathrm T},\qquad
- \boldsymbol c_2=(-2,1,4)^{\mathrm T},\qquad
- \boldsymbol c_3=(2,-1,1)^{\mathrm T}.
+ \boldsymbol\alpha_R=(\beta_2,-\beta_1)^{\mathrm T},\qquad
+ \boldsymbol\beta_R=(-\alpha_2,\alpha_1)^{\mathrm T},\qquad
+ \overline M=\DetMat{rr}{\beta_2&-\beta_1\\-\alpha_2&\alpha_1}.
 \end{equation}
-它们按列组成
+第1支垂直于第2列，第2支垂直于第1列，它们按行排列。异位置的点积都是0，同位置则为
+\begin{equation*}
+ \boldsymbol\alpha\cdot\boldsymbol\alpha_R
+ =\alpha_1\beta_2-\alpha_2\beta_1=\det(M),\qquad
+ \boldsymbol\beta\cdot\boldsymbol\beta_R
+ =-\beta_1\alpha_2+\beta_2\alpha_1=\det(M).
+\end{equation*}
+因此 $\overline M M=\det(M)I$，除以非零面积就得到熟悉的二阶逆矩阵。两个法向量的旋转方向不同，正是为了让读数使用同一有向面积。
+
+\DetFigure{红色、蓝色箭头是 $M=\left(\begin{smallmatrix}2&1\\0&3\end{smallmatrix}\right)$ 的两列，绿色箭头是它们对应的法向评分器。第2列顺时针转 $90^\circ$ 得到 $\boldsymbol\alpha_R$，第1列逆时针转 $90^\circ$ 得到 $\boldsymbol\beta_R$；它们按行组成右侧的 $\overline M$。各评分器对自己的列读到6，对另一列读到0，除以面积6后便能读回输入坐标。}{fig:six-adjugate-perpendicular}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-1.2,-1.7) grid (12.2,4.2);
+ \draw[detaxis] (-.8,0)--(4,0) node[right] {$x$};
+ \draw[detaxis] (0,-1.5)--(0,3.8) node[above] {$y$};
+ \draw[detrose] (0,0)--(2,0) node[below] {$\boldsymbol\alpha$};
+ \draw[detblue] (0,0)--(1,3) node[above right] {$\boldsymbol\beta$};
+ \draw[detgreen] (0,0)--(3,-1) node[below right] {$\boldsymbol\alpha_R=G(\boldsymbol\beta)$};
+ \draw[detgreen] (0,0)--(0,2) node[left] {$\boldsymbol\beta_R=-G(\boldsymbol\alpha)$};
+ \draw[detgreen] (.62,0) arc[start angle=0,end angle=90,radius=.62];
+ \node[font=\scriptsize,text=DetGreen] at (-.55,.7) {逆时针};
+ \draw[detblue] (.3004,.9012) arc[start angle=71.565,end angle=-18.435,radius=.95];
+ \node[font=\scriptsize,text=DetBlue] at (2.05,.55) {顺时针};
+ \node[anchor=west,align=left] at (5.1,2.75)
+  {$\overline M=\DetMat{rr}{3&-1\\0&2}$\\[10pt]
+   $\boldsymbol\beta\cdot\boldsymbol\alpha_R=0,\quad\boldsymbol\alpha\cdot\boldsymbol\beta_R=0$\\[9pt]
+   $\boldsymbol\alpha\cdot\boldsymbol\alpha_R=\boldsymbol\beta\cdot\boldsymbol\beta_R=6$};
+ \node[anchor=west,font=\footnotesize,text=DetGray] at (5.1,.25) {列的法向量按行摆放，组成反向评分器。};
+\end{tikzpicture}}
+
+\begin{example}[三维验证：叉乘按行排成逆矩阵]
+继续使用前面的矩阵，改用本节的列向量记号：$M=\DetMat{rrr}{1&2&0\\0&1&1\\2&0&1}$，其三列为 $\boldsymbol\alpha=(1,0,2)^{\mathrm T}$、$\boldsymbol\beta=(2,1,0)^{\mathrm T}$、$\boldsymbol\gamma=(0,1,1)^{\mathrm T}$。用另外两列的叉乘，得到
 \begin{equation}
- \operatorname{adj}(A)=\DetMat{rrr}{1&-2&2\\2&1&-1\\-2&4&1},
- \qquad A^{-1}=\frac15\DetMat{rrr}{1&-2&2\\2&1&-1\\-2&4&1}.
+ \boldsymbol\alpha_R=(1,-2,2)^{\mathrm T},\qquad
+ \boldsymbol\beta_R=(2,1,-1)^{\mathrm T},\qquad
+ \boldsymbol\gamma_R=(-2,4,1)^{\mathrm T}.
 \end{equation}
-第1列让三行分别读到 $5,0,0$，另外两列分别给出 $0,5,0$ 与 $0,0,5$，所以
+它们按行组成
 \begin{equation}
- A\operatorname{adj}(A)=\DetMat{rrr}{5&0&0\\0&5&0\\0&0&5}.
+ \overline M=\DetMat{rrr}{1&-2&2\\2&1&-1\\-2&4&1},
+ \qquad M^{-1}=\frac15\DetMat{rrr}{1&-2&2\\2&1&-1\\-2&4&1}.
 \end{equation}
-这不是猜出一份数表，而是先找三个底面的法向量，再统一调整体积读数，构造出逆映射。
+第1个评分器对三列分别读到 $5,0,0$，第2、3个分别读到 $0,5,0$ 与 $0,0,5$，所以
+\begin{equation}
+ \overline M M=\DetMat{rrr}{5&0&0\\0&5&0\\0&0&5}.
+\end{equation}
+得到的逆矩阵与行向量构造完全相同。差别只是构造的观察侧：行构造先找输入标准基的原像，列构造先找读回输入坐标的评分器。
 \end{example}
 
 \begin{note}
-伴随矩阵对不可逆矩阵也有定义，恒等式仍成立；只有求逆公式需要 $\det(A)\ne0$。显式公式适合小阶计算与理论理解，大规模方程求解仍优先使用第三章的LU、PLU等方法，不必先构造全部余子式。
+伴随矩阵对不可逆矩阵也有定义，两个乘积恒等式仍成立；只有求逆公式需要 $\det(M)\ne0$。若秩为 $n-1$，一些法向量仍可能非零，所以不能从行列式为零推出伴随矩阵必为零。高维广义叉乘主要服务于理论构造与理解，小阶计算可用余子式，大规模求解仍优先用第三章的LU、PLU等方法，不必先算出全部伴随矩阵。
 \end{note}
 
 \Needspace{6\baselineskip}
-三条计算路线现在可以放回同一张几何图景：消元用切变整理体积，展开用坐标分量拆开体积，伴随矩阵用其余边的法向量隔开各行，再构造逆映射。行列式从几何长出的公理，也把这些构造变成了任意阶都能验证的算法。下一节再向几何迈一步：若一个变换把直线弯曲，局部还能不能用行列式度量它？
+回到最初的目标：我们只是想从输出读回输入。为此，每个评分器必须屏蔽其余列；叉乘与广义叉乘提供了这样的法向量，混合积又给出了统一的体积读数。把列的法向量按行摆好、再除以非零总体积，逆矩阵便自然出现。消元通过切变整理体积，展开通过坐标分量拆开体积，伴随矩阵则利用底面法向量区分各条边；三条路径由同一套体积几何与行列式公理贯通。下一节再问：若变换把直线弯曲，局部还能不能用行列式度量它？
 
 \section{几何形式的深化：微积分思想下的体积度量}
 \label{sec:six-jacobian-intuition}
