@@ -12518,7 +12518,48 @@ n=\dim\FNull A+\FRank(A).
 \section{一个矩阵，四个基本子空间}
 \label{sec:five-four-spaces}
 
+第3.5.1节中，我们用“正向组合输出、反向回传评分”理解矩阵转置：$A$ 把输入送到输出端，$A^{\mathrm T}$ 则把输出端的评价折算为输入端的评分。现在沿着这两条路径看，四个基本子空间就有了共同的来处：哪些状态能产生输出，哪些变化会被压成零；哪些评分能被回传，哪些评分对全部可达输出都读作零。它们分别属于输入、输出两侧，描述的却是同一个映射。
+
 只看 $A\boldsymbol x=\boldsymbol b$，容易把注意力集中在一组未知数上。换一个问题：矩阵允许哪些输出？哪些输入不起作用？各行又在检查哪些方向？转置矩阵检测哪些输出端约束？这四个问题分别落在输入与输出两端，不能混成一个空间。
+
+\newcommand{\FiveLetterFigure}[5]{%
+ \begingroup\edef\FiveSavedFigure{\arabic{figure}}%
+ \renewcommand{\thefigure}{\thechapter.4#1}%
+ \renewcommand{\theHfigure}{\thechapter.intuitive.#1}%
+ \FiveFigure{#2}{#3}{#4}{#5}%
+ \setcounter{figure}{\FiveSavedFigure}\endgroup}
+\definecolor{FiveScore}{HTML}{BE7135}
+\definecolor{FiveOchre}{HTML}{9A792B}
+
+\FiveLetterFigure{a}{四个子空间的对偶结构：蓝色与绿色位于输入侧，红色与土黄色位于输出侧。正向组合与反向评分把两端联系起来，呼应第3.5.1节的转置解释。}{fig:five-dual-structure}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \draw[step=.5cm,FiveK!7,line width=.25pt] (0,0) grid(14.5,5.5);
+ \node[font=\small\bfseries] at (2.6,5.05) {输入端 $\mathbb R^n$};
+ \node[font=\small\bfseries] at (11.75,5.05) {输出端 $\mathbb R^m$};
+ \filldraw[fill=FiveB!8,draw=FiveB!65,rounded corners=2pt] (.2,2.9) rectangle(5,4.5);
+ \filldraw[fill=FiveG!8,draw=FiveG!65,rounded corners=2pt] (.2,.65) rectangle(5,2.25);
+ \node[align=center,text=FiveB] at (2.6,3.7)
+  {$\Row(A)$：评分方向\\[3pt]可回传的输入评分，维数 $r$};
+ \node[align=center,text=FiveG] at (2.6,1.45)
+  {$\Nul(A)$：探测死角\\[3pt]各行读数全为零，维数 $n-r$};
+ \node[text=FiveG,font=\large] at (2.6,2.58) {$\perp$};
+ \filldraw[fill=FiveR!8,draw=FiveR!65,rounded corners=2pt] (9.3,.65) rectangle(11.7,4.5);
+ \filldraw[fill=FiveOchre!8,draw=FiveOchre!65,rounded corners=2pt] (12.1,.65) rectangle(14.5,4.5);
+ \node[align=center,text=FiveR] at (10.5,3)
+  {$\Col(A)$\\[5pt]可达输出\\[5pt]维数 $r$};
+ \node[align=center,text=FiveOchre] at (13.3,3)
+  {$\Nul(A^{\mathrm T})$\\[5pt]零评分方向\\[5pt]维数 $m-r$};
+ \node[font=\large,text=FiveG] at (11.9,2.6) {$\perp$};
+ \draw[fiveb] (5.1,4)--(9.2,4) node[midway,above] {$A$：组合输出};
+ \draw[-{Stealth[length=2mm]},FiveScore,line width=1.1pt]
+  (9.2,3.2)--(5.1,3.2) node[midway,below] {$A^{\mathrm T}$：回传评分};
+ \draw[fivedash,-{Stealth[length=1.6mm]}] (5.1,1.45)--(7.8,1.45);
+ \fill[FiveG] (7.85,1.45) circle(2pt);
+ \node[above,text=FiveG] at (6.5,1.45) {$A\boldsymbol z=\boldsymbol0$};
+ \node[align=center,text=FiveOchre] at (7.1,.35)
+  {$A^{\mathrm T}\boldsymbol y=\boldsymbol0$：\\输出零评分也被回传为零};
+\end{tikzpicture}}
+{每块色框代表一类方向，不是把空间中的点分到不相交的区域。正向箭头在行空间与列空间之间作用，反向箭头传递评价；它们互不保证是对方的逆。左右各自的正交与维数关系将在本节证明。}
 
 \subsection{四个子空间的定义与维数}
 
@@ -12527,6 +12568,37 @@ n=\dim\FNull A+\FRank(A).
 先站在\textbf{输入侧 $\mathbb R^n$} 看。行空间 $\Row(A)$ 由各行竖排后张成，收集方程能够检查到的方向；零空间 $\Nul(A)$ 则收集经过 $A$ 后全被送到零的输入。前者与独立约束有关，维数为 $r(A)$；后者与自由变量有关，维数为 $n-r(A)$。同一个输入可以同时包含这两类分量。
 
 再站在\textbf{输出侧 $\mathbb R^m$} 看。列空间 $\Col(A)$ 由各列张成，是所有输入实际能够产生的范围，维数为 $r(A)$；左零空间 $\Nul(A^{\mathrm T})$ 由转置齐次方程确定，给出输出必须避开的非零方向，维数为 $m-r(A)$。两侧的分组取决于向量有多少个分量，而不是名称中的“行”或“列”在纸上朝哪个方向。
+
+把这两侧再用探测器语言读一遍。设输出端评价为 $\boldsymbol y$，第3.5.1节给出的总评分恒等式是
+\begin{equation}
+ \boldsymbol y\cdot(A\boldsymbol x)
+   =(A^{\mathrm T}\boldsymbol y)\cdot\boldsymbol x.
+ \label{eq:five-dual-score}
+\end{equation}
+左边是在输出端打分，右边是在输入端使用回传的评分器；无论从哪端算，总分相同。这个等式也提醒我们：\textbf{转置传回的是评价，不是在撤销原来的映射。}
+
+\FiveLetterFigure{b}{一次组合、两端评分：输出端的评价由转置拉回，成为输入端的评分器。橙色两条路径算出的总分相同，评价方向与状态传递方向相反。}{fig:five-score-pullback}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,FiveK!7,line width=.25pt] (0,0) grid(14,3.5);
+ \node[fivebox,text=FiveB,minimum width=3.1cm,minimum height=.9cm] (xx) at (2,2.6) {输入 $\boldsymbol x$};
+ \node[fivebox,text=FiveR,minimum width=3.1cm,minimum height=.9cm] (bb) at (11,2.6) {输出 $A\boldsymbol x$};
+ \draw[fiveb] (xx)--(bb) node[midway,above] {$A$ 组合};
+ \node[fivebox,text=FiveScore,minimum width=3.7cm,minimum height=.9cm] (dd) at (2,.7) {$A^{\mathrm T}\boldsymbol y$：输入评分};
+ \node[fivebox,text=FiveScore,minimum width=3.7cm,minimum height=.9cm] (yy) at (11,.7) {$\boldsymbol y$：输出评价};
+ \draw[-{Stealth[length=2mm]},FiveScore,line width=1pt] (yy)--(dd)
+  node[midway,below] {$A^{\mathrm T}$ 回传};
+ \draw[FiveScore,densely dashed] (xx)--(dd);
+ \draw[FiveScore,densely dashed] (bb)--(yy);
+ \node[text=FiveScore,align=center] at (6.5,1.65)
+  {两端总分相等\\式\eqref{eq:five-dual-score}};
+\end{tikzpicture}}
+{每一个输出坐标就是一把原始评分尺：若取 $\boldsymbol y=\mathbf e_i$，回传后的 $A^{\mathrm T}\mathbf e_i=\boldsymbol r_i$ 正是第 $i$ 行竖排的向量。任意输出评价都是这些坐标评分的线性组合，因而任意回传评分都落在行空间里。}
+
+先看\textbf{列空间}：$A\boldsymbol x$ 把各列按权重组合，所以它是第三章“组合器”的全部输出范围。这里的各列是特征方向，未必线性无关，不一定是一组基。再看\textbf{零空间}：$A\boldsymbol z=\boldsymbol0$ 表示每一行探测器都有 $\boldsymbol r_i\cdot\boldsymbol z=0$；在这些输入方向上改变权重，全部输出记录都不变。因此“探测死角”指的是\emph{各行在输入端}的读数为零，不是说输入向量本身不存在。
+
+\textbf{行空间}则收集了所有可能的回传评分：$A^{\mathrm T}\boldsymbol y$ 随 $\boldsymbol y$ 改变，得到的正是 $\Col(A^{\mathrm T})$。每一行是输入端的一把特征探测器，行空间是这些评分器能组合出的全部方向。从对偶观点说，它是\textbf{列空间上全部线性评分的一个坐标实现}：将可达输出上的评分沿 $A$ 拉回，便得到输入评分。这里不能把 $\Row(A)$ 与 $\Col(A)'$ 直接写成相等；前者位于 $\mathbb R^n$，后者由定义在列空间上的泛函组成，二者通过评分回传建立对应。第3.5.1节已经解释了这种区别。
+
+最后看\textbf{左零空间}：若 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$，式\eqref{eq:five-dual-score}就说明，对任何输入都有 $\boldsymbol y\cdot(A\boldsymbol x)=0$。它收集的是那些\emph{对全部可达输出都打0分}的评价方向。准确说，$\boldsymbol y$ 是评分器的系数向量，评分器本身是 $\boldsymbol w\mapsto\boldsymbol y\cdot\boldsymbol w$；借助标准点积，我们把这些评分器画成输出端的向量。
 
 下面的正式定义把这四种角色写成准确的集合；读每一行时，都先问它属于输入侧还是输出侧。
 
@@ -12557,6 +12629,8 @@ n=\dim\FNull A+\FRank(A).
 列空间维数是矩阵秩的定义，零空间维数由秩与零度定理给出。第四章已证明行秩等于列秩，因而 $r(A^{\mathrm T})=r(A)=r$；把秩与零度定理用于 $A^{\mathrm T}:\mathbb R^m\to\mathbb R^n$，就得到左零空间维数 $m-r$。注意，两次计数所用的输入维数分别为 $n$ 与 $m$。
 \end{proof}
 
+两次秩与零度的计数，也可以分别读成“状态”与“评分”的计数：输入端有 $r$ 个独立的有效方向，另有 $n-r$ 个不改变输出的自由方向；输出端有 $r$ 个可达方向，另有 $m-r$ 个对可达输出全给零分的评价方向。行空间与列空间维数相同，是评分回传连接两侧的结果；两个零空间的维数则不必相同，不能因为箭头反向就把 $n-r$ 与 $m-r$ 混用。
+
 % 四个子空间的总览集中放在第5.4.3节；字母后缀图独立于正文连续图号。
 
 \begin{example}[贯穿矩阵的四个空间]
@@ -12580,6 +12654,8 @@ n=\dim\FNull A+\FRank(A).
 列空间的基要取\textbf{原矩阵中对应主元列号的列}；行空间的基可以取阶梯形的非零行，因为行变换不改变行空间。零空间的基由自由参数构造；左零空间的基对 $A^{\mathrm T}\boldsymbol y=\boldsymbol0$ 使用同一构造。这样四种基仍由第二章的算法求得，只是读结果时所面对的空间不同。
 
 \subsection{正交与直和：拆开输入与输出}
+
+为什么正向的“看不见”，会对应反向的“读作零”？若 $\boldsymbol z$ 被 $A$ 送到零，任意输出评分回传后都满足 $(A^{\mathrm T}\boldsymbol y)\cdot\boldsymbol z=\boldsymbol y\cdot(A\boldsymbol z)=0$。所以零空间中的输入，确实会让\emph{行空间里的每一把探测器}都读作零。输出侧完全对称：左零空间里的评价，面对列空间中的任何结果，都读作零。正交不是额外添加的图形印象，而是总评分恒等式在两端留下的结构。
 
 维数能够相加，还不足以说明两个空间不重叠。我们需要进一步辨认它们的方向关系。这里只使用第0章的标准点积：称两个子空间\term{orthogonal-subspaces}，是指其中任取两支向量的点积都为零。这个表述包括零向量；只有在用夹角解释时，才要求参与夹角的向量非零。
 
@@ -12648,17 +12724,20 @@ n=\dim\FNull A+\FRank(A).
 
 \FiveFigure{输出端的正交直和：可产生的部分与左零空间部分分别记录。}{fig:five-output-direct-sum}{%
 \begin{tikzpicture}[font=\small,x=1cm,y=1cm]
+ \draw[step=.5cm,FiveK!7,line width=.25pt] (-2.8,-2.1) grid(4,3.1);
  \draw[fiveax] (-2.8,0)--(4,0) node[right] {$y_1$};
  \draw[fiveax] (0,-2.1)--(0,3.1) node[above] {$y_2$};
- \draw[FiveB,line width=1.1pt] (-1,-2)--(1.5,3);
- \draw[FiveG,line width=1.1pt] (-2.5,1.25)--(3,-1.5);
- \draw[fiveb] (0,0)--(1,2) node[above left] {$\boldsymbol b_C$};
- \draw[fiveg] (1,2)--(3,1) node[midway,above right] {$\boldsymbol b_L$};
- \draw[fiver] (0,0)--(3,1) node[right] {$\boldsymbol b$};
+ \draw[FiveR,line width=1.1pt] (-1,-2)--(1.5,3);
+ \draw[FiveOchre,line width=1.1pt] (-2.5,1.25)--(3,-1.5);
+ \draw[fiver] (0,0)--(1,2) node[above left] {$\boldsymbol b_C$};
+ \draw[-{Stealth[length=2.2mm]},FiveOchre,line width=1.1pt] (1,2)--(3,1)
+  node[midway,above right] {$\boldsymbol b_L$};
+ \draw[-{Stealth[length=2.2mm]},FiveScore,line width=1.1pt]
+  (0,0)--(3,1) node[right] {$\boldsymbol b$};
  \draw[fivedash] (0,0)--(2,-1)--(3,1);
  \draw[FiveK] (.1,.2)--(-.1,.3)--(-.2,.1);
- \node[text=FiveB,anchor=west] at (1.5,3) {$\Col(D)$};
- \node[text=FiveG,anchor=east] at (-2.5,1.25) {$\Nul(D^{\mathrm T})$};
+ \node[text=FiveR,anchor=west] at (1.5,3) {$\Col(D)$};
+ \node[text=FiveOchre,anchor=east] at (-2.5,1.25) {$\Nul(D^{\mathrm T})$};
 \end{tikzpicture}}
 {仍取上一图的 $D$。这里 $\boldsymbol b=(3,1)^{\mathrm T}=(1,2)^{\mathrm T}+(2,-1)^{\mathrm T}$，第二部分非零，故整个 $\boldsymbol b$ 不在列空间中。分解只说明结构，本节不讨论投影算法或近似解。}
 
@@ -12677,23 +12756,17 @@ n=\dim\FNull A+\FRank(A).
 \definecolor{FiveDark}{HTML}{FAFBFC}
 \definecolor{FiveGold}{HTML}{397AA1}
 \definecolor{FiveRose}{HTML}{448678}
-\definecolor{FiveSky}{HTML}{397AA1}
-\definecolor{FiveSilver}{HTML}{68747D}
+\definecolor{FiveSky}{HTML}{AC4963}
+\definecolor{FiveSilver}{HTML}{9A792B}
 \definecolor{FiveWhite}{HTML}{35312D}
 \definecolor{FiveGrid}{HTML}{8F9FB4}
-\newcommand{\FiveLetterFigure}[5]{%
- \begingroup\edef\FiveSavedFigure{\arabic{figure}}%
- \renewcommand{\thefigure}{\thechapter.4#1}%
- \renewcommand{\theHfigure}{\thechapter.intuitive.#1}%
- \FiveFigure{#2}{#3}{#4}{#5}%
- \setcounter{figure}{\FiveSavedFigure}\endgroup}
 \tikzset{
- fivelightax/.style={-{Stealth[length=1.8mm]},FiveSilver!65,line width=.55pt},
- fivelightdash/.style={FiveSilver!70,densely dashed,line width=.65pt},
+ fivelightax/.style={-{Stealth[length=1.8mm]},FiveK!55,line width=.55pt},
+ fivelightdash/.style={FiveK!55,densely dashed,line width=.65pt},
  fivelightlabel/.style={fill=FiveDark,inner sep=2pt},
  fivelightvec/.style={-{Stealth[length=2.3mm]},line width=1.3pt}}
 
-\FiveLetterFigure{a}{四个基本子空间总览：输入、输出两侧各有一组正交互补的子空间。}{fig:five-intuitive-overview}{%
+\FiveLetterFigure{c}{四个基本子空间总览：输入、输出两侧各有一组正交互补的子空间。评分方向与探测死角在输入端配对，可达输出与零评分方向在输出端配对。}{fig:five-intuitive-overview}{%
 \begin{tikzpicture}[x=1cm,y=1cm,
  font=\linespread{1}\fontsize{10.5pt}{14.5pt}\selectfont,text=FiveWhite]
  \fill[FiveDark,rounded corners=4pt] (-.25,-.65) rectangle(15.05,10.6);
@@ -12705,9 +12778,9 @@ n=\dim\FNull A+\FRank(A).
  \fill[FiveSky!7!FiveDark] (0,2.9) rectangle(14.8,4.8);
  \fill[FiveSilver!7!FiveDark] (0,1) rectangle(14.8,2.9);
  \foreach \yy in {1,2.9,4.8,6.7,8.6,9.35}
-  {\draw[FiveSilver!55,line width=.45pt] (0,\yy)--(14.8,\yy);}
+  {\draw[FiveK!30,line width=.45pt] (0,\yy)--(14.8,\yy);}
  \foreach \xx in {0,3,5.3,7.2,10,14.8}
-  {\draw[FiveSilver!55,line width=.45pt] (\xx,1)--(\xx,9.35);}
+  {\draw[FiveK!30,line width=.45pt] (\xx,1)--(\xx,9.35);}
  \node[font=\bfseries] at (1.5,8.98) {空间名称};
  \node[font=\bfseries] at (4.15,8.98) {所在宇宙};
  \node[font=\bfseries] at (6.25,8.98) {维度};
@@ -12718,25 +12791,25 @@ n=\dim\FNull A+\FRank(A).
  \node[text=FiveGold] at (6.25,7.65) {$r(A)$};
  \node[text=FiveGold,align=center,text width=2.55cm] at (8.6,7.65) {所有行向量\\张成的子空间};
  \node[text=FiveGold,align=center,text width=4.4cm] at (12.4,7.65)
-  {\textbf{能被看见的输入方向}\\真正对输出产生贡献的分量};
+  {\textbf{有效的输入评分方向}\\输出评价能回传到这里};
  \node[text=FiveRose,align=center,text width=2.7cm] at (1.5,5.75) {\textbf{零空间}\\$\Nul(A)$};
  \node[text=FiveRose,align=center] at (4.15,5.75) {输入空间\\$\mathbb R^n$};
  \node[text=FiveRose] at (6.25,5.75) {$n-r(A)$};
  \node[text=FiveRose,align=center,text width=2.55cm] at (8.6,5.75) {齐次方程的\\解空间};
  \node[text=FiveRose,align=center,text width=4.4cm] at (12.4,5.75)
-  {\textbf{会被消灭的输入方向}\\经过映射后会被压成零向量};
+  {\textbf{各行探测器的死角}\\全部输入响应读数为零};
  \node[text=FiveSky,align=center,text width=2.7cm] at (1.5,3.85) {\textbf{列空间}\\$\Col(A)$};
  \node[text=FiveSky,align=center] at (4.15,3.85) {输出空间\\$\mathbb R^m$};
  \node[text=FiveSky] at (6.25,3.85) {$r(A)$};
  \node[text=FiveSky,align=center,text width=2.55cm] at (8.6,3.85) {所有列向量\\张成的子空间};
  \node[text=FiveSky,align=center,text width=4.4cm] at (12.4,3.85)
-  {\textbf{能到达的输出方向}\\所有可能产生的结果都在这里};
+  {\textbf{组合器的可达输出}\\所有可能产生的结果都在这里};
  \node[text=FiveSilver,align=center,text width=2.7cm] at (1.5,1.95) {\textbf{左零空间}\\$\Nul(A^{\mathrm T})$};
  \node[text=FiveSilver,align=center] at (4.15,1.95) {输出空间\\$\mathbb R^m$};
  \node[text=FiveSilver] at (6.25,1.95) {$m-r(A)$};
  \node[text=FiveSilver,align=center,text width=2.55cm] at (8.6,1.95) {转置矩阵的\\零空间};
  \node[text=FiveSilver,align=center,text width=4.4cm] at (12.4,1.95)
-  {\textbf{到不了的输出方向}\\永远无法被矩阵产生的方向};
+  {\textbf{对可达输出都打0分}\\非零分量使整个目标不可达};
  \node[font=\fontsize{10pt}{14pt}\selectfont] at (7.4,.35)
   {$\mathbb R^n=\Row(A)\oplus\Nul(A)\qquad
     \mathbb R^m=\Col(A)\oplus\Nul(A^{\mathrm T})$};
@@ -12753,7 +12826,7 @@ n=\dim\FNull A+\FRank(A).
 \end{align}
 零空间里的所有变动，当前输出都看不见。例如电网络中的循环流可以改变线路记录，却不改变节点收支；“看不见”是针对这个矩阵所记录的量而言的。
 
-\FiveLetterFigure{b}{输入空间的正交分解：任意输入都可以拆成“有效分量＋被消分量”。}{fig:five-intuitive-input}{%
+\FiveLetterFigure{d}{输入空间的正交分解：任意输入都可以拆成“有效分量＋被消分量”。行空间里的任意评分器，对绿色零空间分量都读作零。}{fig:five-intuitive-input}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small,text=FiveWhite]
  \fill[FiveDark,rounded corners=4pt] (-7.35,-3.7) rectangle(7.35,4.3);
  \node at (0,3.55) {$\mathbb R^n=\Row(A)\oplus\Nul(A)$};
@@ -12772,9 +12845,9 @@ n=\dim\FNull A+\FRank(A).
  \draw[FiveSilver,line width=.6pt] (.18,.18)--(.36,0)--(.18,-.18);
  \fill[FiveWhite] (0,0) circle(1.6pt) node[below left] {$O$};
  \node[text=FiveGold,align=left,anchor=west,fivelightlabel] at (2.65,2.25)
-  {$\Row(A)$\\有效输入方向};
+  {$\Row(A)$\\有效输入／评分方向};
  \node[text=FiveRose,align=left,anchor=west,fivelightlabel] at (-6.35,2.25)
-  {$\Nul(A)$\\被消去的输入方向};
+  {$\Nul(A)$\\各行读数全为零};
  \node at (0,-3.05) {$r+(n-r)=n,\qquad r=r(A)$};
 \end{tikzpicture}}
 {图取 $A=\FiveMat{rr}{1&1\\2&2}$，故 $n=2$、$r(A)=1$。这里 $\boldsymbol x=(2.8,.8)^{\mathrm T}=(1.8,1.8)^{\mathrm T}+(1,-1)^{\mathrm T}$。两个分量均从原点出发，灰色虚线表示相加关系。高维情形仍有唯一分解，但两部分未必都是直线，维数也未必相等。}
@@ -12791,7 +12864,7 @@ n=\dim\FNull A+\FRank(A).
 \end{align}
 所以，目标有没有“伸向盲区”，要看这一分量是否为零；它是方向上的判断，不是看图上的点落在哪一块颜色里。
 
-\FiveLetterFigure{c}{输出空间的正交分解：目标是否有解，取决于它有没有伸向盲区的分量。}{fig:five-intuitive-output}{%
+\FiveLetterFigure{e}{输出空间的正交分解：目标是否有解，取决于它有没有非零的左零空间分量。土黄色方向对全部可达输出都给零分，却可以检测目标是否超出了可达范围。}{fig:five-intuitive-output}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small,text=FiveWhite]
  \fill[FiveDark,rounded corners=4pt] (-7.35,-3.7) rectangle(7.35,4.3);
  \node at (0,3.55) {$\mathbb R^m=\Col(A)\oplus\Nul(A^{\mathrm T})$};
@@ -12812,10 +12885,10 @@ n=\dim\FNull A+\FRank(A).
  \node[text=FiveSky,align=left,anchor=west,fivelightlabel] at (1.55,2.3)
   {$\Col(A)$\\可到达的输出方向};
  \node[text=FiveSilver,align=left,anchor=west,fivelightlabel] at (-6.35,2.25)
-  {$\Nul(A^{\mathrm T})$\\不可到达的输出方向};
+  {$\Nul(A^{\mathrm T})$\\对可达输出给零分};
  \node at (0,-3.05) {$r+(m-r)=m,\qquad r=r(A)$};
 \end{tikzpicture}}
-{仍取上一图的 $A$。红色目标为 $(3,1)^{\mathrm T}$，蓝色分量为 $(1,2)^{\mathrm T}$，灰色分量为 $(2,-1)^{\mathrm T}$。灰色分量非零，所以目标不可达；蓝色与灰色方向虽正交，仍共同含有原点。}
+{仍取上一图的 $A$。红色目标为 $(3,1)^{\mathrm T}$，深红色列空间分量为 $(1,2)^{\mathrm T}$，土黄色左零空间分量为 $(2,-1)^{\mathrm T}$。后一个分量非零，所以目标不可达；两个正交子空间仍共同含有原点。}
 
 回到解的问题。既然零空间分量会被映射消灭，所有输入只要行空间分量相同，输出就完全相同。反过来，只要方程组有解，行空间中就恰好有一个解：它是所有解里不带零空间分量的那一个，这就是这里所说的“干净”。其他解只是在它上面加入不同的零空间向量。\textbf{列空间决定目标能否到达，零空间决定到达同一目标的全部自由度。}下一节将把这幅直观画面完整写成解的判定，并证明行空间与列空间之间的一一对应。
 % FOUR SPACES INTUITIVE END
@@ -13129,7 +13202,7 @@ n=\dim\FNull A+\FRank(A).
 \begingroup
 \setlength{\parskip}{2pt}
 \setlength{\abovedisplayskip}{5pt}\setlength{\belowdisplayskip}{5pt}
-% 本节的七幅图采用节号加字母，不占用正文插图的整数序号。
+% 新旧图统一按本节阅读顺序采用字母后缀，不占用正文插图的整数序号。
 \newcommand{\FiveLSFigure}[4]{%
  \par\addvspace{5pt}\noindent\begin{minipage}{\linewidth}
  \begingroup\edef\FiveLSSavedFigure{\arabic{figure}}%
@@ -13139,8 +13212,247 @@ n=\dim\FNull A+\FRank(A).
  \setcounter{figure}{\FiveLSSavedFigure}\endgroup
  \end{minipage}\par\addvspace{5pt}}
 
+\definecolor{FiveLSOrange}{HTML}{BE7135}
+\tikzset{
+ lsgrid/.style={FiveK!8,line width=.25pt},
+ lsread/.style={-{Stealth[length=2mm]},FiveLSOrange,line width=1.05pt},
+ lsnote/.style={fill=white,inner sep=2pt,align=center},
+ lsline/.style={-{Stealth[length=2mm]},line width=1.05pt}}
+
+\FiveHead{第三章留下的读数问题，现在怎样解决？}
+第3.5.1节把矩阵的每一列看作特征探测器：用它扫描目标 $\boldsymbol b$，得到点积响应 $A^{\mathrm T}\boldsymbol b$。那时我们留下了一个问题：探测器若不正交，原始响应读数就包含彼此的串扰，不能直接当作组合系数。现在不仅要分清读数与配方，还要面对更实际的困难：目标可能根本不在特征能够组合出的范围里。怎样处理探测器的重叠，同时让组合出来的输出尽可能靠近目标？这就是本节要回收的伏笔。
+
 \FiveHead{目标够不到，还能给出有意义的答案吗？}
 第5.5节说明，$A\boldsymbol x=\boldsymbol b$ 有解当且仅当 $\boldsymbol b\in\operatorname{Col}(A)$。目标在列空间外时，解集是空集。但带有测量误差的工程数据、统计数据常常如此。我们可以退一步：在所有可能的输入中，哪个 $A\boldsymbol x$ 最接近 $\boldsymbol b$？这就是\term{least-squares}要解决的问题。本节只用第0章的点积、长度，以及第5.4.2节的正交直和。
+
+用 $\widehat{\boldsymbol x}$ 记待求的最优系数，问题写成
+\begin{equation}
+ \text{寻找 }\widehat{\boldsymbol x}\in\mathbb R^n,\qquad
+ \|\boldsymbol b-A\widehat{\boldsymbol x}\|^2
+   =\min_{\boldsymbol x\in\mathbb R^n}\|\boldsymbol b-A\boldsymbol x\|^2.
+ \label{eq:five-ls-detector-objective}
+\end{equation}
+白话说，配方可以改变，特征方向固定；我们要让全部输出分量的误差平方和最小。误差在输出端比较，未知的权重却在输入端求，转置正是连接两端的工具。
+
+\FiveLSFigure{a}{最小二乘先找最优输出，再找产生它的权重。红色平面代表特征可组合的列空间，橙色目标在平面外，绿色残差垂直于平面；这是式\eqref{eq:five-ls-detector-objective}的几何图景。}{fig:five-ls-plane-goal}{%
+\begin{tikzpicture}[x={(1cm,-.22cm)},y={(.62cm,.34cm)},z={(0cm,.85cm)},font=\small]
+ \filldraw[fill=FiveR!7,draw=FiveR!45]
+  (-.5,-.5,0)--(3.5,-.5,0)--(3.5,2.8,0)--(-.5,2.8,0)--cycle;
+ \foreach \q in {0,1,2,3}{\draw[lsgrid] (\q,-.5,0)--(\q,2.8,0);}
+ \foreach \q in {0,1,2}{\draw[lsgrid] (-.5,\q,0)--(3.5,\q,0);}
+ \draw[fiveax] (0,0,0)--(4.2,0,0);
+ \draw[fiveax] (0,0,0)--(0,3.4,0);
+ \draw[fiveax] (0,0,0)--(0,0,3);
+ \node[below left] at (0,0,0) {$O$};
+ \draw[lsread] (0,0,0)--(2.1,1.4,2.2) node[above] {$\boldsymbol b$};
+ \draw[lsline,FiveR] (0,0,0)--(2.1,1.4,0)
+  node[below,lsnote,text=FiveR] {$A\widehat{\boldsymbol x}$};
+ \draw[lsline,FiveG] (2.1,1.4,0)--(2.1,1.4,2.2)
+  node[midway,right,text=FiveG] {$\boldsymbol r$};
+ \draw[FiveG] (2.35,1.4,0)--(2.35,1.4,.25)--(2.1,1.4,.25);
+ \node[lsnote,text=FiveR] at (2.6,2.9,0) {$\Col(A)$};
+ \node[anchor=west,align=left,text width=7cm] at (5.5,0,1.9)
+  {列空间：特征可组合范围\\[6pt]
+   目标：$\boldsymbol b$\\[6pt]
+   最优近似：$A\widehat{\boldsymbol x}$\\[6pt]
+   剩下的残差：$\boldsymbol r=\boldsymbol b-A\widehat{\boldsymbol x}$\\[6pt]
+   为什么“垂直”保证最优？\\稍后用点积展开严格证明。};
+\end{tikzpicture}}
+
+\FiveHead{第一步：先扫描目标，得到原始响应读数}
+设 $A=[\,\boldsymbol a_1\ \cdots\ \boldsymbol a_n\,]$。输出端的目标 $\boldsymbol b$ 同时接受各列探测器的扫描，读数排成输入端的 $n$ 维向量 $\boldsymbol c$：
+\begin{equation}
+ \boldsymbol c=A^{\mathrm T}\boldsymbol b
+  =\begin{pmatrix}
+    \boldsymbol a_1\cdot\boldsymbol b\\
+    \boldsymbol a_2\cdot\boldsymbol b\\
+    \vdots\\
+    \boldsymbol a_n\cdot\boldsymbol b
+   \end{pmatrix},\qquad c_i=\boldsymbol a_i\cdot\boldsymbol b.
+ \label{eq:five-ls-raw-readings}
+\end{equation}
+每个分量都是一个点积响应，不是“第 $i$ 个方向应当取几份”的直接答案；这和第三章的探测器解释完全一致。若把 $\boldsymbol b$ 当作输出端的评分系数，$\boldsymbol c$ 也就是对偶映射回传的输入评分向量。
+
+沿用第3.5.1节的二维例子，先排除目标不可达的困难，只观察读数怎样混在一起：
+\begin{equation}
+ \boldsymbol a_1=\begin{pmatrix}1\\0\end{pmatrix},\qquad
+ \boldsymbol a_2=\begin{pmatrix}1\\1\end{pmatrix},\qquad
+ A=\begin{pmatrix}1&1\\0&1\end{pmatrix},\qquad
+ \boldsymbol b=\begin{pmatrix}2\\1\end{pmatrix}.
+ \label{eq:five-ls-detector-example}
+\end{equation}
+两列不共线，能够组合出整个平面，但它们也不垂直。先把方向看清，再比较响应与权重。
+
+\FiveLSFigure{b}{蓝色与红色箭头是两支固定的特征探测器，橙色箭头是待扫描目标。它们取自式\eqref{eq:five-ls-detector-example}，和第三章使用同一组数字；两列不共线，却仍会相互响应。}{fig:five-ls-detector-directions}{%
+\begin{tikzpicture}[x=1.25cm,y=1.25cm,font=\small]
+ \draw[step=.5cm,lsgrid] (-.3,-.3) grid(3,2);
+ \draw[fiveax] (-.3,0)--(3.1,0) node[right] {$y_1$};
+ \draw[fiveax] (0,-.3)--(0,2.1) node[above] {$y_2$};
+ \draw[fiveb] (0,0)--(1,0) node[below] {$\boldsymbol a_1$};
+ \draw[fiver] (0,0)--(1,1) node[above left] {$\boldsymbol a_2$};
+ \draw[lsread] (0,0)--(2,1) node[above right] {$\boldsymbol b$};
+ \draw[fivedash] (1,1)--(2,1);
+ \draw[fivedash] (1,0)--(2,1);
+ \node[anchor=west,align=left,text width=7.5cm] at (4,1)
+  {特征方向1：$\boldsymbol a_1=(1,0)^{\mathrm T}$\\[6pt]
+   特征方向2：$\boldsymbol a_2=(1,1)^{\mathrm T}$\\[6pt]
+   待拟合目标：$\boldsymbol b=(2,1)^{\mathrm T}$\\[6pt]
+   实际配方：$\boldsymbol b=\boldsymbol a_1+\boldsymbol a_2$};
+\end{tikzpicture}}
+
+\FiveHead{第二步：目标在范围内，为什么读数仍不等于配方？}
+两支探测器给出的原始读数是
+\begin{equation}
+ A^{\mathrm T}\boldsymbol b=\begin{pmatrix}2\\3\end{pmatrix},
+ \qquad
+ \boldsymbol b=1\boldsymbol a_1+1\boldsymbol a_2,\quad
+ \boldsymbol x_0=\begin{pmatrix}1\\1\end{pmatrix}.
+ \label{eq:five-ls-readings-not-weights}
+\end{equation}
+配方是“各取1份”，扫描却读出2和3。第一支探测器不只读到自身的那一份，也读到斜向特征的水平部分；第二支既读到第一支的贡献，又带有自身长度平方所决定的增益。不是扫描算错了，而是\textbf{它测的是点积响应，问题要的是组合权重}。非正交会带来串扰；即便彼此正交，若没有单位长度，自身增益也仍须修正。
+
+\FiveLSFigure{c}{原始响应读数为2与3，对应式\eqref{eq:five-ls-raw-readings}的两个分量。色条中的浅色部分提示来自另一探测器的响应；这些读数带有重叠与自身增益，不能直接当作组合系数。}{fig:five-ls-raw-bars}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,lsgrid] (0,0) grid(6.5,3.5);
+ \node[font=\bfseries] at (3.1,3.9) {原始响应读数 $\boldsymbol c$};
+ \draw[fiveax] (.6,0)--(.6,3.5) node[above left] {读数};
+ \draw[fiveax] (.6,0)--(6.4,0);
+ \foreach \q in {1,2,3}{\node[left] at (.6,\q) {$\q$};}
+ \fill[FiveB!70] (1.6,0) rectangle(2.8,1);
+ \fill[FiveB!25] (1.6,1) rectangle(2.8,2);
+ \fill[FiveR!75] (4,0) rectangle(5.2,2);
+ \fill[FiveR!25] (4,2) rectangle(5.2,3);
+ \node[above] at (2.2,2) {$c_1=2$};
+ \node[above] at (4.6,3) {$c_2=3$};
+ \node[below,align=center] at (2.2,0) {$\boldsymbol a_1\cdot\boldsymbol b$\\$1+1$};
+ \node[below,align=center] at (4.6,0) {$\boldsymbol a_2\cdot\boldsymbol b$\\$2+1$};
+ \node[anchor=west,align=left,text width=6.5cm] at (7.2,1.8)
+  {深色：自身那一份产生的响应\\[6pt]
+   浅色：另一特征产生的串扰\\[6pt]
+   本例两份真实权重都为1，\\响应却叠成2和3。};
+\end{tikzpicture}}
+
+\FiveHead{第三步：把探测器的重叠记录成矩阵}
+若先用权重 $\boldsymbol x$ 组合，再扫描组合结果，得到的是 $A^{\mathrm T}(A\boldsymbol x)$。因此，权重与响应之间的转换由 $A^{\mathrm T}A$ 描述：
+\begin{equation}
+ A^{\mathrm T}A=
+ \begin{pmatrix}
+  \boldsymbol a_1\cdot\boldsymbol a_1&\boldsymbol a_1\cdot\boldsymbol a_2&\cdots&\boldsymbol a_1\cdot\boldsymbol a_n\\
+  \boldsymbol a_2\cdot\boldsymbol a_1&\boldsymbol a_2\cdot\boldsymbol a_2&\cdots&\boldsymbol a_2\cdot\boldsymbol a_n\\
+  \vdots&\vdots&\ddots&\vdots\\
+  \boldsymbol a_n\cdot\boldsymbol a_1&\boldsymbol a_n\cdot\boldsymbol a_2&\cdots&\boldsymbol a_n\cdot\boldsymbol a_n
+ \end{pmatrix}.
+ \label{eq:five-detector-correlation}
+\end{equation}
+这就是探测器的\term{detector-correlation-matrix}。对角线记录每支探测器的自身增益，即长度平方；非对角线记录两支探测器的重叠响应。这里的“互相关”指原始点积，\textbf{没有归一化，也不是统计学的相关系数}；它还受探测器长度影响，不能只用来比较夹角。若两支探测器垂直，相应的非对角线元素才为零。
+
+\FiveLSFigure{d}{互相关矩阵逐格记录探测器的相互响应，对应式\eqref{eq:five-detector-correlation}。对角线是自身增益，非对角线是串扰系数；本例方格的数字为1、1、1、2，颜色较深的格子表示读数较大。}{fig:five-ls-correlation-grid}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,lsgrid] (-1,-.2) grid(13.8,5.3);
+ \node at (2.5,5.55) {$A^{\mathrm T}A=\begin{pmatrix}1&1\\1&2\end{pmatrix}$};
+ \foreach \xx/\yy/\vv/\tt/\cc in {0/2.4/1/自身增益/FiveB,2.5/2.4/1/串扰系数/FiveLSOrange,0/0/1/串扰系数/FiveLSOrange,2.5/0/2/自身增益/FiveR}{
+  \filldraw[fill=\cc!15,draw=FiveK!30] (\xx,\yy) rectangle ++(2.4,2.3);
+  \node[font=\large,text=\cc] at (\xx+1.2,\yy+1.5) {$\vv$};
+  \node at (\xx+1.2,\yy+.55) {\tt};}
+ \fill[FiveR!30] (2.5,0) rectangle(4.9,2.3);
+ \node[font=\large,text=FiveR] at (3.7,1.5) {$2$};
+ \node at (3.7,.55) {自身增益};
+ \node[left] at (-.1,3.5) {$\boldsymbol a_1$};
+ \node[left] at (-.1,1.1) {$\boldsymbol a_2$};
+ \node[above] at (1.2,4.7) {$\boldsymbol a_1$};
+ \node[above] at (3.7,4.7) {$\boldsymbol a_2$};
+ \node[anchor=west,align=left,text width=7.2cm] at (6.2,2.4)
+  {$\boldsymbol a_1\cdot\boldsymbol a_1=1$\\[5pt]
+   $\boldsymbol a_2\cdot\boldsymbol a_2=2$\\[5pt]
+   $\boldsymbol a_1\cdot\boldsymbol a_2
+    =\boldsymbol a_2\cdot\boldsymbol a_1=1$\\[9pt]
+   正向组合后再扫描：\\
+   $\boldsymbol x\ \xrightarrow{\ A\ }\ A\boldsymbol x\
+     \xrightarrow{\ A^{\mathrm T}\ }\ A^{\mathrm T}A\boldsymbol x$};
+\end{tikzpicture}}
+
+\FiveHead{第四步：让组合结果与目标具有相同的响应}
+一个合理的配方，应使组合结果在所有探测器上产生与目标相同的读数。把两组响应相等写出来，就是
+\begin{equation}
+ \underbrace{A^{\mathrm T}A\widehat{\boldsymbol x}}_{\text{组合结果的响应}}
+    =\underbrace{A^{\mathrm T}\boldsymbol b}_{\text{目标的原始读数}}.
+ \label{eq:five-normal-response}
+\end{equation}
+这就是稍后正式说明的正规方程。两边接受同一套探测器扫描，左边把权重经过自身增益与串扰后的响应写出来，右边给出目标读数；解这个方程，相当于\textbf{根据互相关矩阵修正读数，找出应当送回组合器的权重}。这里是解方程，不是把矩阵的非对角线元素删掉。
+
+在二维例子中，这个修正可以完整跟着数字做一遍：
+\begin{equation}
+ \begin{pmatrix}1&1\\1&2\end{pmatrix}
+ \begin{pmatrix}\widehat x_1\\\widehat x_2\end{pmatrix}
+ =\begin{pmatrix}2\\3\end{pmatrix}
+ \ \Longrightarrow\
+ \begin{cases}\widehat x_1+\widehat x_2=2,\\
+ \widehat x_1+2\widehat x_2=3
+ \end{cases}
+ \ \Longrightarrow\
+ \widehat{\boldsymbol x}=\begin{pmatrix}1\\1\end{pmatrix}.
+ \label{eq:five-ls-decrosstalk-example}
+\end{equation}
+第二式减去第一式得到 $\widehat x_2=1$，再代回得到 $\widehat x_1=1$；使用的仍是第二章消元。此次目标本来就在列空间内，修正后的配方确实精确还原目标。若目标在列空间外，就不存在“真实的精确配方”，同一过程求出的是\emph{最优拟合权重}；若列向量相关，权重还可能有无穷多组。这两个边界不能被“去串扰”这个比喻掩盖。
+
+\FiveLSFigure{e}{读数修正前是2、3，修正后组合系数是1、1，两个面板使用相同刻度。箭头表示解互相关矩阵对应的方程，不表示再次做一次转置；在本例目标可达的条件下，修正后恰好还原原配方。}{fig:five-ls-reading-correction}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \foreach \off in {0,8.2}{
+  \draw[step=.5cm,lsgrid] (\off,0) grid(\off+5,3.5);
+  \draw[fiveax] (\off+.5,0)--(\off+.5,3.5);
+  \draw[fiveax] (\off+.5,0)--(\off+4.9,0);
+  \foreach \q in {1,2,3}{\node[left] at (\off+.5,\q) {$\q$};}}
+ \fill[FiveB!55] (1.4,0) rectangle(2.4,2);
+ \fill[FiveR!55] (3.2,0) rectangle(4.2,3);
+ \fill[FiveB!55] (9.6,0) rectangle(10.6,1);
+ \fill[FiveR!55] (11.4,0) rectangle(12.4,1);
+ \node[above] at (1.9,2) {$2$};\node[above] at (3.7,3) {$3$};
+ \node[above] at (10.1,1) {$1$};\node[above] at (11.9,1) {$1$};
+ \node[font=\bfseries] at (2.7,3.9) {原始读数 $\boldsymbol c$};
+ \node[font=\bfseries] at (10.9,3.9) {组合系数 $\widehat{\boldsymbol x}$};
+ \node[below] at (1.9,0) {$c_1$};\node[below] at (3.7,0) {$c_2$};
+ \node[below] at (10.1,0) {$\widehat x_1$};\node[below] at (11.9,0) {$\widehat x_2$};
+ \draw[lsread] (5.3,1.8)--(7.6,1.8);
+ \node[align=center,text=FiveLSOrange] at (6.45,2.65) {去串扰\\修正};
+ \node[align=center] at (6.45,.75) {解方程\\$A^{\mathrm T}A\widehat{\boldsymbol x}=\boldsymbol c$};
+\end{tikzpicture}}
+
+\FiveHead{第五步：目标不可达时，为什么匹配读数就已经最优？}
+记残差为 $\boldsymbol r=\boldsymbol b-A\widehat{\boldsymbol x}$。式\eqref{eq:five-normal-response}等价于 $A^{\mathrm T}\boldsymbol r=\boldsymbol0$：\textbf{残差在所有特征探测器上的响应读数都为零。}组合结果已经捕捉了这套特征能够捕捉的部分，剩下的是全部列探测器共同的死角，也就是左零空间。残差可能非零，但再调整组合权重，只会沿列空间移动，无法消除这个正交方向上的差距。
+
+前面的二维例子能精确匹配，所以残差为零。要看见“读数全为零，但残差不为零”，只需把两支探测器补上第三个分量0，而把目标的第三个分量改为1：
+\begin{equation}
+ \widetilde A=\begin{pmatrix}1&1\\0&1\\0&0\end{pmatrix},\qquad
+ \widetilde{\boldsymbol b}=\begin{pmatrix}2\\1\\1\end{pmatrix},\qquad
+ \widehat{\boldsymbol x}=\begin{pmatrix}1\\1\end{pmatrix},\qquad
+ \boldsymbol r=\widetilde{\boldsymbol b}-\widetilde A\widehat{\boldsymbol x}
+    =\begin{pmatrix}0\\0\\1\end{pmatrix}.
+ \label{eq:five-ls-unreachable-detector-example}
+\end{equation}
+互相关矩阵与目标读数仍分别是 $\begin{pmatrix}1&1\\1&2\end{pmatrix}$ 和 $(2,3)^{\mathrm T}$，因此最优权重仍是各取1份。两列只能组合出第三分量为0的输出，目标多出的那一份没有探测器能够响应。这正是左零空间中的非零残差；图\ref{fig:five-ls-zero-responses}画出了这一关系。
+
+\FiveLSFigure{f}{绿色残差与红色平面中的两支特征探测器都正交，因此每支探测器的残差响应都为0。图中把残差平移到原点，只为比较方向；正规方程要求的是全部读数为零，而不是要求残差本身为零。}{fig:five-ls-zero-responses}{%
+\begin{tikzpicture}[x={(1cm,-.22cm)},y={(.62cm,.34cm)},z={(0cm,.85cm)},font=\small]
+ \filldraw[fill=FiveR!7,draw=FiveR!40]
+  (-.5,-.5,0)--(3.8,-.5,0)--(3.8,2.6,0)--(-.5,2.6,0)--cycle;
+ \foreach \q in {0,1,2,3}{\draw[lsgrid] (\q,-.5,0)--(\q,2.6,0);}
+ \draw[fiveax] (0,0,0)--(4.3,0,0);
+ \draw[fiveax] (0,0,0)--(0,3.2,0);
+ \draw[fiveb] (0,0,0)--(1.6,0,0) node[below] {$\widetilde{\boldsymbol a}_1$};
+ \draw[fiver] (0,0,0)--(1.6,1.6,0) node[above,lsnote] {$\widetilde{\boldsymbol a}_2$};
+ \draw[fiveg] (0,0,0)--(0,0,1.6) node[above] {$\boldsymbol r$};
+ \draw[FiveG] (.3,0,0)--(.3,0,.3)--(0,0,.3);
+ \draw[FiveG] (.21,.21,0)--(.21,.21,.3)--(0,0,.3);
+ \node[text=FiveR,lsnote] at (2.7,2.5,0) {$\Col(\widetilde A)$};
+ \node[anchor=west,align=left,text width=7cm] at (5.5,0,1.8)
+  {$\widetilde{\boldsymbol a}_1\cdot\boldsymbol r=0$\\[6pt]
+   $\widetilde{\boldsymbol a}_2\cdot\boldsymbol r=0$\\[6pt]
+   $\widetilde A^{\mathrm T}\boldsymbol r=\boldsymbol0$\\[6pt]
+   $\boldsymbol r\in\Nul(\widetilde A^{\mathrm T})$\\[6pt]
+   余下部分：所有列探测器都读不到。};
+\end{tikzpicture}}
+
+“全部读作零”为什么保证误差最小，而不只是一条必要条件？下面保留完整的点积证明：先从正交直和找出唯一的最近输出，再说明正规方程恰好找到它的全部原像。为和原有计算统一，以下用 $\boldsymbol e$ 表示残差，即上面所用的 $\boldsymbol r$。
 
 \FiveHead{没有精确解时，用什么替代原目标？}
 设 $A$ 是实 $m\times n$ 矩阵。第5.4.2节已经给出
@@ -13153,18 +13465,18 @@ n=\dim\FNull A+\FRank(A).
 \end{equation}
 也就是说，任意目标都能唯一拆成“$A$ 能产生的部分”与“和列空间垂直的部分”。
 
-\FiveLSFigure{a}{绿色点是列空间中离目标最近的点，红色线段记录剩下的误差。}{fig:five-ls-nearest}{%
+\FiveLSFigure{g}{红色点是列空间中离目标最近的点，绿色线段记录剩下的误差。正交直和先确定唯一输出，随后才求输入权重；剩下的误差在列探测器上的响应为零。}{fig:five-ls-nearest}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
  \draw[fiveax] (0,-.45)--(0,2.3) node[above] {$\mathbb R^2$};
- \draw[FiveB,line width=1.1pt] (-1,0)--(5,0);
- \node[text=FiveB,below] at (4,0) {$\operatorname{Col}(A)$};
+ \draw[FiveR,line width=1.1pt] (-1,0)--(5,0);
+ \node[text=FiveR,below] at (4,0) {$\operatorname{Col}(A)$};
  \node[below left] at (0,0) {$\boldsymbol0$};
- \draw[fiver] (0,0)--(2.5,1.7);
- \draw[fiveg] (0,0)--(2.5,0);
- \draw[fiver] (2.5,0)--(2.5,1.7) node[midway,right] {$\boldsymbol e$};
+ \draw[lsread] (0,0)--(2.5,1.7);
+ \draw[fiver] (0,0)--(2.5,0);
+ \draw[fiveg] (2.5,0)--(2.5,1.7) node[midway,right] {$\boldsymbol e$};
  \draw[FiveK,line width=.55pt] (2.25,0)--(2.25,.25)--(2.5,.25);
- \fill[FiveR] (2.5,1.7) circle(2pt) node[above] {$\boldsymbol b$};
- \fill[FiveG] (2.5,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}$};
+ \fill[FiveLSOrange] (2.5,1.7) circle(2pt) node[above] {$\boldsymbol b$};
+ \fill[FiveR] (2.5,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}$};
  \node[align=left,anchor=west,text width=6.4cm] at (6,.9)
   {$\widehat{\boldsymbol b}$ 是列空间中离 $\boldsymbol b$ 最近的点。\\[5pt]
    $\boldsymbol e\perp\operatorname{Col}(A)$。};
@@ -13190,7 +13502,6 @@ n=\dim\FNull A+\FRank(A).
 \end{equation}
 这句话就是“所有方程的误差平方和最小”。若原目标可达，$\boldsymbol e=\boldsymbol0$，它就是精确解；若不可达，$\boldsymbol e\ne\boldsymbol0$，它则是\textbf{用列空间分量代替原目标后得到的精确解}。
 
-\newpage
 \FiveHead{怎样把“误差垂直”写成一个能解的方程组？}
 把最小二乘解产生的误差 $\boldsymbol e=\boldsymbol b-A\widehat{\boldsymbol x}$ 叫作\term{residual-vector}。它属于左零空间，与 $A$ 的每一列 $\boldsymbol a_j$ 都正交。这些逐列条件合在一起，正是转置矩阵的一次作用：
 \begin{align}
@@ -13204,23 +13515,23 @@ n=\dim\FNull A+\FRank(A).
 \end{align}
 后一式叫作\term{normal-equations}。白话说，误差和每一列都垂直，把这句话写成矩阵形式，就得到正规方程。
 
-\FiveLSFigure{b}{每一列都沿着蓝色直线；最优输出到目标的误差，与这些列全部垂直。}{fig:five-ls-residual}{%
+\FiveLSFigure{h}{每一列都沿着红色直线；最优输出到目标的误差，与这些列全部垂直。每条逐列正交条件都是一个零响应读数，合起来就得到正规方程。}{fig:five-ls-residual}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\small]
  \draw[fiveax] (0,-.9)--(0,2.1);
- \draw[FiveB,line width=1.1pt] (-.8,0)--(5,0);
- \node[text=FiveB,below] at (4.1,0) {$\operatorname{Col}(A)$};
+ \draw[FiveR,line width=1.1pt] (-.8,0)--(5,0);
+ \node[text=FiveR,below] at (4.1,0) {$\operatorname{Col}(A)$};
  \foreach \xx/\jj/\yy in {.8/1/-.35,1.6/2/-.75,3.6/3/-.75}{
   \draw[fivedash,-{Stealth[length=1.8mm]}] (0,0)--(\xx,0);
   \node[text=FiveK] at (\xx,\yy) {$\boldsymbol a_{\jj}$};}
- \draw[fiveg] (0,0)--(2.6,0);
- \draw[fiver] (0,0)--(2.6,1.6);
- \draw[fiver] (2.6,0)--(2.6,1.6) node[midway,right] {$\boldsymbol e$};
+ \draw[fiver] (0,0)--(2.6,0);
+ \draw[lsread] (0,0)--(2.6,1.6);
+ \draw[fiveg] (2.6,0)--(2.6,1.6) node[midway,right] {$\boldsymbol e$};
  \draw[FiveK] (2.35,0)--(2.35,.25)--(2.6,.25);
- \fill[FiveR] (2.6,1.6) circle(2pt) node[above] {$\boldsymbol b$};
- \fill[FiveG] (2.6,0) circle(2pt) node[below] {$A\widehat{\boldsymbol x}$};
+ \fill[FiveLSOrange] (2.6,1.6) circle(2pt) node[above] {$\boldsymbol b$};
+ \fill[FiveR] (2.6,0) circle(2pt) node[below] {$A\widehat{\boldsymbol x}$};
  \node[anchor=west,align=left,text width=6.6cm] at (6,.75)
   {$\boldsymbol e$ 与 $A$ 的每一列正交。\\[5pt]
-   这里画出列空间为一维的情形；列向量用灰色虚线表示。};
+   这里画出列空间为一维的情形；灰色虚线标出列向量，绿色残差在这些探测器上的读数全为零。};
 \end{tikzpicture}}
 
 \begin{theorem}[最小二乘解的等价条件]
@@ -13231,7 +13542,7 @@ n=\dim\FNull A+\FRank(A).
 先看存在性：式\eqref{eq:five-ls-split}给出列空间中的 $\widehat{\boldsymbol b}$，它一定有原像，所以最小二乘解总能找到。若输入最优，最近输出的唯一性说明 $A\widehat{\boldsymbol x}=\widehat{\boldsymbol b}$；误差便属于左零空间，上面的逐列推导给出正规方程。反过来，若满足正规方程，则 $\boldsymbol b-A\widehat{\boldsymbol x}\in\operatorname{Null}(A^{\mathrm T})$，而 $A\widehat{\boldsymbol x}\in\operatorname{Col}(A)$。直和分解唯一，所以这两部分必定就是 $\boldsymbol e$ 和 $\widehat{\boldsymbol b}$；再由式\eqref{eq:five-ls-shortest}，这个输入确实最优。两个方向都已说明。
 \end{proof}
 
-\FiveLSFigure{c}{正规方程把 $m$ 条方程整理为 $n$ 条条件；是否唯一，仍要看 $A$ 的列是否线性无关。}{fig:five-ls-normal-blocks}{%
+\FiveLSFigure{i}{正规方程把 $m$ 条方程整理为 $n$ 条条件，原始目标读数与组合结果读数在输入端匹配。是否唯一，仍要看 $A$ 的列是否线性无关；转置不是对原映射求逆。}{fig:five-ls-normal-blocks}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
  \foreach \yy in {1.05,-.15}{
   \filldraw[fill=FiveB!12,draw=FiveB!65] (0,\yy) rectangle ++(1.9,.85);
@@ -13253,7 +13564,6 @@ n=\dim\FNull A+\FRank(A).
 \end{tikzpicture}}
 原来的 $m$ 条等式可能无法同时成立；新的 $n$ 条条件要求误差逐列垂直。未知量仍有 $n$ 个，正规方程始终有解，但还没有保证解唯一。
 
-\newpage
 \FiveHead{正规方程有一个答案，还是有一整族答案？}
 问题落在 $n\times n$ 的系数矩阵 $A^{\mathrm T}A$ 上。它会不会比 $A$ 多出一些被送到零的输入？下面的事实把新方程重新接回原来的零空间。
 
@@ -13281,7 +13591,7 @@ n=\dim\FNull A+\FRank(A).
 \end{equation}
 这个公式写出唯一解；实际计算也可以直接解正规方程。若列线性相关，零空间含有非零方向，正规方程已经有解，所以沿这些方向可以得到无穷多个解。
 
-\FiveLSFigure{d}{左边只有一个最优输入；右边有一条解直线，但线上所有输入都产生同一个最优输出。}{fig:five-ls-unique}{%
+\FiveLSFigure{j}{左边只有一个最优输入；右边有一条解直线，但线上所有输入都产生同一个最优输出。互相关矩阵修正读数，却不会消除原矩阵的零空间自由度。}{fig:five-ls-unique}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
  \node at (2.8,2.2) {$A$ 的列线性无关};
  \node at (10,2.2) {$A$ 的列线性相关：示意一维零空间};
@@ -13306,16 +13616,16 @@ n=\dim\FNull A+\FRank(A).
 \end{equation}
 因此解集仍是零空间的平移，维数为 $n-\operatorname{rank}(A)$。输入可以不同，输出却始终是唯一的 $\widehat{\boldsymbol b}$；这正是本章反复出现的解结构。
 
-\FiveLSFigure{e}{原方程无解，正规方程仍有解；绿色直线表示一个最优输入加上零空间中的变化。}{fig:five-ls-solution-sets}{%
+\FiveLSFigure{k}{原方程无解，正规方程仍有解；绿色直线表示一个最优输入加上零空间中的变化。沿绿色方向改变权重，组合结果与全部响应读数都保持不变。}{fig:five-ls-solution-sets}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
  \node at (2.8,2.05) {原方程：在输出端看目标};
  \node at (10.2,2.05) {正规方程：在输入端看解集};
  \draw[fiveax] (0,-.35)--(0,1.65);
- \draw[FiveB,line width=1.1pt] (-.5,0)--(5.7,0);
- \node[text=FiveB,below] at (4.2,0) {$\operatorname{Col}(A)$};
- \fill[FiveR] (2,1.3) circle(2pt) node[above] {$\boldsymbol b$};
+ \draw[FiveR,line width=1.1pt] (-.5,0)--(5.7,0);
+ \node[text=FiveR,below] at (4.2,0) {$\operatorname{Col}(A)$};
+ \fill[FiveLSOrange] (2,1.3) circle(2pt) node[above] {$\boldsymbol b$};
  \draw[fivedash] (2,0)--(2,1.3);
- \fill[FiveG] (2,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}$};
+ \fill[FiveR] (2,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}$};
  \node[text=FiveR] at (2.6,-.65) {$A\boldsymbol x=\boldsymbol b$ 的解集为 $\varnothing$};
  \draw[fiveax] (7.4,0)--(13.8,0);\draw[fiveax] (8,-.35)--(8,1.6);
  \draw[fivedash] (8,-.35)--(8,1.6);
@@ -13328,23 +13638,23 @@ n=\dim\FNull A+\FRank(A).
 \FiveHead{为什么不能随便挑一个方向拆开目标？}
 同一个目标，也能沿斜方向接近列空间，但那样留下的误差更长。本章的直和分解给出右图的分解方式；第7章将从投影的角度系统解释这种最短距离关系。
 
-\FiveLSFigure{h}{本章的直和分解给出右图：沿与列空间垂直的方向拆开目标，误差最短。这种最短距离关系将在第7章系统讨论。}{fig:five-ls-two-directions}{%
+\FiveLSFigure{l}{本章的直和分解给出右图：沿与列空间垂直的方向拆开目标，误差最短。右图残差在所有特征探测器上读作零，左图没有满足这一条件；这种最短距离关系将在第7章系统讨论。}{fig:five-ls-two-directions}{%
 \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
  \foreach \xx in {0,7.4}{
   \draw[fiveax] (\xx,-.45)--(\xx,2.15);
-  \draw[FiveB,line width=1.1pt] (\xx-.5,0)--(\xx+5.3,0);
-  \node[text=FiveB,below] at (\xx+4.1,0) {$\operatorname{Col}(A)$};
-  \fill[FiveR] (\xx+2.5,1.5) circle(2pt) node[above] {$\boldsymbol b$};}
+  \draw[FiveR,line width=1.1pt] (\xx-.5,0)--(\xx+5.3,0);
+  \node[text=FiveR,below] at (\xx+4.1,0) {$\operatorname{Col}(A)$};
+  \fill[FiveLSOrange] (\xx+2.5,1.5) circle(2pt) node[above] {$\boldsymbol b$};}
  \node at (2.7,2.45) {沿非正交方向分解};
  \node at (10.1,2.45) {沿正交方向分解};
  \draw[fivedash] ({.8-1.7*.35/1.5},-.35)--({.8+1.7*1.85/1.5},1.85);
- \draw[fiver] (.8,0)--(2.5,1.5) node[midway,above left] {$\boldsymbol e_1$};
- \fill[FiveG] (.8,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}_1$};
+ \draw[fiveg] (.8,0)--(2.5,1.5) node[midway,above left] {$\boldsymbol e_1$};
+ \fill[FiveR] (.8,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}_1$};
  \node[text=FiveR] at (2.5,-.65) {误差 $\boldsymbol e_1$ 更长};
  \draw[fivedash] (9.9,-.35)--(9.9,1.85);
- \draw[fiver] (9.9,0)--(9.9,1.5) node[midway,right] {$\boldsymbol e_2$};
+ \draw[fiveg] (9.9,0)--(9.9,1.5) node[midway,right] {$\boldsymbol e_2$};
  \draw[FiveK] (9.65,0)--(9.65,.25)--(9.9,.25);
- \fill[FiveG] (9.9,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}_2$};
+ \fill[FiveR] (9.9,0) circle(2pt) node[below] {$\widehat{\boldsymbol b}_2$};
  \node[text=FiveR] at (10,-.65) {误差 $\boldsymbol e_2$ 最短};
 \end{tikzpicture}}
 
@@ -13359,7 +13669,7 @@ n=\dim\FNull A+\FRank(A).
 \end{align}
 三个点不在同一条过原点的直线上，但 $k=17/14$ 让三条方程的误差平方和最小。这也回答了第0章用点积拟合数据时留下的问题。
 
-\FiveLSFigure{f}{这条直线使纵向误差的平方和最小，三个误差却没有全部变成零。灰色竖线记录纵向差，不是点到直线的垂直距离。}{fig:five-ls-fit}{%
+\FiveLSFigure{m}{这条直线使纵向误差的平方和最小，三个误差却没有全部变成零。灰色竖线记录纵向差，不是点到直线的垂直距离；探测器扫描的是三维残差记录，而不是这张数据图上的每一段竖线。}{fig:five-ls-fit}{%
 \begin{tikzpicture}[x=1cm,y=.72cm,font=\footnotesize]
  \draw[fiveax] (-.3,0)--(5.1,0) node[right] {$x$};
  \draw[fiveax] (0,-.35)--(0,5.3) node[above] {$y$};
@@ -13385,6 +13695,8 @@ n=\dim\FNull A+\FRank(A).
 误差向量与 $(1,2,3)^{\mathrm T}$ 的点积为零，这才是正规方程要求的条件；过原点拟合不保证残差之和为零。由于 $A$ 只有一列且该列非零，本例的最小二乘解唯一。
 
 \FiveHead{这条路线怎样走向第7章？}
+回到第三章的语言：先用转置读取目标响应，再用互相关矩阵把响应关系写成正规方程，最后检查残差是否在全部探测器上读作零。正向组合、反向评分与四个子空间现在合成了同一条求解路线。读数有确定的含义，权重是否唯一却仍由零空间决定；“最优输出唯一”与“最优输入唯一”必须分开判断。
+
 最小二乘解把“有解时的全部解”延伸到“无解时的最优近似”：先用唯一的列空间分量替代原目标，再求它的全部原像。正规方程把这项任务变成已有的线性方程组问题。我们用点积验证了最短距离，却还没有建立任意子空间中分解与计算的一般方法；第7章的正交投影将系统回答这些问题。
 \endgroup
 \clearpage

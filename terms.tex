@@ -19,6 +19,7 @@
 \DeclareLectureTerm{vector-field}{矢量场}{Vector Field}{为状态空间的每个点指定一支向量的对应；连续系统的 $A\boldsymbol y$ 在该点表示瞬时变化率。}
 
 % 第5.7节：无解时的最优近似。
+\DeclareLectureTerm{detector-correlation-matrix}{互相关矩阵}{Detector Correlation Matrix}{本书在特征探测器语境中指矩阵 $A^{\mathrm T}A$；其第 $(i,j)$ 个元素为列向量的点积 $\boldsymbol a_i\cdot\boldsymbol a_j$，对角线记录自身增益，非对角线记录重叠响应；这里未作归一化，不是统计学的相关系数矩阵。}
 \DeclareLectureTerm{least-squares-solution}{最小二乘解}{Least-Squares Solution}{使 $\|\boldsymbol b-A\boldsymbol x\|^2$ 最小的输入；等价于正规方程的解，最优输出唯一，输入是否唯一取决于 $A$ 的零空间。}
 \DeclareLectureTerm{residual-vector}{残差向量}{Residual Vector}{目标与实际输出之差 $\boldsymbol b-A\boldsymbol x$；最小二乘解的残差属于 $\operatorname{Null}(A^{\mathrm T})$，与列空间正交。}
 \DeclareLectureTerm{normal-equations}{正规方程}{Normal Equations}{最小二乘问题对应的线性方程组 $A^{\mathrm T}A\boldsymbol x=A^{\mathrm T}\boldsymbol b$；它始终有解，全部解构成原矩阵零空间的一次平移。}
