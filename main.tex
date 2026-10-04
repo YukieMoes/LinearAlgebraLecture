@@ -15719,15 +15719,151 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \end{equation}
 \end{corollary}
 
-几何上，三角排列让逐层的高度容易读出；对角矩阵就是各边沿坐标轴的长方体。代数上，把上三角矩阵的各列按标准基展开。第1列只有 $u_{11}\boldsymbol e_1$，所以先提出 $u_{11}$；第2列的 $\boldsymbol e_1$ 项会造成重复输入，贡献为0，只留下 $u_{22}\boldsymbol e_2$。依次向后，第 $j$ 列沿前 $j-1$ 支基向量的项都因重复而消失，只留下 $u_{jj}\boldsymbol e_j$。最后标准基的值为1，就得到对角元乘积。这个展开无需除法，对角元为0时仍成立；下三角情形由转置得到。
+为什么只看对角线，就能读出一整个平行体的体积？先看对角元都非零的上三角矩阵。它的作用可以理解为：先沿各坐标轴按对角元缩放，再叠加沿前面坐标方向的切变。非对角元素使边变斜，却不增加新的垂直高度；切变不改变有向体积，所以最终的体积缩放因子，只由各轴的缩放倍数相乘得到。对角元为负时，还要计入方向翻转；对角元为零时，平行体则失去一个独立方向，体积塌缩为0。下三角矩阵只是把“前面的方向”换成“后面的方向”，道理相同。
+
+\DetFigure{左图是标准基围出的单位立方体，右图是矩阵 $U=\left(\begin{smallmatrix}2&3&4\\0&5&6\\0&0&7\end{smallmatrix}\right)$ 的列向量围出的平行六面体，两图分别缩放排版。蓝、红、绿三条边的新增坐标分量依次为2、5、7；灰色虚线标出非对角分量造成的偏移。切变改变形状而不改变有向体积，体积缩放因子为 $2\cdot5\cdot7=70$。}{fig:six-triangular-stretch-shear}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.35,-.95) grid (14.15,4.3);
+ \node[font=\small\bfseries] at (2,3.9) {标准基：单位立方体};
+ \node[font=\small\bfseries] at (10.2,3.9) {上三角变换：拉伸与切变};
+ \begin{scope}[shift={(.85,1)},x={(1.45cm,-.27cm)},y={(.72cm,.45cm)},z={(0cm,1.65cm)}]
+  \fill[DetBlue!8] (0,0,0)--(1,0,0)--(1,1,0)--(0,1,0)--cycle;
+  \fill[DetRose!7] (1,0,0)--(1,1,0)--(1,1,1)--(1,0,1)--cycle;
+  \fill[DetGreen!8] (0,0,1)--(1,0,1)--(1,1,1)--(0,1,1)--cycle;
+  \draw[DetGray!65] (0,0,0)--(1,0,0)--(1,1,0)--(1,1,1)--(0,1,1)--(0,0,1)--cycle;
+  \draw[DetGray!65] (1,0,0)--(1,0,1)--(1,1,1) (0,0,1)--(1,0,1);
+  \draw[detguide] (0,0,0)--(0,1,0)--(1,1,0) (0,1,0)--(0,1,1);
+  \draw[detblue] (0,0,0)--(1,0,0) node[below] {$\mathbf e_1$};
+  \draw[detrose] (0,0,0)--(0,1,0) node[above left] {$\mathbf e_2$};
+  \draw[detgreen] (0,0,0)--(0,0,1) node[left] {$\mathbf e_3$};
+ \end{scope}
+ \node at (2,.25) {单位体积 $=1$};
+ \draw[detblue] (4.1,2)--node[above] {$U$} (6,2);
+ \node[align=center,font=\footnotesize,text=DetGray] at (5.05,1.35) {各轴缩放\\再叠加切变};
+ \begin{scope}[shift={(7.15,.85)},x={(.32cm,-.06cm)},y={(.14cm,.105cm)},z={(0cm,.24cm)}]
+  \fill[DetBlue!8] (0,0,0)--(2,0,0)--(5,5,0)--(3,5,0)--cycle;
+  \fill[DetRose!7] (2,0,0)--(5,5,0)--(9,11,7)--(6,6,7)--cycle;
+  \fill[DetGreen!8] (4,6,7)--(6,6,7)--(9,11,7)--(7,11,7)--cycle;
+  \draw[DetGray!65] (0,0,0)--(2,0,0)--(5,5,0)--(9,11,7)--(7,11,7)--(4,6,7)--cycle;
+  \draw[DetGray!65] (2,0,0)--(6,6,7)--(9,11,7) (4,6,7)--(6,6,7);
+  \draw[detguide] (0,0,0)--(3,5,0)--(5,5,0) (3,5,0)--(7,11,7);
+  \draw[detguide] (0,0,0)--(0,5,0)--(3,5,0) (0,0,0)--(0,0,7)--(4,6,7);
+  \draw[detblue] (0,0,0)--(2,0,0) node[below] {$\boldsymbol a_1$};
+  \draw[detrose] (0,0,0)--(3,5,0) node[below right] {$\boldsymbol a_2$};
+  \draw[detgreen] (0,0,0)--(4,6,7) node[above left] {$\boldsymbol a_3$};
+ \end{scope}
+ \node[font=\footnotesize,align=center] at (10.2,-.3)
+  {对角元：各轴缩放倍数 $2,5,7$\\非对角元：切变分量；切变不改变体积};
+\end{tikzpicture}}
+
+\Needspace{7\baselineskip}
+\begin{proof}
+先看上三角矩阵。设 $\mathbf e_1,\ldots,\mathbf e_n$ 是标准基，第 $j$ 列为 $\boldsymbol a_j$，记 $\lambda_j=u_{jj}$。上三角结构意味着
+\begin{equation*}
+ \boldsymbol a_j=u_{1j}\mathbf e_1+\cdots+u_{j-1,j}\mathbf e_{j-1}
+                 +\lambda_j\mathbf e_j
+ \in\operatorname{Span}\{\mathbf e_1,\ldots,\mathbf e_j\}.
+\end{equation*}
+也就是说，第 $j$ 支标准基的像不会跑出前 $j$ 维子空间。这种\textbf{子空间递推}让我们能够按列逐步消去倾斜的分量，每一步只用保持行列式不变的列倍加变换。
+
+\textbf{先设全部对角元非零。}第1列已经是 $\boldsymbol a_1=\lambda_1\mathbf e_1$。第2列为 $u_{12}\mathbf e_1+\lambda_2\mathbf e_2$，作
+\begin{equation*}
+ C_2\leftarrow C_2-\frac{u_{12}}{\lambda_1}C_1,
+\end{equation*}
+就只剩 $\lambda_2\mathbf e_2$，行列式不变。第3列的前两个分量也能用已整理好的两列消去：依次作
+\begin{equation*}
+ C_3\leftarrow C_3-\frac{u_{13}}{\lambda_1}C_1,
+ \qquad
+ C_3\leftarrow C_3-\frac{u_{23}}{\lambda_2}C_2,
+\end{equation*}
+第3列就只剩 $\lambda_3\mathbf e_3$，行列式仍不变。几何上，前两步都是沿已经确定的边滑动顶端，把切变分量撤销。
+
+一般地，若前 $k-1$ 列已经整理为 $\lambda_1\mathbf e_1,\ldots,\lambda_{k-1}\mathbf e_{k-1}$，第 $k$ 列仍只有前 $k$ 个分量。依次作
+\begin{equation*}
+ C_k\leftarrow C_k-\frac{u_{ik}}{\lambda_i}C_i,
+ \qquad i=1,\ldots,k-1,
+\end{equation*}
+便消去前 $k-1$ 个方向上的分量，只留下 $\lambda_k\mathbf e_k$。所有分母都非零，因此这条递推可以进行到底。最终得到对角矩阵；由各列的线性性提出公因子，
+\begin{equation*}
+ \det(U)=\det\bigl(\operatorname{diag}(\lambda_1,\ldots,\lambda_n)\bigr)
+ =\lambda_1\cdots\lambda_n\det(E_n)
+ =\lambda_1\cdots\lambda_n.
+\end{equation*}
+平行体被逐次切正以后，各条边沿坐标轴排列，乘积读数与几何中的体积完全对应。
+
+\textbf{再看有对角元为零的情形。}设 $\lambda_k$ 是第一个为零的对角元。前 $k-1$ 列仍能按上面的方式整理好，但第 $k$ 列没有 $\mathbf e_k$ 分量，只在前 $k-1$ 维子空间中。用前面的列倍加消去这些分量后，第 $k$ 列成为零列，因而行列式为0；若 $k=1$，则第1列本来就是零列。此时对角元乘积也为0，所以结论仍成立。这里不能除以 $\lambda_k$：它表示新的一维高度没有出现，平行体已经塌缩。
+
+最后，若 $U$ 是下三角矩阵，则 $U^{\mathrm T}$ 是上三角矩阵，且主对角线相同。由转置不改变行列式，下三角情形得到完全相同的乘积公式。
+\end{proof}
+
+\DetHead{跟着三次列倍加，把斜盒子切正}
+取一个可以逐步看清的上三角矩阵：
+\begin{equation*}
+ A=\DetMat{rrr}{2&3&4\\0&5&6\\0&0&7}.
+\end{equation*}
+它的三条边分别为 $2\mathbf e_1$、$3\mathbf e_1+5\mathbf e_2$、$4\mathbf e_1+6\mathbf e_2+7\mathbf e_3$。先整理第2列，再整理第3列，与刚才的证明使用同一条路线：
+\begin{align*}
+ A&\xrightarrow{\ C_2\leftarrow C_2-\frac32C_1\ }
+ A^{(1)}=\DetMat{rrr}{2&0&4\\0&5&6\\0&0&7},\\[3pt]
+ A^{(1)}&\xrightarrow{\ C_3\leftarrow C_3-2C_1\ }
+ A^{(2)}=\DetMat{rrr}{2&0&0\\0&5&6\\0&0&7},\\[3pt]
+ A^{(2)}&\xrightarrow{\ C_3\leftarrow C_3-\frac65C_2\ }
+ D=\DetMat{rrr}{2&0&0\\0&5&0\\0&0&7}.
+\end{align*}
+第一步沿第1条边移动第2条边，消去分量3；\textbf{行列式不变}。第二步沿第1条边移动第3条边，消去分量4；\textbf{行列式不变}。第三步沿已经切正的第2条边移动第3条边，消去分量6；\textbf{行列式仍不变}。于是
+\begin{equation*}
+ \det(A)=\det\bigl(A^{(1)}\bigr)=\det\bigl(A^{(2)}\bigr)=\det(D)
+ =2\cdot5\cdot7\det(E_3)=70.
+\end{equation*}
+最后一步提出三列的公因子，把三条边分别缩回单位长度；外面的 $2\cdot5\cdot7$ 保存原来的体积倍率。
+
+\DetFigure{三栏分别画出三次列倍加后的平行六面体，采用相同的坐标比例；蓝、红、绿箭头表示当前的三列，灰色虚线箭头表示本步操作前被调整的那条边。沿已有边撤销切变，斜盒子逐次变成沿坐标轴排列的长方体。三次操作均保持体积，行列式始终为70。}{fig:six-triangular-column-shears}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.2,-.6) grid (14,4.25);
+ \foreach \sh/\tx/\ty/\gx/\gy/\gz/\hx/\hy/\hz/\stepno/\operation in {
+  0/4/6/3/5/0/0/5/0/1/{C_2\leftarrow C_2-\frac32C_1},
+  4.65/0/6/4/6/7/0/6/7/2/{C_3\leftarrow C_3-2C_1},
+  9.3/0/0/0/6/7/0/0/7/3/{C_3\leftarrow C_3-\frac65C_2}} {
+  \node[font=\footnotesize] at ({\sh+2},3.75) {第\stepno 步：$\operation$};
+  \begin{scope}[shift={({\sh+.5},.85)},x={(.30cm,-.055cm)},y={(.105cm,.075cm)},z={(0cm,.24cm)}]
+   \coordinate (O) at (0,0,0);
+   \coordinate (P1) at (2,0,0);
+   \coordinate (P2) at (0,5,0);
+   \coordinate (P3) at (\tx,\ty,7);
+   \coordinate (P12) at (2,5,0);
+   \coordinate (P13) at ({2+\tx},\ty,7);
+   \coordinate (P23) at (\tx,{5+\ty},7);
+   \coordinate (P123) at ({2+\tx},{5+\ty},7);
+   \fill[DetBlue!8] (O)--(P1)--(P12)--(P2)--cycle;
+   \fill[DetRose!7] (P1)--(P12)--(P123)--(P13)--cycle;
+   \fill[DetGreen!8] (P3)--(P13)--(P123)--(P23)--cycle;
+   \draw[DetGray!65] (O)--(P1)--(P12)--(P123)--(P23)--(P3)--cycle;
+   \draw[DetGray!65] (P1)--(P13)--(P123) (P3)--(P13);
+   \draw[detguide] (O)--(P2)--(P12) (P2)--(P23);
+   \draw[detguide,-{Stealth[length=1.6mm]}] (O)--(\gx,\gy,\gz);
+   \draw[detguide,-{Stealth[length=1.6mm]}] (\gx,\gy,\gz)--(\hx,\hy,\hz);
+   \draw[detblue] (O)--(P1);
+   \draw[detrose] (O)--(P2);
+   \draw[detgreen] (O)--(P3);
+  \end{scope}
+  \node[font=\footnotesize,align=center] at ({\sh+2},.05)
+   {反向切变，体积不变\\$\det=70$};
+ }
+\end{tikzpicture}}
+
+回看第五章式(5.40)：当时的三阶矩阵，行空间只有 $(1,1,0)^{\mathrm T}$ 这一个独立方向，列空间也只有一维；由三列围出的三维体积必为0。这里的矩阵则依次保留了 $\mathbf e_1,\mathbf e_2,\mathbf e_3$ 三个新方向，列倍加只撤销倾斜，没有消灭任何一维。\textbf{第五章用秩数出保留下来的方向，第六章用行列式量出这些方向围成的有向体积。}三角矩阵的第一个零对角元，正是这条递推中“新方向没有出现”的位置。
 
 \begin{example}[列公因子与列倍加]
-求 $A=\DetMat{rr}{2&6\\4&15}$ 的行列式。先从第1列提出2、第2列提出3，再用 $C_2\leftarrow C_2-2C_1$：
+求 $A=\DetMat{rr}{2&6\\4&15}$ 的行列式。
+
+先把两条边的共同倍率分开：第1列为 $2(1,2)^{\mathrm T}$，第2列为 $3(2,5)^{\mathrm T}$。分别提出2与3，等于先把这两条边缩回相应倍数，再把面积倍率 $2\cdot3$ 记在行列式外。接着作列倍加变换 $C_2\leftarrow C_2-2C_1$：让第二条边沿第一条边移动，消去它的第一个分量。这一步是切变，有向面积不变。因此
 \begin{equation}
  \det(A)=2\cdot3\det\!\left(\DetMat{rr}{1&2\\2&5}\right)
  =6\det\!\left(\DetMat{rr}{1&0\\2&1}\right)=6.
 \end{equation}
-第1行第2列被消为零，矩阵成为下三角形。提出的两个公因子乘在矩阵外，列倍加本身不再改变行列式。
+变换后的矩阵是下三角矩阵，对角元为1、1，所以内部的行列式为1；再乘回外面的两个公因子，得到6。\textbf{下三角和上三角使用同一条对角元乘积规则}，不必为了套用结论再把它转成上三角。
+
+这里要分清两类操作：提公因子改变了括号内平行四边形的面积，外面的倍数补回这一缩放；列倍加只改变倾斜程度，本身保持面积。把每次缩放都记清，再用切变整理边的方向，才是这条计算链的几何含义。
 \end{example}
 
 \begin{note}
