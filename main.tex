@@ -15538,40 +15538,92 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \section{从公理到性质：代数骨架的搭建}
 \label{sec:six-determinant-properties}
 
-现在有了严格定义，我们可以回答一个实际问题：图形被拉伸、翻转或倾斜时，行列式会怎样变？先看三种列变换怎样改变盒子的边，再借助转置，把同样的规则交给第二章的行消元。每一条性质都先在低维图形中看见，再用公理验证；这样，图形给出的直觉就能成为任意阶矩阵的计算规则。
+第6.1节从平行体的有向体积中，提炼出了行列式的三条公理：每一列单独线性，交换两列使值变号，标准基的值为1。本节从这三条要求出发，推导常用性质。我们先问公理允许怎样改动各列，再看这些改动对应怎样的几何动作，最后把结论接回方程组与线性映射。\textbf{代数规则不是另加的口诀，而是有向体积性质的坐标表达。}
 
-\subsection*{单位基准与三种列变换}
+\subsection*{基础列性质：从公理直接推出}
 
-单位基向量围出单位正方形或单位立方体，这解释了 $\det(E_n)=1$ 的尺度约定。若某条边为零，图形塌缩；代数上，由该位置的线性性，函数值为0。若两条边相同，方向没有独立贡献；交换这两列既不改变矩阵，又使行列式变号，因而也为0。这两件小事，将成为下面推导的支点。
-
-先把三种操作放在图形中看：倍乘一条边使高度按同一比例改变，交换两条边使定向翻转，把底边的倍数加到另一条边上则只让顶端平行移动。这三个几何动作，分别要求尺度变化、符号变化与体积保持。
+归一性给出单位刻度 $\det(E_n)=1$；另外两条公理决定这把体积尺怎样响应边的变化。先把结论集中列出，再逐条说明它们为什么成立。
 
 \begin{property}[列变换对行列式的影响]
 对方阵 $A$ 作一次列操作，得到 $B$。则
 \begin{align}
- C_i\leftarrow kC_i&:\quad \det(B)=k\det(A);\\
- C_i\leftrightarrow C_j&:\quad \det(B)=-\det(A);\\
+ C_i\leftrightarrow C_j\ (i\ne j)&:\quad \det(B)=-\det(A),\\
+ C_i\leftarrow kC_i&:\quad \det(B)=k\det(A),\\
  C_i\leftarrow C_i+kC_j\ (i\ne j)&:\quad \det(B)=\det(A).
  \label{eq:six-column-operation-determinants}
 \end{align}
-第一条对任意实数 $k$ 都成立；作为可逆的初等列变换使用时，须要求 $k\ne0$。
+此外，若两列成比例，则 $\det(A)=0$；有零列时也为0。列倍乘的等式对任意实数 $k$ 成立，但作为可逆的初等列变换使用时，须要求 $k\ne0$。
 \end{property}
 
-\DetHead{倍乘一列：改变尺度，也可能改变方向}
-几何上，固定其余边，把一条边拉长 $|k|$ 倍，带符号高度也乘 $k$；若 $k<0$，方向同时翻转。代数上，在第 $i$ 个位置直接使用多重线性，得到 $\det(\ldots,k\boldsymbol a_i,\ldots)=k\det(\ldots,\boldsymbol a_i,\ldots)$。所以不是整个矩阵乘 $k$ 才使行列式乘 $k$，\textbf{只乘一列就已经带来一次尺度变化}。若所有 $n$ 列都乘 $k$，则
+\DetHead{1. 交换两列：数值变号，形状不变}
+\textbf{公理推导}\quad 交换任意两列使行列式变号，正是交替性公理。若两列完全相同，交换后矩阵没有变化，却要求 $\det(A)=-\det(A)$；实数中这只能意味着 $\det(A)=0$。因此，\textbf{两列相同必使行列式为零}，不是一条需要另背的规则。
+
+\textbf{几何意义}\quad 两条有序边交换次序，围出的点集不变，定向却反转。有向面积或有向体积因此变为相反数；连续交换两次，方向与数值都恢复。注意，变号的是\emph{有向}体积，通常体积仍取绝对值。
+
+\DetFigure{蓝、红两条边分别为 $\boldsymbol u=(2,0)^{\mathrm T}$、$\boldsymbol v=(\frac12,\frac32)^{\mathrm T}$，两图围出相同的平行四边形。绿色弧形箭头记录读取边的次序：左侧由 $\boldsymbol u$ 转向 $\boldsymbol v$，右侧反过来；有向面积由 $+3$ 变为 $-3$，通常面积都为3。}{fig:six-column-swap-orientation}{%
+\begin{tikzpicture}[x=1.05cm,y=1.05cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.3,-1) grid (12,2.5);
+ \foreach \sh/\order/\value in {0/{(\boldsymbol u,\boldsymbol v)}/{+3},7/{(\boldsymbol v,\boldsymbol u)}/{-3}} {
+  \begin{scope}[shift={(\sh,0)}]
+   \filldraw[fill=DetBlue!8,draw=DetBlue!50] (0,0)--(2,0)--(2.5,1.5)--(.5,1.5)--cycle;
+   \draw[detblue] (0,0)--(2,0) node[below] {$\boldsymbol u$};
+   \draw[detrose] (0,0)--(.5,1.5) node[above left] {$\boldsymbol v$};
+   \node at (1.3,2.15) {$\order$};
+   \node at (1.3,-.7) {有向面积 $\value$};
+  \end{scope}
+ }
+ \draw[detgreen] (.5,0) arc[start angle=0,end angle=71.565,radius=.5];
+ \draw[detgreen] (7.1581,.4743) arc[start angle=71.565,end angle=0,radius=.5];
+ \draw[detrose] (3.5,.8)--node[above,font=\footnotesize] {交换两列} (5.8,.8);
+ \node[font=\footnotesize,text=DetGray] at (4.65,.2) {定向反转};
+\end{tikzpicture}}
+
+\DetHead{2. 数乘一列：只记录一次缩放}
+\textbf{公理推导}\quad 固定其余各列，第 $i$ 列的线性性直接给出
+\begin{equation*}
+ \det(\ldots,k\boldsymbol a_i,\ldots)=k\det(\ldots,\boldsymbol a_i,\ldots).
+\end{equation*}
+\Needspace{5\baselineskip}
+反过来，也可以从一列中提出公因子 $k$。若整个 $n$ 阶矩阵都乘 $k$，则每列都贡献一次倍率，所以
 \begin{equation}
  \det(kA)=k^n\det(A).
 \end{equation}
-在平面中，它对应两条边同时伸长；面积乘的是 $k^2$。
+这里是 $n$ 次列缩放，不能只在行列式外乘一次 $k$。
 
-\DetHead{交换两列：形状不动，方向变号}
-交换两条有序边，不改变平行体作为一个点集的形状，却改变其定向。公理中的交替性正是这一事实的代数写法。连续作两次交换，符号翻转两次，又回到原值；这也解释了三维混合积循环换序不变。
+\textbf{几何意义}\quad 只把一条边拉长 $|k|$ 倍，有向体积便乘 $k$；$k<0$ 时，这条边还反向，定向随之翻转；$k=0$ 时，边被压成零向量。若所有边都伸长2倍，平面面积乘4，三维体积乘8，这正是上式在低维中的读数。
 
-\DetHead{倍加一列：倾斜而不改变体积}
-固定底边，把另一条边加上底边的倍数，顶端沿平行于底边的方向移动，底与高都不变。三维中，沿底面移动顶端同样不改变体积。坐标图形可能明显变斜，行列式却保持原值。
+\DetFigure{左侧蓝色底边长度为2，右侧只把这条边伸长为4，红色边保持不变；灰色虚线标出相同的高 $\frac32$。因此有向面积由3变为6，倍率为2。图中仅改变第一列，若两列同时乘2，面积倍率就应当是 $2^2$。}{fig:six-column-scaling-volume}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.3,-1) grid (14,2.55);
+ \draw[detguide] (-.2,1.5)--(13,1.5);
+ \filldraw[fill=DetBlue!8,draw=DetBlue!50] (0,0)--(2,0)--(2.5,1.5)--(.5,1.5)--cycle;
+ \draw[detblue] (0,0)--(2,0) node[below] {$\boldsymbol u$};
+ \draw[detrose] (0,0)--(.5,1.5) node[above left] {$\boldsymbol v$};
+ \node at (1.25,-.7) {有向面积 $3$};
+ \draw[detblue] (3.5,.8)--node[above,font=\footnotesize] {仅第一列乘2} (6,.8);
+ \begin{scope}[shift={(7.5,0)}]
+  \filldraw[fill=DetBlue!8,draw=DetBlue!50] (0,0)--(4,0)--(4.5,1.5)--(.5,1.5)--cycle;
+  \draw[detblue] (0,0)--(4,0) node[below] {$2\boldsymbol u$};
+  \draw[detrose] (0,0)--(.5,1.5) node[above left] {$\boldsymbol v$};
+  \node at (2.25,-.7) {有向面积 $6=2\times3$};
+ \end{scope}
+\end{tikzpicture}}
+
+\DetHead{3. 列倍加：切变保持有向体积}
+\textbf{公理推导}\quad 把第 $i$ 列改为 $\boldsymbol a_i+k\boldsymbol a_j$，其中 $i\ne j$。只在这个位置使用线性性，
+\begin{align}
+ \det(\ldots,\boldsymbol a_i+k\boldsymbol a_j,\ldots,\boldsymbol a_j,\ldots)
+ &=\det(\ldots,\boldsymbol a_i,\ldots,\boldsymbol a_j,\ldots)\\
+ &\quad+k\det(\ldots,\boldsymbol a_j,\ldots,\boldsymbol a_j,\ldots)\\
+ &=\det(\ldots,\boldsymbol a_i,\ldots,\boldsymbol a_j,\ldots).
+\end{align}
+第二项有两列相同，因而为0。这条推导只拆开一列，没有使用任何行列式的排列公式。
+
+\textbf{几何意义}\quad 把一条边加上另一条边的倍数，相当于沿固定边的方向滑动顶端。平面中的底与高不变，三维中的底面积与高也不变；形状变斜，有向体积却保持原值。\textbf{列倍加变换对应切变变换}。稍后证明它同样适用于行，就能用第二章的高斯消元整理数表，同时保留体积读数。
 
 \DetFigure{向上边加上底边的倍数，只让顶端横向移动。左、右两块平行四边形的底长与高都相同；灰色虚线标出共同的高度，因此有向面积相等。}{fig:six-shear-area}{%
 \begin{tikzpicture}[x=1.3cm,y=1.15cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.3,-1) grid (9.9,2);
  \draw[detguide] (-.3,1.5)--(9.2,1.5);
  \begin{scope}
   \filldraw[fill=DetBlue!7,draw=DetBlue!55] (0,0)--(2,0)--(2.4,1.5)--(.4,1.5)--cycle;
@@ -15588,85 +15640,53 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
  \end{scope}
 \end{tikzpicture}}
 
-代数上，把发生改变的那一列拆开：
-\begin{align}
- \det(\ldots,\boldsymbol a_i+k\boldsymbol a_j,\ldots,\boldsymbol a_j,\ldots)
- &=\det(\ldots,\boldsymbol a_i,\ldots,\boldsymbol a_j,\ldots)\\
- &\quad+k\det(\ldots,\boldsymbol a_j,\ldots,\boldsymbol a_j,\ldots)\\
- &=\det(\ldots,\boldsymbol a_i,\ldots,\boldsymbol a_j,\ldots).
-\end{align}
-第二项有两列相同，因而为0。图形中的“高没变”，在公理中体现为这一项消失。\textbf{倍加不改变行列式}，就是用高斯消元计算行列式的基础。
+\DetHead{4. 比例列与零列：独立方向没有凑齐}
+\textbf{公理推导}\quad 若 $\boldsymbol a_i=k\boldsymbol a_j$，先从第 $i$ 列提出 $k$，剩下两列相同，所以行列式为0。零列也可直接由线性性处理：$\det(\ldots,\boldsymbol0,\ldots)=0\det(\ldots,\boldsymbol v,\ldots)=0$。这个证明对一阶矩阵同样适用，不需要再找另一列。
+
+\textbf{几何意义}\quad 成比例的两条边沿同一直线，不能各贡献一个独立方向；零边则连一个方向也没有。围出的平行体因此只落在低维子空间里，完整的 $n$ 维体积为0。更一般地，\textbf{只要各列线性相关，行列式就为0}：选一列写成其余列的线性组合，在该位置使用线性性，每个分项都有重复列，故都为0。第1章的线性相关，在这里表现为体积的塌缩；这个结论也将用于下面的证明。
 
 \begin{example}[一眼分清三种操作]
 原矩阵 $A=\DetMat{cc}{2&1\\1&3}$ 的行列式为5。将第2列乘3，行列式变为15；交换两列，变为 $-5$；将第2列减去第1列的2倍，变为 $\DetMat{rr}{2&-3\\1&1}$，行列式仍为 $2+3=5$。三个结果分别对应拉伸、换方向和切变。
 \end{example}
 
-\subsection*{体积何时塌缩：可逆性判定}
+列的规则已经建立，但第二章的消元主要改动的是行。要把两者接起来，还需回答一个问题：按行围出的有向体积，为什么与按列围出的相同？
 
-面积为0时，两条边共线；体积为0时，三条边共面。高维中，若 $n$ 个方向线性相关，它们围出的平行体也失去完整的 $n$ 维体积。这个图景与第四章“输入信息能否恢复”的问题是同一件事：某个独立方向被压掉，就不可能唯一恢复每个输入。
+\subsection*{转置与行变换：把一侧的规则交给另一侧}
 
-\begin{theorem}[行列式、线性无关与可逆性]
-对 $n$ 阶方阵 $A$，下列命题等价：$A$ 可逆；$\det(A)\ne0$；$A$ 的列向量组线性无关；$A$ 的行向量组线性无关。
-\end{theorem}
-
-\begin{proof}
-若列向量线性相关，就能选出一列，写成其余列的线性组合。把它代入多重线性公式，每个展开项都出现两列相同，故 $\det(A)=0$。这把几何上的塌缩写成了代数上的零值。
-
-若列向量线性无关，对 $A^{\mathrm T}$ 作第二章的行消元，再转置回来，就是把 $A$ 化成 $E_n$ 的列消元。这里使用的是矩阵转置的运算规则，还没有假定行列式在转置下不变。沿途只作交换、非零倍乘与倍加；由刚证明的三条规则，行列式只会乘上非零因子，或保持不变。终点的值为1，所以起点不可能为0。于是 $\det(A)\ne0$ 当且仅当各列线性无关。
-
-第四章已证明行秩等于列秩；对方阵，列向量线性无关等价于行向量线性无关，也等价于对应映射为双射，即矩阵可逆。把这些结论连接起来，就得到全部等价关系。
-\end{proof}
-
-几何直观现在有了严格保证：\textbf{有向体积非零，说明方向没有塌缩；方向没有塌缩，说明映射可以撤销。}对方阵而言，$\det(A)=0$ 不是“方程组必定无解”：右端项在列空间内时仍有解，只是存在自由度。第五章的目标位置与零空间，仍然需要分别检查。
-
-本节得到的是“能不能逆”的新判据。第三章已有消元求逆的方法；下一节还将从代数余子式构造一个显式的逆矩阵公式。先把其余运算性质接好，才能看清这个公式为什么成立。
-
-\subsection*{乘积与转置：从一侧的规则走向两侧的规则}
-
-先作一次线性变换，再作另一次，区域经历两次缩放：若第一次的有向倍率为 $\det(B)$，第二次为 $\det(A)$，合起来应当是二者的乘积。负号也随之相乘：翻转两次，整体方向恢复。第三章的映射复合，在这里获得了体积上的读数。
-
-\begin{theorem}[乘积法则]
-对同阶方阵 $A,B$，有
+\begin{theorem}[转置不改变行列式]
+对任意方阵 $A$，有
 \begin{equation}
- \det(AB)=\det(A)\det(B).
- \label{eq:six-det-product}
+ \det(A^{\mathrm T})=\det(A).
+ \label{eq:six-det-transpose}
 \end{equation}
 \end{theorem}
+\DetBoxLabel{thm:six-determinant-transpose}
 
+\Needspace{6\baselineskip}
 \begin{proof}
-固定 $A$，把 $F_A(B)=\det(AB)$ 看成关于 $B$ 各列的函数。若 $\boldsymbol b_j$ 是 $B$ 的第 $j$ 列，则 $AB$ 的第 $j$ 列是 $A\boldsymbol b_j$；这个对应是线性的。因此 $F_A$ 对 $B$ 的每列线性；交换 $B$ 的两列，也交换 $AB$ 的两列，所以 $F_A$ 具有交替性。
+不能只说“转置后仍满足三条公理”就结束：公理原本规定的是\emph{列}，这句话还需要说明。我们先用公理给一次初等映射计算倍率，再把它接到第三章的消元上。
 
-单位基准为 $F_A(E_n)=\det(A)$。由定理\ref{thm:six-determinant-existence}的尺度结论，
+设 $F$ 是可逆的初等矩阵。它把单位矩阵的一行交换、非零倍乘或倍加；按列观察，这些矩阵同样能从单位矩阵通过一次相应的列操作得到。因此列规则给出 $\det(F)$ 分别为 $-1$、$k$、1；$F^{\mathrm T}$ 也属于同一类型，且参数不变，所以 $\det(F^{\mathrm T})=\det(F)\ne0$。
+
+现在固定这个 $F$，把 $\Phi_F(X)=\det(F\boldsymbol x_1,\ldots,F\boldsymbol x_n)$ 看成关于 $X$ 各列的函数。由于 $F$ 是线性映射，$\Phi_F$ 对每列线性；交换两列，也交换它们的像，故仍具有交替性。它在标准基处的值为 $\det(F)$，所以由第6.1节定理\ref{thm:six-determinant-existence}的唯一性与尺度结论，
+\begin{equation*}
+ \det(FX)=\det(F)\det(X).
+\end{equation*}
+这是\emph{一次初等映射}的倍率规则，由列公理直接得到，尚未借用一般的乘积法则或行变换规则。
+
+若 $A$ 可逆，第三章已说明它可以写成初等矩阵的连乘 $A=F_1\cdots F_s$。逐次使用刚才的倍率规则，$\det(A)=\prod_{i=1}^s\det(F_i)$。转置把复合的次序反过来，再逐次使用同一规则，
 \begin{equation}
- F_A(B)=F_A(E_n)\det(B)=\det(A)\det(B).
+ \det(A^{\mathrm T})=\det(F_s^{\mathrm T})\cdots\det(F_1^{\mathrm T})
+                   =\prod_{i=1}^{s}\det(F_i)=\det(A).
 \end{equation}
-我们只使用已经定义好的列规则，没有借用行规则或转置不变性；也没有除以任何行列式，所以奇异矩阵同样包含在内。尺度结论的完整证明见第\ref{sec:six-optional-existence}节。
+这里交换的是实数因子的次序，没有交换矩阵。若 $A$ 不可逆，第四章的行秩与列秩相等说明 $A$、$A^{\mathrm T}$ 的列都线性相关；由刚才从公理推出的结论，两者行列式都是0。于是所有方阵都满足等式。
 \end{proof}
 
-把结论放回图形：若一步已经把体积压为0，后续线性变换不能凭空补回丢失的方向，乘积的行列式也为0。若两步都可逆，缩放倍率与方向则按乘法合成。特别地，
-\begin{equation}
- \det(A^{-1})=\frac{1}{\det(A)}\quad(A\text{ 可逆}),\qquad
- \det(A^k)=(\det(A))^k\quad(k\ge1).
-\end{equation}
-前者记录撤销作用的反向倍率，后者记录第五章递推模型中连续 $k$ 步的整体体积倍率。
-
-\DetFigure{复合变换的面积倍率相乘。单位正方形先经 $B=\operatorname{diag}(2,1)$，再经 $A=\operatorname{diag}(1,3)$，面积依次为1、2、6；此例两步都保持方向。}{fig:six-volume-composition}{%
-\begin{tikzpicture}[x=1cm,y=.9cm,font=\small]
- \filldraw[fill=DetBlue!8,draw=DetBlue] (0,0) rectangle (1,1);
- \node at (.5,-.5) {$1$};
- \draw[detrose] (1.5,.5)--node[above] {$B$} (3,.5);
- \filldraw[fill=DetBlue!8,draw=DetBlue] (3.5,0) rectangle (5.5,1);
- \node at (4.5,-.5) {$2$};
- \draw[detrose] (6,.5)--node[above] {$A$} (7.5,.5);
- \filldraw[fill=DetBlue!8,draw=DetBlue] (8,0) rectangle (10,3);
- \node at (9,-.5) {$6=3\times2$};
- \node[anchor=west,text=DetGray] at (10.7,1.5) {$\det(AB)=\det(A)\det(B)$};
-\end{tikzpicture}}
-
-接下来还有一个不那么显然的问题：我们用各列围出的体积定义行列式，按各行围出的体积是否相同？图\ref{fig:six-row-column-volume}提醒我们，两幅平行四边形可以形状不同，有向面积却相同；一般情形还要有代数保证。
+\textbf{几何意义}\quad 行向量围出的平行体与列向量围出的平行体，\emph{形状一般不同}，有向体积却相等。第三章中，转置把正向组合改为评价的反向传递；现在这两种对应关系还有同一个体积倍率。转置并不是逆映射，图形也不必全等，不能把这个结论理解成“同一个盒子换个角度看”。
 
 \DetFigure{同一矩阵 $A=\left(\begin{smallmatrix}2&1\\0&1\end{smallmatrix}\right)$ 的行与列围出不同形状的平行四边形，但有向面积都为2。转置不要求两幅图全等，只保证行列式相等。}{fig:six-row-column-volume}{%
 \begin{tikzpicture}[x=1.25cm,y=1.25cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.35,-.9) grid (9.3,2.6);
  \begin{scope}
   \filldraw[fill=DetBlue!8,draw=DetBlue!45] (0,0)--(2,1)--(2,2)--(0,1)--cycle;
   \draw[detaxis] (-.2,0)--(2.7,0);\draw[detaxis] (0,-.2)--(0,2.4);
@@ -15683,33 +15703,102 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
  \end{scope}
 \end{tikzpicture}}
 
-\begin{theorem}[转置不改变行列式]
-对任意方阵 $A$，有
-\begin{equation}
- \det(A^{\mathrm T})=\det(A).
- \label{eq:six-det-transpose}
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-先看三种初等矩阵 $F$。它们从 $E_n$ 作一次行操作得到；按列看，分别也是对 $E_n$ 作一次交换、倍乘或倍加。因此由列规则，三类矩阵的行列式分别为 $-1$、$k$、$1$；其转置仍属同一类型，参数 $k$ 不变，所以 $\det(F^{\mathrm T})=\det(F)$。
-
-若 $A$ 可逆，第三章的消元说明它能写成初等矩阵的乘积 $A=F_1\cdots F_s$。转置把乘积次序反过来，由刚证明的乘积法则，
-\begin{equation}
- \det(A^{\mathrm T})=\det(F_s^{\mathrm T})\cdots\det(F_1^{\mathrm T})
-                   =\prod_{i=1}^{s}\det(F_i)=\det(A).
-\end{equation}
-这里行列式的因子是实数，所以它们可以交换次序；没有交换矩阵本身。若 $A$ 不可逆，$A^{\mathrm T}$ 也不可逆，由前面的可逆性判据，两者行列式都是0。于是所有方阵都满足结论。
-\end{proof}
-
-这个证明保证了两种体积读法得到同一个数。\textbf{既然行和列在行列式中等价，已经证明的列规则就能转成行规则。}若行操作把 $A$ 变成 $B$，转置后正是同种列操作把 $A^{\mathrm T}$ 变成 $B^{\mathrm T}$，所以
+\textbf{从列性质到行性质}\quad 若行操作把 $A$ 变成 $B$，转置后就是同种列操作把 $A^{\mathrm T}$ 变成 $B^{\mathrm T}$。先用列规则，再用转置不变性，就得到
 \begin{align}
+ R_i\leftrightarrow R_j\ (i\ne j)&:\quad \det(B)=-\det(A),\\
  R_i\leftarrow kR_i&:\quad \det(B)=k\det(A),\\
- R_i\leftrightarrow R_j&:\quad \det(B)=-\det(A),\\
  R_i\leftarrow R_i+kR_j\ (i\ne j)&:\quad \det(B)=\det(A).
  \label{eq:six-row-operation-determinants}
 \end{align}
-因此第二章的行消元也有了体积读数：交换变号，非零倍乘改变倍率，倍加保持不变。下一节用的正是这三条行规则。
+相同行、比例行、零行也都使行列式为0。\textbf{所有列性质对行同样成立}，但不是把“列”字机械换成“行”就算证明；中间的桥梁正是转置定理。第二章的行消元因此获得了合法的体积读数：交换变号，非零倍乘记录倍率，倍加保持不变。
+
+按行的多重线性也由此得到：固定其他行，一行的相加或数乘，转置后正好是一列的相加或数乘，再用列的线性性即可。这里仍然是\emph{每次只改变一行}，不能误读为行列式对整个矩阵的加法都是线性的。
+
+\subsection*{复合变换与乘积法则：两次倍率怎样合成}
+
+第三章中，$AB$ 表示先做 $B$，再做 $A$。上面的证明只检查了一次初等映射；现在让 $A$ 成为任意线性变换，看公理怎样给出一般的复合规则。
+
+\begin{theorem}[乘积法则]
+对同阶方阵 $A,B$，有
+\begin{equation}
+ \det(AB)=\det(A)\det(B).
+ \label{eq:six-det-product}
+\end{equation}
+\end{theorem}
+\DetBoxLabel{thm:six-determinant-product}
+
+\begin{proof}
+固定 $A$，记 $F_A(B)=\det(A\boldsymbol b_1,\ldots,A\boldsymbol b_n)$。每一列先经过线性映射 $A$，再由行列式读数，因此 $F_A$ 对 $B$ 的每列线性；交换两列时，其像也交换，故具有交替性。单位刻度为 $F_A(E_n)=\det(A)$。由同一个唯一性与尺度结论，
+\begin{equation}
+ F_A(B)=F_A(E_n)\det(B)=\det(A)\det(B).
+\end{equation}
+这次不再要求 $A$ 是初等矩阵，也没有除以 $\det(A)$，所以把体积压成0的变换同样包含在内。
+\end{proof}
+
+\textbf{几何意义}\quad $B$ 先让有向体积乘 $\det(B)$，$A$ 再乘 $\det(A)$，总倍率就是乘积。若两步各翻转一次方向，两个负号相乘使整体方向恢复；若一步已经压掉某个方向，后续线性映射不能补回完整体积，乘积仍为0。
+
+\DetFigure{复合变换的面积倍率相乘。单位正方形先经 $B=\operatorname{diag}(2,1)$，再经 $A=\operatorname{diag}(1,3)$，面积依次为1、2、6；此例两步都保持方向。}{fig:six-volume-composition}{%
+\begin{tikzpicture}[x=1cm,y=.9cm,font=\small]
+ \draw[step=.5cm,DetGray!9,very thin] (-.3,-.9) grid (14.5,3.5);
+ \filldraw[fill=DetBlue!8,draw=DetBlue] (0,0) rectangle (1,1);
+ \node at (.5,-.5) {$1$};
+ \draw[detrose] (1.5,.5)--node[above] {$B$} (3,.5);
+ \filldraw[fill=DetBlue!8,draw=DetBlue] (3.5,0) rectangle (5.5,1);
+ \node at (4.5,-.5) {$2$};
+ \draw[detrose] (6,.5)--node[above] {$A$} (7.5,.5);
+ \filldraw[fill=DetBlue!8,draw=DetBlue] (8,0) rectangle (10,3);
+ \node at (9,-.5) {$6=3\times2$};
+ \node[anchor=west,text=DetGray] at (10.7,1.5) {$\det(AB)=\det(A)\det(B)$};
+\end{tikzpicture}}
+
+\Needspace{7\baselineskip}
+\textbf{与逆矩阵、逐步递推的联系}\quad 对可逆的 $A$，把复合的终点取为 $AA^{-1}=E_n$，乘积法则给出 $\det(A)\det(A^{-1})=1$。反向操作的倍率因此是倒数；同一个矩阵连续作用 $k$ 次，则把同一倍率连乘 $k$ 次：
+\begin{equation}
+ \det(A^{-1})=\frac{1}{\det(A)}\quad(A\text{ 可逆}),\qquad
+ \det(A^k)=(\det(A))^k\quad(k\ge1).
+\end{equation}
+前者呼应第三章“逆映射撤销原作用”，后者给第五章状态递推中的 $A^k$ 加上体积解释。行列式是一个整体倍率，单凭它还不能读出每个状态分量怎样变化。
+
+\subsection*{行列式、秩与可逆性：把四种判定接成一条线}
+
+我们已经会算体积的变化，现在回到方程组的老问题：哪些目标能到达，到达之后能否唯一恢复输入？对于方阵，完整体积是否消失，把这些问题连接起来。
+
+\begin{theorem}[行列式、线性无关与可逆性]
+对 $n$ 阶方阵 $A$，以下命题等价：
+\begin{enumerate}
+ \item $\det(A)\ne0$；
+ \item $A$ 的列向量组线性无关，即 $r(A)=n$；
+ \item $A$ 的行向量组线性无关；
+ \item 线性映射 $\boldsymbol x\mapsto A\boldsymbol x$ 是双射；
+ \item $A$ 可逆；
+ \item $A\boldsymbol x=\boldsymbol0$ 只有零解，即 $\operatorname{Null}(A)=\{\boldsymbol0\}$；
+ \item 对\textbf{任意} $\boldsymbol b\in\mathbb R^n$，$A\boldsymbol x=\boldsymbol b$ 有解且解唯一。
+\end{enumerate}
+\end{theorem}
+\DetBoxLabel{thm:six-determinant-equivalences}
+
+\Needspace{6\baselineskip}
+\begin{proof}
+先接上新的体积条件。若列向量线性相关，前面的公理推导给出 $\det(A)=0$。若列向量线性无关，$n$ 列就是 $\mathbb R^n$ 的一组基；第四章已证明此时对应映射为双射，第三章的逆矩阵因此存在。由乘积法则，
+\begin{equation*}
+ 1=\det(E_n)=\det(AA^{-1})=\det(A)\det(A^{-1}),
+\end{equation*}
+所以 $\det(A)$ 不可能为0。两种情形都已说明，故行列式非零当且仅当列向量线性无关。
+
+其余连接来自已经建立的结构：行秩等于列秩，故方阵的行无关与列无关等价；秩与零度定理给出 $\dim\operatorname{Null}(A)=n-r(A)$，故满秩等价于齐次方程只有零解。同维的输入与输出空间中，单射与满射等价，因而等价于双射和可逆。
+
+最后，双射意味着每个目标都有唯一原像，也就是每个右端项都有唯一解；反过来，每个目标都有唯一解，恰好同时说明满射与单射。这样，七条命题连接成了同一组等价判定。
+\end{proof}
+
+\textbf{几何意义}\quad 二维中，两条边没有共线；三维中，三条边没有共面；一般 $n$ 维中，各列张成完整的 $\mathbb R^n$，平行体才有非零的 $n$ 维体积。若行列式为0，独立方向没有凑齐，映射把空间压到低维子空间中，无法恢复每个输入。这把第1章的线性相关、第3章的逆矩阵、第4章的双射与第5章的解集结构接在了一起。
+
+\textbf{回到四个基本子空间}\quad 满秩时，行空间与列空间分别铺满输入、输出两端，零空间与左零空间都只含零向量；每个目标可达，也没有隐藏自由度。秩小于 $n$ 时，列空间缩小，零空间维数 $n-r(A)>0$：\textbf{目标在列空间外则无解，在列空间内则有无穷多解}。因此 $\det(A)=0$ 不能直接翻译成“无解”，还必须检查右端项。
+
+例如 $A=\operatorname{diag}(1,0)$ 的行列式为0。取 $\boldsymbol b=(1,0)^{\mathrm T}$，解为 $x_1=1$、$x_2$ 任意；取 $\boldsymbol b=(1,1)^{\mathrm T}$，第二行要求 $0=1$，方程组无解。第2章的三种解情形仍然适用，第5章则说明两种非唯一情形分别来自目标不可达与零空间自由度。
+
+目前解决的是“能不能逆”的判断，第三章已有消元求逆的算法，下一节还会由代数余子式构造显式的逆矩阵公式。在进入计算之前，先把这些公理规则用于最容易读出体积的三角矩阵。
+
+\subsection*{特例：三角矩阵的行列式}
 
 \begin{corollary}[三角矩阵的行列式]
 上三角矩阵或下三角矩阵 $U$ 的行列式，等于主对角线元素的乘积：
