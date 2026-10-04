@@ -308,7 +308,7 @@
 \DeclareLectureTerm{commutative-diagram}{交换图}{Commutative Diagram}{用箭头表示映射，且任意两条起终点相同的相配路径具有相同的合成作用；本书用它说明换基与矩阵表示的关系。}
 
 % 第4.1.1节：初等旋转与坐标表示。
-\DeclareLectureTerm{right-hand-rule}{右手法则}{Right-Hand Rule}{右手拇指指向转轴正向，四指弯曲方向规定为正向旋转；用于统一三维旋转的正负约定。}
+\DeclareLectureTerm{right-hand-rule}{右手定则}{Right-Hand Rule}{右手拇指指向转轴正向，四指弯曲方向规定为正向旋转；叉乘中四指从第一向量弯向第二向量，拇指指向法线，二者沿用同一三维正定向。}
 \DeclareLectureTerm{active-rotation}{主动旋转}{Active Rotation}{固定坐标基，对向量或物体施加旋转作用，用同一组基记录作用前后的坐标；转轴上的向量可以保持不变。}
 \DeclareLectureTerm{passive-rotation}{被动旋转}{Passive Rotation}{向量不动，转动描述它的坐标架；新坐标由对应主动旋转矩阵的逆矩阵换算。}
 \DeclareLectureTerm{orthogonal-matrix}{正交矩阵}{Orthogonal Matrix}{满足 $Q^{\mathrm T}Q=E$ 的实方阵；列向量单位且两两垂直，逆矩阵等于转置，保持标准点积；不一定表示旋转，也可能包含反射。}
@@ -334,13 +334,17 @@
 % 第6章：从有向面积、体积到归一化的交错多重线性函数。
 \DeclareLectureTerm{oriented-area}{有向面积}{Oriented Area}{按两条边的先后次序记录正负的平行四边形面积；平面标准定向中逆时针为正，共线时为0。}
 \DeclareLectureTerm{oriented-volume}{有向体积}{Oriented Volume}{按有序边的定向记录正负的体积；三维中由混合积给出，通常体积为其绝对值。}
-\DeclareLectureTerm{orthogonal-complement-vector}{正交补向量}{Orthogonal Complement Vector}{本章指按既定方向约定选出的垂直向量；二维取原向量逆时针旋转90度的像，高维余子式向量垂直于其余各行。}
+\DeclareLectureTerm{orthogonal-complement-vector}{正交补向量}{Orthogonal Complement Vector}{本章指按长度和定向选定的垂直向量，区别于由所有垂直向量组成的正交补子空间；二维标准正交基下取逆时针转90度的像，高维由有向底面体积与定向确定。}
 \DeclareLectureTerm{generalized-cross-product-2d}{二维广义叉乘}{Two-Dimensional Generalized Cross Product}{本章采用一个平面向量输入的垂直生成操作，$(a,b)^{\mathrm T}\mapsto(-b,a)^{\mathrm T}$；区别于三维的双向量叉乘。}
 \DeclareLectureTerm{cross-product}{叉乘}{Cross Product}{两支三维向量所确定的法向量，长度为平行四边形面积，方向按右手法则；共线时为零向量。}
 \DeclareLectureTerm{normal-vector}{法向量}{Normal Vector}{垂直于所讨论平面或其方向子空间的非零向量；底面不退化时，叉乘与代数余子式向量提供相应的构造。}
 \DeclareLectureTerm{scalar-triple-product}{混合积}{Scalar Triple Product}{三维中的 $\boldsymbol w\cdot(\boldsymbol u\times\boldsymbol v)$；给出三条有序边围出的有向体积，循环换序不变、交换两条边变号。}
 \DeclareLectureTerm{multilinearity}{多重线性}{Multilinearity}{多输入函数固定其他输入后，对每一个输入分别保持加法与数乘；不是要求所有输入同时改变时仍整体线性。}
-\DeclareLectureTerm{alternation}{交错性}{Alternation}{本书实数情形中，交换两个输入使函数值变号的性质；与多重线性结合时，两输入相同则值为0。}
+\DeclareLectureTerm{alternation}{交替性}{Alternation}{本书实数情形中，交换两个输入使函数值变号的性质；与多重线性结合时，两输入相同则值为0。}
+\DeclareLectureTerm{generalized-cross-product}{广义叉乘}{Generalized Cross Product}{定向的欧氏$n$维空间中，由$n-1$条有序边确定的法向量；长度等于其底面体积，最后接上该法向量构成正定向，边线性相关时为零。}
+\DeclareLectureTerm{cartesian-product}{笛卡尔积}{Cartesian Product}{集合按顺序组合形成有序组的集合；$V^m$的每个元素是来自$V$的$m$个向量组成的有序组。}
+\DeclareLectureTerm{multilinear-form}{多重线性型}{Multilinear Form}{实向量空间上的实数值多输入函数，对每个输入位置分别保持加法与数乘；固定其他位置才考察该位置的线性。}
+\DeclareLectureTerm{alternating-multilinear-form}{交替多重线性型}{Alternating Multilinear Form}{交换任意两个输入位置使值变号的多重线性型；在实数范围，两个输入相同则值为零，归一化的交替$n$重线性型给出行列式。}
 \DeclareLectureTerm{normalization}{归一化}{Normalization}{选定度量基准的条件；行列式规定标准基有序组或单位矩阵的值为1，以固定整体尺度。}
 \DeclareLectureTerm{permutation}{排列}{Permutation}{把 $1,\ldots,n$ 的全部下标按某一顺序重排，或相应的下标一一对应；行列式排列式中每行每列恰取一个元素。}
 \DeclareLectureTerm{inversion-number}{逆序数}{Inversion Number}{排列中前项大于后项的数对个数；行列式项的符号为 $(-1)^{N(\sigma)}$。}

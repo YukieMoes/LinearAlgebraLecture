@@ -14887,6 +14887,10 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \definecolor{DetGray}{HTML}{68747D}
 \newcommand{\DetMat}[2]{\left(\begin{array}{#1}#2\end{array}\right)}
 \newcommand{\DetHead}[1]{\par\addvspace{5pt}\Needspace{4\baselineskip}\noindent\textbf{#1}\par\nobreak}
+\makeatletter
+\newcommand{\DetBoxLabel}[1]{%
+ \begingroup\protected@edef\@currentlabel{\thetheorem}\label{#1}\endgroup}
+\makeatother
 \newcommand{\DetFigure}[3]{\begin{figure}[htbp]\centering
  #3\par\caption{#1}\label{#2}\end{figure}\FloatBarrier}
 \tikzset{
@@ -14896,238 +14900,537 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
  detgreen/.style={DetGreen,line width=1.15pt,-{Stealth[length=2mm]}},
  detguide/.style={DetGray!55,densely dashed,line width=.6pt}}
 
-\section{几何直观与公理化定义：面积、体积与交错多重线性映射}
+\section{几何直观与公理化定义：从面积、体积到行列式}
 \label{sec:six-axiomatic-determinant}
 
-章首已经看见，矩阵既能拉伸一块区域，也能把它压成没有面积或体积的图形。现在要问：能否用同一种规则记录这些变化，既保留大小，也保留方向？我们先在二维、三维中找出这条规则，再把它写成不依赖图形的公理。\textbf{低维几何帮助我们提出定义，代数公理帮助我们把定义带到任意维数。}
+两支箭头能围出多大的面积？三支箭头又能围出多大的体积？章首提出的“空间怎样缩放”，可以从这两个熟悉的问题开始。行列式不是先有一套符号，再给它找一个几何比喻：它首先记录的是\textbf{一组有序向量张开的平行体有多大，以及方向有没有翻转}。
 
-本章只对方阵讨论行列式。为避免与后面的代数余子式混淆，约定矩阵 $A=(a_{ij})$ 的元素用小写 $a_{ij}$ 表示，大写 $A_{ij}$ 专门留给代数余子式；单位矩阵仍记作 $E_n$。讨论一行的几何方向时，把该行的分量写成坐标向量 $\boldsymbol r_i=(a_{i1},\ldots,a_{in})^{\mathrm T}$。把向量横排为一行或竖排为一列，只是记录方式不同。
+在二维中，这个量是平行四边形的有向面积；在三维中，是平行六面体的有向体积。推广到 $n$ 维，它就是 $n$ 个向量张成的平行多面体的有向体积。这些向量线性无关时是一组基；线性相关时，盒子塌缩，$n$ 维体积为0。矩阵的各列正是标准基向量经过映射后的像，所以同一个量又会读出线性变换的体积缩放因子。
 
-\subsection*{二维：平行四边形面积与正交补向量}
+本节先把这些图形看清，再把它们共同遵守的规则提炼成定义。我们只对实方阵讨论行列式，单位矩阵记作 $E_n$；矩阵元素用小写 $a_{ij}$，大写 $A_{ij}$ 留给第6.3节的代数余子式。
 
-把两个平面向量 $\boldsymbol u=(a,b)^{\mathrm T}$、$\boldsymbol v=(c,d)^{\mathrm T}$ 放在同一个起点，便围出一个平行四边形。通常面积只问“有多大”；若还要记录这两条边的先后次序，就需要\term{oriented-area}：从 $\boldsymbol u$ 转向 $\boldsymbol v$，逆时针的情形取正，顺时针的情形取负；共线时面积为0。这里判断的是两支箭头之间不超过 $180^\circ$ 的转向，不把绕一整圈的额外转动算进去。
+\subsection{二维：平行四边形的有向面积}
+\label{sec:six-oriented-plane}
 
-\DetFigure{有序的两条边围出有向面积。绿色箭头由第一条边逆时针转过 $90^\circ$ 得到；第二条边在该方向上的带符号高度，决定面积的正负。}{fig:six-plane-perpendicular}{%
-\begin{tikzpicture}[x=1.65cm,y=1.65cm,font=\small]
- \fill[DetBlue!8] (0,0)--(2,0)--(3,1)--(1,1)--cycle;
- \draw[DetGray!55] (2,0)--(3,1)--(1,1);
- \draw[detaxis] (-.3,0)--(3.5,0) node[right] {$x$};
- \draw[detaxis] (0,-.3)--(0,2.4) node[above] {$y$};
- \draw[detblue] (0,0)--(2,0) node[below] {$\boldsymbol u=(2,0)^{\mathrm T}$};
- \draw[detrose] (0,0)--(1,1) node[above right] {$\boldsymbol v=(1,1)^{\mathrm T}$};
- \draw[detgreen] (0,0)--(0,2) node[left] {$\boldsymbol u^\perp=(0,2)^{\mathrm T}$};
- \draw[detguide] (1,1)--(1,0);
- \draw[DetGray!65] (1,0)--(1,.12)--(.88,.12);
- \draw[detgreen] (.4,0) arc[start angle=0,end angle=90,radius=.4];
- \node[align=center,text=DetBlue] at (2, .56) {有向面积 $+2$};
- \node[anchor=west,align=left] at (4,1.15)
-  {交换边的次序：\\有向面积变为 $-2$\\通常面积仍为 $2$};
+\DetHead{面积为什么还需要正负号？}
+把 $\boldsymbol a_1$、$\boldsymbol a_2$ 放在同一个起点，便围出一个平行四边形。普通面积只回答“有多大”，却不能告诉我们这两条边的先后次序。若还想区分一个图形与它的镜像，就需要保留方向信息：我们约定，从第一条边沿小于 $180^\circ$ 的转向到第二条边，逆时针取正，顺时针取负。这就是\term{oriented-area}；两条边共线或有零向量时，面积为0，不再区分正负。
+
+\DetFigure{蓝色、红色箭头依次是两条有序边，淡色区域是它们围出的平行四边形；弧形箭头标出逆时针定向。右图把蓝色边伸长为原来的2倍，底面所占面积也变为2倍；有向面积同时保留大小与定向。}{fig:six-oriented-area}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \begin{scope}
+  \draw[step=.5cm,DetGray!10,line width=.25pt] (-.4,-.4) grid (3.6,3.6);
+  \filldraw[fill=DetBlue!9,draw=DetGray!55] (0,0)--(2,1)--(3,3)--(1,2)--cycle;
+  \draw[detaxis] (-.3,0)--(3.8,0) node[right] {$x$};
+  \draw[detaxis] (0,-.3)--(0,3.8) node[above] {$y$};
+  \draw[detblue] (0,0)--(2,1) node[right] {$\boldsymbol a_1$};
+  \draw[detrose] (0,0)--(1,2) node[above left] {$\boldsymbol a_2$};
+  \draw[DetGreen,-{Stealth[length=1.8mm]}] (26.565:.55) arc (26.565:63.435:.55);
+  \node[fill=white,inner sep=2pt,align=center] at (1.85,2.25) {有向面积 $+3$\\逆时针};
+  \node[below,align=center] at (1.65,-.65) {$|\boldsymbol a_1|=|\boldsymbol a_2|=\sqrt5$};
+ \end{scope}
+ \begin{scope}[shift={(6.7,0)}]
+  \draw[step=.5cm,DetGray!10,line width=.25pt] (-.4,-.4) grid (5.5,4.3);
+  \filldraw[fill=DetBlue!9,draw=DetGray!55] (0,0)--(4,2)--(5,4)--(1,2)--cycle;
+  \draw[detguide] (0,0)--(2,1)--(3,3)--(1,2)--cycle;
+  \draw[detaxis] (-.3,0)--(5.7,0);
+  \draw[detaxis] (0,-.3)--(0,4.5);
+  \draw[detblue] (0,0)--(4,2) node[right] {$2\boldsymbol a_1$};
+  \draw[detrose] (0,0)--(1,2) node[above left] {$\boldsymbol a_2$};
+  \node[fill=white,inner sep=2pt] at (2.5,2.8) {有向面积 $+6$};
+  \node[below,align=center] at (2.5,-.65) {只伸长一条边，面积乘2};
+ \end{scope}
 \end{tikzpicture}}
 
-怎样把“底乘高”变成坐标运算？先给底边找一支垂直箭头。标准基中的 $\mathbf e_1$ 逆时针转过 $90^\circ$ 变为 $\mathbf e_2$，$\mathbf e_2$ 变为 $-\mathbf e_1$；所以 $a\mathbf e_1+b\mathbf e_2$ 变为 $-b\mathbf e_1+a\mathbf e_2$。由此得到
+图中两条边为 $(2,1)^{\mathrm T}$、$(1,2)^{\mathrm T}$，次序是正向的。暂时把有向面积记作 $S(\boldsymbol a_1,\boldsymbol a_2)$。若只将第一条边乘一个实数 $k$，底或高随之改变，就有
 \begin{equation}
- \boldsymbol u^\perp=\DetMat{r}{-b\\a},\qquad
- \boldsymbol u\cdot\boldsymbol u^\perp=-ab+ba=0,
- \qquad |\boldsymbol u^\perp|=|\boldsymbol u|.
+ S(k\boldsymbol a_1,\boldsymbol a_2)=kS(\boldsymbol a_1,\boldsymbol a_2).
+ \label{eq:six-area-homogeneity}
+\end{equation}
+正数 $k$ 改变大小；负数 $k$ 还把这条边反向，所以有向面积乘 $k$，普通面积乘 $|k|$；$k=0$ 时图形塌缩。第二条边的数乘也有同样效果。
+
+\DetHead{交换次序、拆开一条边，会发生什么？}
+交换两条边，平行四边形作为一个区域没有改变，但读它的次序反了。再固定一条水平底边，把另一条边拆成 $\boldsymbol b+\boldsymbol c$：两支箭头垂直于底边的高度相加，底乘高也随之相加。图\ref{fig:six-area-properties}把这两个动作放在一起。
+
+\DetFigure{上排的两个平行四边形完全相同，交换蓝、红两条边的先后次序，有向面积由 $+3$ 变为 $-3$。下排固定底边 $(2,0)^{\mathrm T}$，两份高度 $1$、$1.5$ 相加，面积也由 $2+3$ 得到 $5$；这里展示的是有向面积的可加性，不是说任意三块区域都能直接拼接。}{fig:six-area-properties}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \foreach \sx/\sgn in {0/{+3},7/{-3}}{
+  \begin{scope}[shift={(\sx,0)}]
+   \draw[step=.5cm,DetGray!10,line width=.25pt] (-.3,-.3) grid (3.5,3.5);
+   \filldraw[fill=DetBlue!8,draw=DetGray!55] (0,0)--(2,1)--(3,3)--(1,2)--cycle;
+   \draw[detaxis] (-.2,0)--(3.7,0);
+   \draw[detaxis] (0,-.2)--(0,3.7);
+   \node[fill=white,inner sep=2pt] at (1.8,3.95) {有向面积 $\sgn$};
+  \end{scope}}
+ \draw[detblue] (0,0)--(2,1) node[right] {$\boldsymbol a_1$：先};
+ \draw[detrose] (0,0)--(1,2) node[above left] {$\boldsymbol a_2$：后};
+ \draw[DetGreen,-{Stealth[length=1.8mm]}] (26.565:.6) arc (26.565:63.435:.6);
+ \draw[detrose] (7,0)--(8,2) node[above left] {$\boldsymbol a_2$：先};
+ \draw[detblue] (7,0)--(9,1) node[right] {$\boldsymbol a_1$：后};
+ \draw[DetRose,-{Stealth[length=1.8mm]}] (7.268, .537) arc (63.435:26.565:.6);
+ \node[align=center,text=DetGray] at (5.1,1.65) {交换次序\\方向反转};
+ \foreach \sx/\dx/\hh/\lab in {0/.5/1/{\boldsymbol b},4.6/.5/1.5/{\boldsymbol c},9.2/1/2.5/{\boldsymbol b+\boldsymbol c}}{
+  \begin{scope}[shift={(\sx,-3.5)},scale=.78]
+   \draw[step=.5cm,DetGray!10,line width=.25pt] (-.2,-.2) grid (3.3,2.8);
+   \filldraw[fill=DetBlue!8,draw=DetGray!55] (0,0)--(2,0)--({2+\dx},\hh)--(\dx,\hh)--cycle;
+   \draw[detblue] (0,0)--(2,0) node[below] {$\boldsymbol a_1$};
+   \draw[detrose] (0,0)--(\dx,\hh) node[above left] {$\lab$};
+   \draw[detguide] (\dx,\hh)--(\dx,0);
+   \node[below] at (1,-.7) {高度 $\hh$};
+  \end{scope}}
+ \node[font=\Large] at (3.45,-2.5) {$+$};
+ \node[font=\Large] at (8,-2.5) {$=$};
+ \node[below,align=center] at (6,-4.5) {共同的底长为2：有向面积 $2+3=5$};
+\end{tikzpicture}}
+
+把图中的两件事写成公式，便得到
+\begin{align}
+ S(\boldsymbol a_2,\boldsymbol a_1)&=-S(\boldsymbol a_1,\boldsymbol a_2),\\
+ S(\boldsymbol a_1,\boldsymbol b+\boldsymbol c)
+   &=S(\boldsymbol a_1,\boldsymbol b)+S(\boldsymbol a_1,\boldsymbol c).
+ \label{eq:six-area-additivity}
+\end{align}
+第一式是“交换变号”，第二式是“高度相加，面积相加”。若两份高度的符号不同，面积还会相互抵消。因此可加性说的是带符号的数，不是普通面积一律相加。固定第二条边、拆开第一条边时也成立；可以交换两条边后使用同一条规则，再把它们交换回来。
+
+\DetHead{为什么要找一支垂直于底边的箭头？}
+底乘高中的“高”，不是第二条边的长度，而是它沿垂直方向伸出了多远。第0章的点乘恰好能读出这种带符号的投影长度。于是，先给底边选一支垂直箭头，就能把面积转成坐标计算。
+
+\DetFigure{左、中两图分别把标准基 $\boldsymbol e_1$、$\boldsymbol e_2$ 逆时针转过 $90^\circ$，得到 $\boldsymbol e_2$、$-\boldsymbol e_1$。右图的绿色箭头与蓝色底边垂直且等长，红色边在这个方向上的分量给出带符号的高；点乘把底长和高合在同一个数里，这就是二阶行列式的面积来源。}{fig:six-plane-perpendicular}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \foreach \sx in {0,4.4,8.8}{
+  \begin{scope}[shift={(\sx,0)}]
+   \draw[step=.5cm,DetGray!10,line width=.25pt] (-1.5,-.3) grid (2.4,2.4);
+   \draw[detaxis] (-1.4,0)--(2.5,0);
+   \draw[detaxis] (0,-.2)--(0,2.5);
+  \end{scope}}
+ \draw[detblue] (0,0)--(1.5,0) node[below] {$\boldsymbol e_1$};
+ \draw[detgreen] (0,0)--(0,1.5) node[left] {$\boldsymbol e_2$};
+ \draw[detgreen] (.65,0) arc (0:90:.65);
+ \node at (.85,.85) {$90^\circ$};
+ \draw[detrose] (4.4,0)--(4.4,1.5) node[right] {$\boldsymbol e_2$};
+ \draw[detgreen] (4.4,0)--(2.9,0) node[below] {$-\boldsymbol e_1$};
+ \draw[detgreen] (4.4,.65) arc (90:180:.65);
+ \node at (3.55,.85) {$90^\circ$};
+ \fill[DetBlue!8] (8.8,0)--(10.8,0)--(11.8,1)--(9.8,1)--cycle;
+ \draw[DetGray!55] (10.8,0)--(11.8,1)--(9.8,1);
+ \draw[detblue] (8.8,0)--(10.8,0) node[below] {$\boldsymbol a_1$};
+ \draw[detrose] (8.8,0)--(9.8,1) node[above right] {$\boldsymbol a_2$};
+ \draw[detgreen] (8.8,0)--(8.8,2) node[left] {$\boldsymbol a_1^\perp$};
+ \draw[detguide] (9.8,1)--(8.8,1);
+ \draw[DetGreen] (8.8,1)--(8.95,1)--(8.95,.85);
+ \node[left] at (8.8,.5) {$h$};
+ \node[below] at (.3,-.65) {第一条基边的垂直向量};
+ \node[below] at (4.4,-.65) {第二条基边的垂直向量};
+ \node[below] at (10.2,-.65) {有向面积＝底长 $\times h$};
+\end{tikzpicture}}
+
+垂直方向有两侧，为什么在图中选逆时针的一侧？因为前面已经选定“逆时针为正”的平面定向；与它配套的正向垂直箭头就是逆时针转过 $90^\circ$ 的像。定向本身是一项约定，一旦选定，后面的符号就必须与它一致，不能随意切换。
+
+设两条列向量为
+\begin{equation}
+ \boldsymbol a_1=\DetMat{c}{a_{11}\\a_{21}},\qquad
+ \boldsymbol a_2=\DetMat{c}{a_{12}\\a_{22}},\qquad
+ \boldsymbol a_1^\perp=\DetMat{r}{-a_{21}\\a_{11}}.
  \label{eq:six-plane-complement}
 \end{equation}
-这是一支按方向约定选出的\term{orthogonal-complement-vector}。在二维中，这种从一支箭头生成垂直箭头的操作也可看作\term{generalized-cross-product-2d}；它只有一个向量输入，要与下一段的三维双向量叉乘区别开。
-
-若 $\boldsymbol u\ne\boldsymbol0$，$\boldsymbol u^\perp/|\boldsymbol u|$ 是垂直于底边的单位向量。由第0章的点积公式，$\boldsymbol v\cdot\boldsymbol u^\perp/|\boldsymbol u|$ 就是带符号的高度。乘回底长，得到
+在标准正交基下，最后一支箭头就是第一支箭头的正向垂直向量，本节称它为\term{orthogonal-complement-vector}。它与原向量的点乘为0，长度与原向量相同：
 \begin{equation}
- S(\boldsymbol u,\boldsymbol v)
- =\boldsymbol v\cdot\boldsymbol u^\perp
- =-bc+ad=ad-bc.
+ \boldsymbol a_1\cdot\boldsymbol a_1^\perp=0,\qquad
+ |\boldsymbol a_1^\perp|=|\boldsymbol a_1|.
+\end{equation}
+所以当 $\boldsymbol a_1\ne\boldsymbol0$ 时，$\boldsymbol a_1^\perp/|\boldsymbol a_1|$ 是正向单位法线，读出带符号的高。底长乘回去，得到
+\begin{equation}
+ S(\boldsymbol a_1,\boldsymbol a_2)
+ =|\boldsymbol a_1|\left(\frac{\boldsymbol a_1^\perp}{|\boldsymbol a_1|}
+       \cdot\boldsymbol a_2\right)
+ =\boldsymbol a_1^\perp\cdot\boldsymbol a_2
+ =a_{11}a_{22}-a_{12}a_{21}.
  \label{eq:six-oriented-area}
 \end{equation}
-因此，有向面积是一个数；通常面积为 $|ad-bc|$。若底边为零，两者也都为0。把 $\boldsymbol u,\boldsymbol v$ 按行排成 $A$，这就是二阶行列式的几何来源。
+这不是另加一条运算法则，而是把底乘高写成点乘；底边为零时，最后两种表达也都给出0。
 
-\begin{example}[用垂直向量读出面积]
-取 $\boldsymbol u=(2,1)^{\mathrm T}$、$\boldsymbol v=(1,3)^{\mathrm T}$。则
+标准基 $\boldsymbol e_1,\boldsymbol e_2$ 围出的单位正方形正向面积为1。以这份面积为基准，把两条边按列排成 $A=[\,\boldsymbol a_1\ \boldsymbol a_2\,]$，便得到二阶\term{determinant}：
 \begin{equation}
- \boldsymbol u^\perp=(-1,2)^{\mathrm T},\qquad
- S=\boldsymbol v\cdot\boldsymbol u^\perp=-1+6=5.
+ \det(A)=\det(\boldsymbol a_1,\boldsymbol a_2)
+ =a_{11}a_{22}-a_{12}a_{21}.
 \end{equation}
-两条边按此顺序围出正向面积5；交换它们后得到 $-5$，通常面积仍为5。
+取绝对值才是普通面积；不取绝对值，才保留边的次序与翻转信息。
+
+\begin{example}[用底乘高核对一个数]
+取 $\boldsymbol a_1=(2,1)^{\mathrm T}$、$\boldsymbol a_2=(1,3)^{\mathrm T}$。底长为 $\sqrt5$，正向单位法线是 $(-1,2)^{\mathrm T}/\sqrt5$，于是
+\begin{equation}
+ h=\frac{-1+6}{\sqrt5}=\sqrt5,\qquad
+ \det(A)=\sqrt5\,\sqrt5=5.
+\end{equation}
+直接按坐标计算也是 $2\cdot3-1\cdot1=5$。交换两条边后，有向面积为 $-5$，普通面积仍为5。
 \end{example}
 
-这里已经出现一条值得保留的思路：\textbf{用其余的边确定一个垂直方向，再与剩下的一条边作点积，读出面积或体积。}三维中它将成为叉乘与混合积，高维中它将成为代数余子式向量。
+这里要分清两个对象。第五章的“正交补”是一个\textbf{子空间}：对非零 $\boldsymbol a_1$，所有垂直于它的向量组成一条直线，包含无穷多个向量。本节的 $\boldsymbol a_1^\perp$ 是其中按长度和定向选定的一支箭头。逆时针转 $90^\circ$ 只是二维标准正交坐标下的具体构造，不是一般的“逆旋转”，也不是高维正交补的定义。
 
-\subsection*{三维：平行六面体、叉乘与混合积}
+\subsection{三维：平行六面体、叉乘与混合积}
+\label{sec:six-cross-and-volume}
 
-两条边围出一个底面，第三条边把底面推到另一位置，形成平行六面体。底面积仍然容易看见；困难在于第三条边通常是斜的，不能直接把它的长度当作高。我们需要一支垂直于底面的箭头，用它读出第三条边的带符号高度。
+\DetHead{第三条边怎样把面积变成体积？}
+两条边先围出底面，再沿第三条边推移底面，就得到一个平行六面体。和二维一样，倾斜的边长不能直接当作高：真正决定体积的是第三条边离开底面有多远。
 
-\begin{definition}[叉乘的几何定义]
-两个不共线的三维向量 $\boldsymbol u,\boldsymbol v$ 的\term{cross-product}，记作 $\boldsymbol u\times\boldsymbol v$，是垂直于二者所张平面的向量。其长度为底面平行四边形的面积，即
+\DetFigure{蓝色、红色向量围出底面，绿色向量把它推到上方，形成平行六面体；灰色虚线标出平行边与垂直高度。这里底面积为2、高为1.5，通常体积为3；第三条边在底面内的偏移只改变倾斜程度，不改变底乘高。}{fig:six-parallelepiped}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!10,line width=.25pt] (-.8,-1.1) grid (6.6,4.8);
+ \begin{scope}[x={(1.45cm,-.35cm)},y={(.7cm,.55cm)},z={(0cm,1.6cm)}]
+  \filldraw[fill=DetBlue!10,draw=DetGray!55] (0,0,0)--(2,0,0)--(2,1,0)--(0,1,0)--cycle;
+  \filldraw[fill=DetGreen!7,draw=DetGray!45] (2,0,0)--(2,1,0)--(2.5,1.35,1.5)--(2.5,.35,1.5)--cycle;
+  \draw[DetGray!65] (.5,.35,1.5)--(2.5,.35,1.5)--(2.5,1.35,1.5)--(.5,1.35,1.5)--cycle;
+  \foreach \xx/\yy in {0/0,0/1}{\draw[detguide] (\xx,\yy,0)--({\xx+.5},{\yy+.35},1.5);}
+  \draw[DetGray!65] (2,0,0)--(2.5,.35,1.5);
+  \draw[detaxis] (0,0,0)--(3.3,0,0) node[right] {$x$};
+  \draw[detaxis] (0,0,0)--(0,2.3,0) node[above] {$y$};
+  \draw[detaxis] (0,0,0)--(0,0,2.5) node[above] {$z$};
+  \draw[detblue] (0,0,0)--(2,0,0) node[below] {$\boldsymbol a_1$};
+  \draw[detrose] (0,0,0)--(0,1,0) node[left] {$\boldsymbol a_2$};
+  \draw[detgreen] (0,0,0)--(.5,.35,1.5) node[above left] {$\boldsymbol a_3$};
+  \draw[detguide] (.5,.35,1.5)--(.5,.35,0) node[midway,right] {$h=1.5$};
+  \draw[DetGray] (.5,.35,.13)--(.65,.35,.13)--(.65,.35,0);
+  \node[fill=white,inner sep=2pt] at (1.25,.7,0) {底面积 $2$};
+ \end{scope}
+ \node[anchor=west,align=left] at (7.2,2.8) {三条有序边：\\[4pt]
+  $\boldsymbol a_1=(2,0,0)^{\mathrm T}$\\[4pt]
+  $\boldsymbol a_2=(0,1,0)^{\mathrm T}$\\[4pt]
+  $\boldsymbol a_3=(0.5,0.35,1.5)^{\mathrm T}$\\[8pt]
+  通常体积＝底面积 $\times$ 高};
+\end{tikzpicture}}
+
+要给体积带上符号，还缺哪份信息？仅有底面积不够，我们也要知道底面哪一侧算正向。于是，把底面的面积和正向法线合成一支箭头：\textbf{长度保存底面积，方向保存底面的朝向}。这就是\term{cross-product}的几何动机，而不是为记忆三阶公式添一个符号。
+
+\DetFigure{左侧右手示意中，四指从蓝色第一向量弯向红色第二向量，伸出的拇指指向法线；右侧把同一动作放到底面上。叉乘垂直于底面，长度等于底面积；右手定则使这支箭头与标准三维空间的正定向一致，交换两条边便使它反向。}{fig:six-right-hand-cross}{%
+\begin{tikzpicture}[x=1cm,y=1cm,font=\small]
+ \draw[step=.5cm,DetGray!10,line width=.25pt] (-.2,-1) grid (12.8,4.8);
+ % 右手的侧面示意：拇指向上，四指由伸出的方向弯回掌心。
+ \begin{scope}[shift={(1,.15)}]
+  \filldraw[fill=DetGray!5,draw=DetGray!85,line width=.85pt]
+   (.25,-.15)--(.25,.55)
+   .. controls (-.15,1) and (-.2,1.4) .. (.05,1.8)
+   --(.05,3.25)
+   .. controls (.05,3.8) and (.58,3.8) .. (.63,3.25)
+   --(.75,2.15)
+   .. controls (1.1,2.4) and (1.45,2.55) .. (2.25,2.35)
+   .. controls (2.65,2.1) and (2.6,1.6) .. (2.3,1.45)
+   .. controls (2.65,1.15) and (2.5,.75) .. (2.12,.68)
+   .. controls (2.35,.36) and (2.1,.08) .. (1.78,.15)
+   --(1.65,-.15)--cycle;
+  \foreach \yy in {.65,1.05,1.45,1.85}{
+   \draw[DetGray!80,line width=.65pt]
+    (1.05,\yy) .. controls (1.7,{\yy+.18}) and (2.2,{\yy+.23}) .. (2.3,{\yy+.1})
+    .. controls (2.15,{\yy-.12}) and (1.5,{\yy-.15}) .. (1.25,{\yy-.05});}
+  \draw[DetGreen,line width=1.3pt,-{Stealth[length=2.2mm]}] (.32,2.35)--(.32,4.1);
+  \node[above,text=DetGreen] at (.32,4.1) {拇指：法线};
+  \draw[detblue] (3.35,1.5)--(4.6,1.5) node[right] {$\boldsymbol a_1$};
+  \draw[detrose] (3.35,1.5)--(3.9,2.8) node[above] {$\boldsymbol a_2$};
+  \draw[DetRose,line width=1pt,-{Stealth[length=2mm]}]
+   (4,1.5) arc (0:67:.65);
+  \node[align=center,font=\footnotesize] at (2.8,-.75) {右手四指按箭头的次序弯曲};
+ \end{scope}
+ \begin{scope}[shift={(8.3,.5)},x={(1.2cm,-.35cm)},y={(.65cm,.6cm)},z={(0cm,1.3cm)}]
+  \filldraw[fill=DetBlue!10,draw=DetGray!55] (0,0,0)--(2,0,0)--(2,1.3,0)--(0,1.3,0)--cycle;
+  \draw[detblue] (0,0,0)--(2,0,0) node[below] {$\boldsymbol a_1$};
+  \draw[detrose] (0,0,0)--(0,1.3,0) node[left] {$\boldsymbol a_2$};
+  \draw[detgreen] (0,0,0)--(0,0,2.6) node[above] {$\boldsymbol a_1\times\boldsymbol a_2$};
+  \draw[DetGray!65] (.18,0,0)--(.18,0,.18)--(0,0,.18);
+  \draw[DetRose,-{Stealth[length=1.8mm]}]
+   (.5,0,0) .. controls (.5,.35,0) and (.2,.5,0) .. (0,.5,0);
+ \end{scope}
+\end{tikzpicture}}
+
+\begin{definition}[叉乘：带着方向的底面积]
+对不共线的三维向量 $\boldsymbol a_1,\boldsymbol a_2$，$\boldsymbol a_1\times\boldsymbol a_2$ 是垂直于二者所张平面的向量，长度为该底面面积：
 \begin{equation}
- |\boldsymbol u\times\boldsymbol v|=|\boldsymbol u||\boldsymbol v|\sin\theta,
- \qquad 0\le\theta\le\pi.
+ |\boldsymbol a_1\times\boldsymbol a_2|
+   =|\boldsymbol a_1|\,|\boldsymbol a_2|\sin\theta,\qquad 0<\theta<\pi.
 \end{equation}
-方向按右手法则确定：四指从 $\boldsymbol u$ 转向 $\boldsymbol v$，拇指指向叉乘方向。若二者共线，规定叉乘为零向量。
+其方向按\term{right-hand-rule}选取：右手四指从第一向量沿小于 $180^\circ$ 的角度弯向第二向量，伸出的拇指指向叉乘方向。共线或有零向量时，叉乘为零向量。
 \end{definition}
 
-当底面不退化时，这支箭头是底面的\term{normal-vector}，长度又恰好等于底面积，所以不必另外保存这两份信息。交换两条底边，四指的转向颠倒，叉乘也反向。设 $\boldsymbol w$ 是第三条边，就有
+这里选用的是标准右手定向：$\boldsymbol e_1\times\boldsymbol e_2=\boldsymbol e_3$。右手动作是这个定向约定的直观记法，不能在一处用右手、另一处又改用左手。不退化的底面有无穷多支\term{normal-vector}，叉乘则按底面积确定长度、按有序两条边确定方向，选出其中唯一的一支。
+
+\DetHead{第三条边怎样被这支法线读出？}
+设 $\boldsymbol N=\boldsymbol a_1\times\boldsymbol a_2\ne\boldsymbol0$。$\boldsymbol N/|\boldsymbol N|$ 是正向单位法线；第三条边在它上面的分量，正是带符号的高度。图\ref{fig:six-cross-triple}中，斜边虽然更长，只有法向分量对体积有贡献。
+
+\DetFigure{蓝、红两条边决定底面，绿色第三条边分成底面内的偏移与垂直高度；灰色法线箭头保存底面积及其正向。沿法线读出的带符号高度乘以底面积，就得到混合积：同侧为正、另一侧为负，第三条边留在底面内时为0。}{fig:six-cross-triple}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!10,line width=.25pt] (-.7,-1) grid (7.1,4.7);
+ \begin{scope}[x={(1.6cm,-.3cm)},y={(.7cm,.6cm)},z={(0cm,1.35cm)}]
+  \filldraw[fill=DetBlue!10,draw=DetGray!55] (0,0,0)--(2,0,0)--(2,1,0)--(0,1,0)--cycle;
+  \foreach \xx/\yy in {0/0,2/0,2/1,0/1}
+   {\draw[detguide] (\xx,\yy,0)--({\xx+.7},{\yy+.4},1.6);}
+  \draw[DetGray!55] (.7,.4,1.6)--(2.7,.4,1.6)--(2.7,1.4,1.6)--(.7,1.4,1.6)--cycle;
+  \draw[detblue] (0,0,0)--(2,0,0) node[below] {$\boldsymbol a_1$};
+  \draw[detrose] (0,0,0)--(0,1,0) node[left] {$\boldsymbol a_2$};
+  \draw[detgreen] (0,0,0)--(.7,.4,1.6) node[above right] {$\boldsymbol a_3$};
+  \draw[DetGray,line width=1.1pt,-{Stealth[length=2mm]}] (0,0,0)--(0,0,2.6) node[above] {$\boldsymbol N$};
+  \draw[detguide] (.7,.4,1.6)--(0,0,1.6);
+  \draw[detgreen] (0,0,0)--(0,0,1.6) node[midway,left] {$h$};
+  \draw[detguide] (.7,.4,1.6)--(.7,.4,0);
+  \draw[DetGray] (.7,.4,.16)--(.86,.4,.16)--(.86,.4,0);
+  \node[fill=white,inner sep=2pt] at (1.2,.8,0) {底面积 $|\boldsymbol N|$};
+  \node[below] at (.7,.4,0) {垂足};
+ \end{scope}
+ \node[anchor=west,align=left] at (7.5,2.7)
+  {第三条边不必垂直于底面。\\[7pt]
+   法向高度：$h=\dfrac{\boldsymbol N}{|\boldsymbol N|}\cdot\boldsymbol a_3$\\[9pt]
+   有向体积：$|\boldsymbol N|h$\\[7pt]
+   普通体积：$|\boldsymbol N|\,|h|$};
+\end{tikzpicture}}
+
+于是，\term{oriented-volume}写成
 \begin{equation}
- V(\boldsymbol u,\boldsymbol v,\boldsymbol w)
- =\boldsymbol w\cdot(\boldsymbol u\times\boldsymbol v).
+ \det(\boldsymbol a_1,\boldsymbol a_2,\boldsymbol a_3)
+ =|\boldsymbol N|h
+ =(\boldsymbol a_1\times\boldsymbol a_2)\cdot\boldsymbol a_3.
  \label{eq:six-scalar-triple-volume}
 \end{equation}
-这个点积称为\term{scalar-triple-product}，给出\term{oriented-volume}；取绝对值才是通常体积。第三条边指向法向量同一侧时为正，指向另一侧时为负，落在底面内时为0。
+叉乘先保存有向底面，点乘再读出第三条边的高；这个组合称为\term{scalar-triple-product}。若底面退化，叉乘为零，体积也为0，此时不再使用除以 $|\boldsymbol N|$ 的高度公式。
 
-\DetFigure{叉乘把底面积与法向方向合在一支箭头中。第三条边与它的点积给出有向体积；灰色虚线表示底面与平行边。图中三条边采用正向次序。}{fig:six-cross-triple}{%
-\begin{tikzpicture}[x={(1.4cm,.25cm)},y={(-.65cm,.6cm)},z={(0cm,1.45cm)},font=\small]
- \filldraw[fill=DetBlue!9,draw=DetBlue!50] (0,0,0)--(2,0,0)--(2,1.5,0)--(0,1.5,0)--cycle;
- \foreach \x/\y in {0/0,2/0,2/1.5,0/1.5}
-  {\draw[detguide] (\x,\y,0)--({\x+.45},{\y+.2},1.35);}
- \draw[DetGray!60] (.45,.2,1.35)--(2.45,.2,1.35)--(2.45,1.7,1.35)--(.45,1.7,1.35)--cycle;
- \draw[detblue] (0,0,0)--(2,0,0) node[below right] {$\boldsymbol u$};
- \draw[detblue] (0,0,0)--(0,1.5,0) node[left] {$\boldsymbol v$};
- \draw[detrose] (0,0,0)--(.45,.2,1.35) node[right] {$\boldsymbol w$};
- \draw[detgreen] (0,0,0)--(0,0,3) node[above] {$\boldsymbol u\times\boldsymbol v$};
- \node[anchor=west,align=left] at (3,0,1.7)
-  {绿色：垂直于底面\\长度等于底面积\\红色：第三条边};
- \node[anchor=west] at (3,0,.55) {$V=\boldsymbol w\cdot(\boldsymbol u\times\boldsymbol v)$};
-\end{tikzpicture}}
-
-坐标公式也能从面积读出。叉乘在各坐标轴上的分量，分别是底面在相应坐标平面上的有向面积；沿 $x,y,z$ 轴观察，依次采用 $(y,z)$、$(z,x)$、$(x,y)$ 的正向次序。因此
+怎样把底面法线写成三个坐标？分别看底面在 $yz$、$zx$、$xy$ 平面上的有向面积，就得到法线的三个分量。次序 $yz,zx,xy$ 与右手定向相配，代入二维面积公式得
 \begin{equation}
- \boldsymbol u\times\boldsymbol v
- =\DetMat{c}{u_2v_3-u_3v_2\\u_3v_1-u_1v_3\\u_1v_2-u_2v_1}.
+ \boldsymbol a_1\times\boldsymbol a_2
+ =\DetMat{c}{
+ a_{21}a_{32}-a_{31}a_{22}\\
+ a_{31}a_{12}-a_{11}a_{32}\\
+ a_{11}a_{22}-a_{21}a_{12}}.
  \label{eq:six-cross-coordinates}
 \end{equation}
-每个分量都是上一段的二阶有向面积。中间分量采用 $(z,x)$ 次序，符号不能凭记忆随意更改。
-
-由几何定义，叉乘与 $\boldsymbol u,\boldsymbol v$ 都正交；坐标上也能核对。例如
-\begin{equation}
- \boldsymbol u\cdot(\boldsymbol u\times\boldsymbol v)
- =u_1u_2v_3-u_1u_3v_2+u_2u_3v_1-u_2u_1v_3
-   +u_3u_1v_2-u_3u_2v_1=0.
-\end{equation}
-各项成对抵消；换成 $\boldsymbol v$ 同样得到0。再把第三条边代入，混合积成为
+每个分量都是一个二阶有向面积；中间分量采用 $zx$ 的次序，不能擅自换成 $xz$ 而不改符号。与第三列点乘，便给出三阶行列式：
 \begin{align}
- V&=u_1v_2w_3+u_2v_3w_1+u_3v_1w_2\\
-  &\quad-u_1v_3w_2-u_2v_1w_3-u_3v_2w_1.
+ \det(A)
+ &=a_{11}a_{22}a_{33}+a_{21}a_{32}a_{13}+a_{31}a_{12}a_{23}\\
+ &\quad-a_{31}a_{22}a_{13}-a_{11}a_{32}a_{23}-a_{21}a_{12}a_{33}.
  \label{eq:six-three-volume-six-terms}
 \end{align}
-这就是把三条边按行排列后，三阶行列式的六项表达式。循环改变三条边的次序，要作两次交换，方向回到原来的方向，所以
-\begin{equation}
- \boldsymbol w\cdot(\boldsymbol u\times\boldsymbol v)
- =\boldsymbol u\cdot(\boldsymbol v\times\boldsymbol w)
- =\boldsymbol v\cdot(\boldsymbol w\times\boldsymbol u).
-\end{equation}
-但只交换其中两条边，就会变号。循环不变与交换变号是两件不同的事。
+这六项只是底面积乘高的坐标展开，不需要另背一套与几何无关的口诀。
 
-\begin{example}[一块斜平行六面体的体积]
-取 $\boldsymbol u=(1,2,0)^{\mathrm T}$、$\boldsymbol v=(0,1,1)^{\mathrm T}$、$\boldsymbol w=(2,0,1)^{\mathrm T}$。则
+\Needspace{9\baselineskip}
+\begin{example}[先找到底面，再计算体积]
+取三条列向量 $\boldsymbol a_1=(1,2,0)^{\mathrm T}$、$\boldsymbol a_2=(0,1,1)^{\mathrm T}$、$\boldsymbol a_3=(2,0,1)^{\mathrm T}$。则
 \begin{equation}
- \boldsymbol u\times\boldsymbol v=(2,-1,1)^{\mathrm T},\qquad
- V=(2,0,1)\cdot(2,-1,1)=5.
+ \boldsymbol N=(2,-1,1)^{\mathrm T},\qquad
+ |\boldsymbol N|=\sqrt6,\qquad
+ h=\frac5{\sqrt6},\qquad \det(A)=5.
 \end{equation}
-通常体积为5。若把第三条边改为 $\boldsymbol u+\boldsymbol v$，它落在底面内，混合积为0；体积的消失正好对应线性相关。
+底面积与法向高度分别为 $\sqrt6$、$5/\sqrt6$，乘积为5。若把第三条边换成 $\boldsymbol a_1+\boldsymbol a_2$，它留在底面内，法向高度为0，三维体积也为0。
 \end{example}
 
-\subsection*{从几何直观到公理：多重线性与交错性}
+二维的三条规则在三维仍然看得见：交换两条有序边，盒子的定向反转；把一条边乘 $k$，对应的带符号高度乘 $k$；把一条边拆成两个向量之和，两份带符号高度相加。任取另两条边作底面，都能这样看。所以，对任一列都有数乘与可加性，交换任意两列都使有向体积变号。循环换序作了两次交换，符号恢复；只交换一次则不会恢复。
 
-二维、三维的计算看起来不同，却在遵守同一套规则。固定底面，把剩下一条边拉长 $c$ 倍，带符号高度也乘 $c$；把这条边换成两支箭头的和，带符号高度相加，有向体积也相加。\textbf{加法与数乘都要保持}，才构成线性，仅有“拉伸按比例”还不完整。这种对每一条边分别成立的线性，称为\term{multilinearity}。另一方面，交换两条有序边，几何方向翻转，这就是\term{alternation}。
+\DetHead{小注：正交补是什么}
+刚才的叉乘向量，是“正交补”最容易看见的一种几何形式。两个不共线的向量张成一个平面子空间，叉乘给出一支与平面内\textbf{所有向量}都垂直的箭头；它的长度等于底面平行四边形的面积，方向满足右手定则。它不是另一个随意选出的方向，而是保存了底面大小与定向的高度方向。
 
-\DetFigure{固定底边时，高度相加使有向面积相加；交换有序边则只改变符号。图中三块面积分别为1、2、3，展示的是对一条边分别成立的线性。}{fig:six-multilinear-area}{%
-\begin{tikzpicture}[x=1.15cm,y=1cm,font=\small]
- \foreach \sx/\dx/\hh/\lab in {0/.5/1/{\boldsymbol v},4/-.2/2/{\boldsymbol w},8/.3/3/{\boldsymbol v+\boldsymbol w}} {
-  \begin{scope}[shift={(\sx,0)}]
-   \filldraw[fill=DetBlue!7,draw=DetBlue!45] (0,0)--(1,0)--({1+\dx},\hh)--(\dx,\hh)--cycle;
-   \draw[detblue] (0,0)--(1,0) node[below] {$\boldsymbol u$};
-   \draw[detrose] (0,0)--(\dx,\hh) node[above] {$\lab$};
-   \node at (.65,-.65) {$S=\hh$};
-  \end{scope}}
- \node[font=\Large] at (2.85,1) {$+$};
- \node[font=\Large] at (6.9,1) {$=$};
+\DetFigure{蓝、红向量张成淡色斜平面，绿色叉乘向量垂直于其中所有向量，对应体积计算中的法向高度方向。更一般的正交补空间我们已在第5章接触过，第7章将系统展开；图中只画出其中按底面积与右手定向选定的一支箭头。}{fig:six-orthogonal-complement-note}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!10,line width=.25pt] (-.3,-1.1) grid (13,4.6);
+ \begin{scope}[shift={(4.3,.15)},x={(1.2cm,-.25cm)},y={(.65cm,.55cm)},z={(0cm,1cm)}]
+  \filldraw[fill=DetBlue!7,draw=DetBlue!35]
+   (-.6,-.6,-.6)--(2.6,-.6,1)--(2.6,2.6,2.6)--(-.6,2.6,1)--cycle;
+  \draw[DetGray!45] (2,0,1)--(2,2,2)--(0,2,1);
+  \draw[detaxis] (0,0,0)--(3.1,0,0) node[right] {$x$};
+  \draw[detaxis] (0,0,0)--(0,3.2,0) node[above right] {$y$};
+  \draw[detaxis] (0,0,0)--(0,0,4) node[above] {$z$};
+  \draw[detblue] (0,0,0)--(2,0,1) node[below right] {$\boldsymbol a_1$};
+  \draw[detrose] (0,0,0)--(0,2,1) node[above left] {$\boldsymbol a_2$};
+  \draw[detgreen] (0,0,0)--(-2,-2,4)
+    node[above,align=center] {$\boldsymbol a_1\times\boldsymbol a_2$\\正交补向量（高度方向）};
+  \draw[DetGreen] (.22,0,.11)--(.11,-.11,.33)--(-.11,-.11,.22);
+  \node[fill=white,inner sep=2pt,text=DetBlue] at (2.2,1.9,2.05) {张成子空间};
+  \node[below left] at (0,0,0) {$O$};
+ \end{scope}
+ \node[anchor=west,align=left,text width=3.7cm,font=\footnotesize] at (9.7,1.1)
+  {平面内的每支箭头，\\都与这支法线垂直。\\[7pt]
+   整条法线：正交补空间。\\绿色箭头：选定的向量。};
 \end{tikzpicture}}
 
-引入公理化定义的目的，是\textbf{摆脱三维空间直观的限制，把这套规则推广到任意 $n$ 维}。我们不再要求先画出一块区域，只要求一个实数值函数保持上述关系。不过，还必须选定度量的基准：如果把所有面积或体积都乘一个常数，两条性质依然成立；恒为0的函数也满足它们。单位平行体的值为1，才能把尺度确定下来。
+往回看，第5章四个基本子空间中，$\operatorname{Null}(A)$ 就是 $\operatorname{Row}(A)$ 的正交补：所有与行空间中每个向量都垂直的向量，合在一起构成一个子空间。因此，“一支正交补向量”和“整个正交补空间”不能混为一谈。
 
-\begin{definition}[行列式的公理化定义]
-固定正整数 $n$。设函数 $D:(\mathbb R^n)^n\to\mathbb R$ 满足下列条件。
+第7章会在内积空间中系统讲解正交补的定义、性质与构造。本章先记住：算面积需要垂直于底边的高，算体积需要垂直于底面的高，正交补给出这个高度方向。升到高维，底面与高度的分工仍然保留。
 
-对每个位置 $i$，固定其余向量后，$D$ 对第 $i$ 个向量线性：
-\begin{align}
- &D(\boldsymbol r_1,\ldots,\alpha\boldsymbol u+\beta\boldsymbol v,\ldots,\boldsymbol r_n)\\
- &\qquad=\alpha D(\boldsymbol r_1,\ldots,\boldsymbol u,\ldots,\boldsymbol r_n)
-       +\beta D(\boldsymbol r_1,\ldots,\boldsymbol v,\ldots,\boldsymbol r_n).
- \label{eq:six-multilinearity}
-\end{align}
-交换任意两个位置的向量，函数值变号；这称为交错性。并规定\term{normalization}条件
+\Needspace{7\baselineskip}
+\subsection{升维：$n$维有向体积与正交补}
+\label{sec:six-higher-volume}
+
+\DetHead{看不见四维盒子，还能保留什么？}
+我们不能在纸上直接画出四维平行多面体，但可以保留它的构造方式：从一个起点出发，沿每条边各走0到1倍，收集所有到达的位置。对 $n$ 个 $n$ 维向量，这个平行多面体是
 \begin{equation}
- D(\mathbf e_1,\ldots,\mathbf e_n)=1.
- \label{eq:six-normalization}
+ \left\{\sum_{j=1}^n t_j\boldsymbol a_j:\ 0\le t_j\le1\right\}.
 \end{equation}
-以 $\boldsymbol r_1^{\mathrm T},\ldots,\boldsymbol r_n^{\mathrm T}$ 为各行的矩阵 $A$ 的\term{determinant}，定义为
+二维时正是刚画过的平行四边形，三维时正是平行六面体。$n$ 条边线性相关时，这个集合留在一个较低维的子空间内，$n$ 维体积为0；不是说它在低维中也没有面积或体积。
+
+\DetFigure{左侧固定底面，只把绿色第三条边伸长为2倍，盒子的体积也乘2；右侧保持同一盒子，交换蓝、红两条边的次序，定向便反转。把第三条边拆成两支箭头时，两份法向高度相加，体积也相加；这些低维动作展示了任意维数中多重线性与交替性的几何原型。}{fig:six-multilinear-area}{%
+\begin{tikzpicture}[font=\small]
+ \draw[step=.5cm,DetGray!10,line width=.25pt] (-.4,-.8) grid (13,4.7);
+ \begin{scope}[x={(1cm,-.2cm)},y={(.55cm,.45cm)},z={(0cm,1cm)}]
+  \filldraw[fill=DetBlue!9,draw=DetGray!55] (0,0,0)--(1.6,0,0)--(1.6,1,0)--(0,1,0)--cycle;
+  \foreach \xx/\yy in {0/0,1.6/0,1.6/1,0/1}
+   {\draw[detguide] (\xx,\yy,0)--(\xx,\yy,1);}
+  \draw[detguide] (0,0,1)--(1.6,0,1)--(1.6,1,1)--(0,1,1)--cycle;
+  \foreach \xx/\yy in {0/0,1.6/0,1.6/1,0/1}
+   {\draw[DetGreen!65] (\xx,\yy,0)--(\xx,\yy,2);}
+  \draw[DetGreen!65] (0,0,2)--(1.6,0,2)--(1.6,1,2)--(0,1,2)--cycle;
+  \draw[detblue] (0,0,0)--(1.6,0,0);
+  \draw[detrose] (0,0,0)--(0,1,0);
+  \draw[detgreen] (0,0,0)--(0,0,2) node[above] {$2\boldsymbol a_3$};
+ \end{scope}
+ \node[align=center] at (1.1,-.7) {数乘齐次性\\灰色高为1，绿色高为2};
+ \begin{scope}[shift={(5.5,.3)},x={(1cm,-.2cm)},y={(.55cm,.45cm)},z={(0cm,1cm)}]
+  \filldraw[fill=DetBlue!9,draw=DetGray!55] (0,0,0)--(1.6,0,0)--(1.6,1,0)--(0,1,0)--cycle;
+  \foreach \xx/\yy in {0/0,1.6/0,1.6/1,0/1}{\draw[detguide] (\xx,\yy,0)--(\xx,\yy,1.5);}
+  \draw[DetGray!55] (0,0,1.5)--(1.6,0,1.5)--(1.6,1,1.5)--(0,1,1.5)--cycle;
+  \draw[detblue] (0,0,0)--(1.6,0,0) node[below] {$\boldsymbol a_1$};
+  \draw[detrose] (0,0,0)--(0,1,0) node[left] {$\boldsymbol a_2$};
+  \draw[detgreen] (0,0,0)--(0,0,1.5) node[above] {$\boldsymbol a_3$};
+ \end{scope}
+ \node at (6.3,2.8) {次序 $(1,2,3)$：$+V$};
+ \draw[detaxis] (8.1,1.1)--(9,1.1);
+ \node[above,align=center] at (8.55,1.1) {交换\\两列};
+ \begin{scope}[shift={(10.1,.3)},x={(1cm,-.2cm)},y={(.55cm,.45cm)},z={(0cm,1cm)}]
+  \filldraw[fill=DetRose!9,draw=DetGray!55] (0,0,0)--(1.6,0,0)--(1.6,1,0)--(0,1,0)--cycle;
+  \foreach \xx/\yy in {0/0,1.6/0,1.6/1,0/1}{\draw[detguide] (\xx,\yy,0)--(\xx,\yy,1.5);}
+  \draw[DetGray!55] (0,0,1.5)--(1.6,0,1.5)--(1.6,1,1.5)--(0,1,1.5)--cycle;
+  \draw[detblue] (0,0,0)--(1.6,0,0) node[below] {$\boldsymbol a_1$};
+  \draw[detrose] (0,0,0)--(0,1,0) node[left] {$\boldsymbol a_2$};
+  \draw[detgreen] (0,0,0)--(0,0,1.5) node[above] {$\boldsymbol a_3$};
+ \end{scope}
+ \node at (11,2.8) {次序 $(2,1,3)$：$-V$};
+ \node[align=center] at (8.8,-.7) {交替性：边的位置不变，读取的次序改变};
+ \node[anchor=west,align=left] at (.2,4) {同一规则不依赖盒子能否画出：\\每条边单独线性，交换两条边则变号。};
+\end{tikzpicture}}
+
+固定其他边，只对一条边保持加法与数乘，叫作\term{multilinearity}；交换任意两条边，函数值变号，叫作\term{alternation}，也称交错性。这两条不是新添的高维技巧，而是我们在面积和体积里已经看见的规则。注意“分别线性”不等于“全部输入同时线性”：两条边都乘2，二维面积会乘4，而不是乘2。
+
+\DetHead{高维的“底面法线”到哪里找？}
+在 $\mathbb R^n$ 中，若 $n-1$ 条边线性无关，它们张成一个过原点的超平面 $W$。第五章的正交与维数告诉我们，$W^\perp$ 是一维的：所有法向量都在同一条直线上。单凭“垂直”并不能选出唯一向量；还要用底面的 $(n-1)$ 维体积确定长度，再用空间定向选择两侧中的一侧。
+
+把这样选出的向量记作 $\boldsymbol N$，称为\term{generalized-cross-product}。本书沿用标准基 $(\boldsymbol e_1,\ldots,\boldsymbol e_n)$ 的正定向，要求有序组 $(\boldsymbol a_1,\ldots,\boldsymbol a_{n-1},\boldsymbol N)$ 为正向。二维时，它就是刚才的逆时针垂直箭头；三维时，就是右手叉乘。更高维没有可以直接照搬的手势，起作用的是这个\textbf{有序基的定向约定}。
+
+若这 $n-1$ 条边线性相关，底面自身已经退化，约定 $\boldsymbol N=\boldsymbol0$；此时正交补子空间可能不止一维，不能再说“所有法线只有一个方向”。不退化时，用单位法线读出最后一条边的高，仍然得到
 \begin{equation}
- \det(A)=D(\boldsymbol r_1,\ldots,\boldsymbol r_n).
- \label{eq:six-det-definition}
+ \det(\boldsymbol a_1,\ldots,\boldsymbol a_n)
+       =\boldsymbol N\cdot\boldsymbol a_n.
+ \label{eq:six-generalized-cross-volume}
 \end{equation}
-即行列式是\textbf{归一化的交错多重线性函数}。三项条件共同确定它，归一化不能省略。
+这就是高维的底乘高：$|\boldsymbol N|$ 保存底面体积，点乘取出最后一条边的法向高度。图\ref{fig:six-cross-triple}画的是它的三维模型；底面换成超平面时，角色并没有改变。
+
+例如在 $\mathbb R^4$ 中，前三条标准基边围出的三维底面体积为1，正向法线为 $\boldsymbol e_4$。取最后一条边为 $2\boldsymbol e_4$，四维有向体积就是2；若取最后一条边为 $\boldsymbol e_1+\boldsymbol e_2$，它留在底面内，四维体积就是0。我们不必先画出四维空间，才能读懂这两个数。
+
+这也接上第三章“列是基向量的像”的视角：当 $A\boldsymbol e_j=\boldsymbol a_j$ 时，单位盒子被映成由各列围出的盒子，$\det(A)$ 就是有向体积倍率，普通体积倍率为 $|\det(A)|$。对任意体积非零的输入平行体，变换前后的有向体积之比仍是 $\det(A)$；原体积为0时不能作这个比值，体积缩放关系本身仍成立，下一节的乘积法则会给出代数保证。
+
+最后一条边的每个坐标，怎样被法线读出？式\eqref{eq:six-generalized-cross-volume}表明，体积对最后一列是一个点乘。第6.3节将看到，这支法线的各分量正是最后一列的代数余子式；固定其他行时也有对应的行法向量。这里先保留几何角色，不提前展开余子式计算。
+
+\subsection{从几何性质提炼行列式的公理化定义}
+\label{sec:six-volume-axioms}
+
+图形能帮助我们理解，但无法代替任意维数中的推理。怎样把“每条边分别线性、交换边变号、单位盒子为1”留下来，让它们在看不见的维数中也能使用？答案是把图形中的规则写成一个实数值函数的要求。公理在这里是对刚才所见的概括，不是先塞给读者的计算指令。
+
+\begin{definition}[笛卡尔积空间：把有序的边放在一起]
+设 $V$ 是实向量空间，$m$ 是正整数。\term{cartesian-product} $V^m$ 定义为
+\begin{equation}
+ V^m=\underbrace{V\times\cdots\times V}_{m\text{个 }V}.
+\end{equation}
+它的元素是有序组 $(\boldsymbol u_1,\ldots,\boldsymbol u_m)$，即来自 $V$ 的 $m$ 个向量依次放在 $m$ 个位置上。这里的次序必须保留，因为交换两条边会改变有向体积的符号。
 \end{definition}
 
-回到刚画过的图：单位正方形的两条边是 $\mathbf e_1,\mathbf e_2$，有向面积为1；单位立方体的三条边是 $\mathbf e_1,\mathbf e_2,\mathbf e_3$，有向体积也为1。二阶面积公式与三阶混合积都对每条边线性，交换两条边变号，且满足这一基准。因此，几何公式正好落在定义中，而不是另起一套规则。
+若我们只改变其中一条边，需要函数保持什么关系？图\ref{fig:six-area-properties}中的高度相加、图\ref{fig:six-multilinear-area}中的一条边伸长，已经给出了答案。
 
-\begin{theorem}[行列式的存在性与唯一性]
-对每个正整数 $n$，满足上述三项条件的函数存在且唯一。
+\begin{definition}[$m$重线性型：每个位置单独线性]
+函数 $\beta:V^m\to\mathbb R$ 称为\term{multilinear-form}，如果固定其余位置后，它对每个位置 $k$ 都满足
+\begin{align}
+ \beta(\ldots,\boldsymbol u_k+\boldsymbol v_k,\ldots)
+ &=\beta(\ldots,\boldsymbol u_k,\ldots)+\beta(\ldots,\boldsymbol v_k,\ldots),\\
+ \beta(\ldots,c\boldsymbol u_k,\ldots)
+ &=c\,\beta(\ldots,\boldsymbol u_k,\ldots)\qquad(c\in\mathbb R).
+ \label{eq:six-multilinearity}
+\end{align}
+这两式分别保存“一条边拆开”和“一条边数乘”的规则；其他位置的向量在等式各项中保持不变。
+\end{definition}
+
+本节把全部 $m$ 重线性型记作 $V^{(m)}$，与由向量有序组组成的 $V^m$ 区别开。它本身也是向量空间：两型相加或把一型数乘，就是对每个输入把输出数相加或数乘，所得函数仍对每个位置线性。
+
+还缺少哪条信息？仅有线性，不能区分两条边交换后的定向。因此要把交换变号单独写出来。
+
+\begin{definition}[交替的多重线性型]
+一个 $m$ 重线性型 $\beta$ 称为\term{alternating-multilinear-form}，如果交换任意两个位置的向量，函数值变号：
+\begin{equation}
+ \beta(\ldots,\boldsymbol u_i,\ldots,\boldsymbol u_j,\ldots)
+ =-\beta(\ldots,\boldsymbol u_j,\ldots,\boldsymbol u_i,\ldots)
+ \qquad(i\ne j).
+\end{equation}
+这正是图\ref{fig:six-area-properties}、图\ref{fig:six-multilinear-area}中“盒子不变，定向反转”的代数表达。若两个位置放的是同一向量，交换后输入不变，数值又必须变号，所以这个值只能为0。
+\end{definition}
+
+最后，怎样确定单位？把有向体积一律乘10，多重线性与交替性仍成立；恒为0的函数也满足它们。还必须规定标准单位盒子的值为1，才能固定尺度，这称为\term{normalization}。
+
+\begingroup
+\tcbset{commonbox/.append style={unbreakable}}
+\begin{definition}[行列式函数]
+在 $V=\mathbb R^n$ 中，满足
+\begin{equation}
+ \det(\boldsymbol e_1,\ldots,\boldsymbol e_n)=1
+ \label{eq:six-normalization}
+\end{equation}
+的交替 $n$ 重线性型，称为行列式函数。对以 $\boldsymbol a_1,\ldots,\boldsymbol a_n$ 为各列的方阵 $A$，记
+\begin{equation}
+ \det(A)=\det(\boldsymbol a_1,\ldots,\boldsymbol a_n).
+ \label{eq:six-det-definition}
+\end{equation}
+因此，行列式由三条要求描述：\textbf{每列单独线性，交换两列变号，标准基的值为1}。
+\end{definition}
+\endgroup
+
+在一般 $n$ 维实向量空间中，也可以先指定一组有序基，再用同样方式归一；没有选定基，就不能凭空说它的“标准单位体积”为1。
+
+\begin{theorem}[行列式函数的存在性与唯一性]
+对每个正整数 $n$，上述归一化的交替 $n$ 重线性型存在且唯一。更一般地，任一交替 $n$ 重线性型 $\beta$ 都满足
+\begin{equation}
+ \beta(\boldsymbol a_1,\ldots,\boldsymbol a_n)
+ =\beta(\boldsymbol e_1,\ldots,\boldsymbol e_n)\det(A).
+ \label{eq:six-alternating-scale}
+\end{equation}
 \end{theorem}
+\DetBoxLabel{thm:six-determinant-existence}
 
-\begin{proof}
-先解释为何只能有一种答案。若有两条边相同，交换它们既不改变输入，又使函数值变号，所以该值只能为0。再将每个行向量按标准基展开：
-\begin{equation}
- \boldsymbol r_i=\sum_{j=1}^n a_{ij}\mathbf e_j.
-\end{equation}
-利用多重线性依次展开，所有项都成为若干坐标的乘积，乘上 $D(\mathbf e_{j_1},\ldots,\mathbf e_{j_n})$。只要下标重复，该项为0；不重复时，下标恰好是 $1,\ldots,n$ 的一种\term{permutation}。其值由交换变号和单位基准唯一确定为 $+1$ 或 $-1$。
+第二个结论说，所有这样的体积读数至多相差一个统一的尺度，单位基准为1便把尺度固定。几何上的有向体积给出这三条性质的模型；任意维数中完整的代数存在性与唯一性证明放在第\ref{sec:six-optional-existence}节选读内容中，用排列与逆序数核对，主线先使用这个结论。
 
-把排列写为 $\sigma=(\sigma(1),\ldots,\sigma(n))$，用\term{inversion-number} $N(\sigma)$ 记录其中满足 $i<j$、$\sigma(i)>\sigma(j)$ 的数对个数。相邻交换每次翻转一次符号，故任何候选函数都只能是
-\begin{equation}
- D(\boldsymbol r_1,\ldots,\boldsymbol r_n)
- =\sum_{\sigma\in S_n}(-1)^{N(\sigma)}
-     a_{1,\sigma(1)}\cdots a_{n,\sigma(n)}.
- \label{eq:six-permutation-existence}
-\end{equation}
-这里 $S_n$ 表示全部排列。另一方面，这个有限和确实定义了一个函数：每一项从每行恰取一个元素，所以对各行线性；交换两行时，把相应排列重新配对，每项符号翻转；代入 $E_n$ 时只有恒等排列留下，值为1。因此它满足三项条件，存在性也得到证明。
-\end{proof}
+现在回望二维的 $a_{11}a_{22}-a_{12}a_{21}$ 与三维的混合积：它们分别满足这三条要求，所以正是二阶、三阶行列式，不是与抽象定义并列的两种不同办法。\textbf{几何先告诉我们要记录什么，公理再保证这个记录只有一种。}下一节将由这些规则推导初等变换、可逆性与乘积法则；从此，即使不能画出图形，我们也能可靠地计算体积的变化。
 
-这段排列公式承担的是\textbf{证明公理能定义出一个对象}的任务，实际计算不必从列出所有排列开始。$n=1$ 时得到 $\det([a])=a$；$n=2$ 时只留下两项，得到 $a_{11}a_{22}-a_{12}a_{21}$；$n=3$ 时恰好得到前面的六项混合积。到了 $n>3$，我们虽然无法直接画出整个平行体，仍然能够严格定义它的有向体积。
-
-还有一个随后会用到的结论：若只要求多重线性与交错性，而不要求基准为1，则同一展开表明，这个函数必为 $D(E_n)\det(A)$。因此，\textbf{归一化固定尺度，两条运算性质固定结构}。下一节就用这套公理，重新解释消元为何能够度量体积。
 
 \section{从公理到性质：代数骨架的搭建}
 \label{sec:six-determinant-properties}
 
-现在有了严格定义，我们可以回答一个实际问题：图形被拉伸、翻转或倾斜时，行列式会怎样变？第二章的三种初等行变换，恰好对应这三类操作。每一条性质都先在低维图形中看见，再用公理验证；这样，图形给出的直觉就能成为任意阶矩阵的计算规则。
+现在有了严格定义，我们可以回答一个实际问题：图形被拉伸、翻转或倾斜时，行列式会怎样变？先看三种列变换怎样改变盒子的边，再借助转置，把同样的规则交给第二章的行消元。每一条性质都先在低维图形中看见，再用公理验证；这样，图形给出的直觉就能成为任意阶矩阵的计算规则。
 
-\subsection*{单位基准与三种初等行变换}
+\subsection*{单位基准与三种列变换}
 
-单位基向量围出单位正方形或单位立方体，这解释了 $\det(E_n)=1$ 的尺度约定。若某条边为零，图形塌缩；代数上，由该位置的线性性，函数值为0。若两条边相同，方向没有独立贡献；交换这两行既不改变矩阵，又使行列式变号，因而也为0。这两件小事，将成为下面推导的支点。
+单位基向量围出单位正方形或单位立方体，这解释了 $\det(E_n)=1$ 的尺度约定。若某条边为零，图形塌缩；代数上，由该位置的线性性，函数值为0。若两条边相同，方向没有独立贡献；交换这两列既不改变矩阵，又使行列式变号，因而也为0。这两件小事，将成为下面推导的支点。
 
 先把三种操作放在图形中看：倍乘一条边使高度按同一比例改变，交换两条边使定向翻转，把底边的倍数加到另一条边上则只让顶端平行移动。这三个几何动作，分别要求尺度变化、符号变化与体积保持。
 
-\begin{property}[初等行变换对行列式的影响]
-对方阵 $A$ 作一次行操作，得到 $B$。则
+\begin{property}[列变换对行列式的影响]
+对方阵 $A$ 作一次列操作，得到 $B$。则
 \begin{align}
- R_i\leftarrow kR_i&:\quad \det(B)=k\det(A);\\
- R_i\leftrightarrow R_j&:\quad \det(B)=-\det(A);\\
- R_i\leftarrow R_i+kR_j\ (i\ne j)&:\quad \det(B)=\det(A).
- \label{eq:six-row-operation-determinants}
+ C_i\leftarrow kC_i&:\quad \det(B)=k\det(A);\\
+ C_i\leftrightarrow C_j&:\quad \det(B)=-\det(A);\\
+ C_i\leftarrow C_i+kC_j\ (i\ne j)&:\quad \det(B)=\det(A).
+ \label{eq:six-column-operation-determinants}
 \end{align}
-第一条对任意实数 $k$ 都成立；作为可逆的初等行变换使用时，须要求 $k\ne0$。
+第一条对任意实数 $k$ 都成立；作为可逆的初等列变换使用时，须要求 $k\ne0$。
 \end{property}
 
-\DetHead{倍乘一行：改变尺度，也可能改变方向}
-几何上，固定其余边，把一条边拉长 $|k|$ 倍，带符号高度也乘 $k$；若 $k<0$，方向同时翻转。代数上，在第 $i$ 个位置直接使用多重线性，得到 $D(\ldots,k\boldsymbol r_i,\ldots)=kD(\ldots,\boldsymbol r_i,\ldots)$。所以不是整个矩阵乘 $k$ 才使行列式乘 $k$，\textbf{只乘一行就已经带来一次尺度变化}。若所有 $n$ 行都乘 $k$，则
+\DetHead{倍乘一列：改变尺度，也可能改变方向}
+几何上，固定其余边，把一条边拉长 $|k|$ 倍，带符号高度也乘 $k$；若 $k<0$，方向同时翻转。代数上，在第 $i$ 个位置直接使用多重线性，得到 $\det(\ldots,k\boldsymbol a_i,\ldots)=k\det(\ldots,\boldsymbol a_i,\ldots)$。所以不是整个矩阵乘 $k$ 才使行列式乘 $k$，\textbf{只乘一列就已经带来一次尺度变化}。若所有 $n$ 列都乘 $k$，则
 \begin{equation}
  \det(kA)=k^n\det(A).
 \end{equation}
 在平面中，它对应两条边同时伸长；面积乘的是 $k^2$。
 
-\DetHead{交换两行：形状不动，方向变号}
-交换两条有序边，不改变平行体作为一个点集的形状，却改变其定向。公理中的交错性正是这一事实的代数写法。连续作两次交换，符号翻转两次，又回到原值；这也解释了三维混合积循环换序不变。
+\DetHead{交换两列：形状不动，方向变号}
+交换两条有序边，不改变平行体作为一个点集的形状，却改变其定向。公理中的交替性正是这一事实的代数写法。连续作两次交换，符号翻转两次，又回到原值；这也解释了三维混合积循环换序不变。
 
-\DetHead{倍加一行：倾斜而不改变体积}
+\DetHead{倍加一列：倾斜而不改变体积}
 固定底边，把另一条边加上底边的倍数，顶端沿平行于底边的方向移动，底与高都不变。三维中，沿底面移动顶端同样不改变体积。坐标图形可能明显变斜，行列式却保持原值。
 
 \DetFigure{向上边加上底边的倍数，只让顶端横向移动。左、右两块平行四边形的底长与高都相同；灰色虚线标出共同的高度，因此有向面积相等。}{fig:six-shear-area}{%
@@ -15148,17 +15451,17 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
  \end{scope}
 \end{tikzpicture}}
 
-代数上，把发生改变的那一行拆开：
+代数上，把发生改变的那一列拆开：
 \begin{align}
- D(\ldots,\boldsymbol r_i+k\boldsymbol r_j,\ldots,\boldsymbol r_j,\ldots)
- &=D(\ldots,\boldsymbol r_i,\ldots,\boldsymbol r_j,\ldots)\\
- &\quad+kD(\ldots,\boldsymbol r_j,\ldots,\boldsymbol r_j,\ldots)\\
- &=D(\ldots,\boldsymbol r_i,\ldots,\boldsymbol r_j,\ldots).
+ \det(\ldots,\boldsymbol a_i+k\boldsymbol a_j,\ldots,\boldsymbol a_j,\ldots)
+ &=\det(\ldots,\boldsymbol a_i,\ldots,\boldsymbol a_j,\ldots)\\
+ &\quad+k\det(\ldots,\boldsymbol a_j,\ldots,\boldsymbol a_j,\ldots)\\
+ &=\det(\ldots,\boldsymbol a_i,\ldots,\boldsymbol a_j,\ldots).
 \end{align}
-第二项有两行相同，因而为0。图形中的“高没变”，在公理中体现为这一项消失。\textbf{倍加不改变行列式}，就是用高斯消元计算行列式的基础。
+第二项有两列相同，因而为0。图形中的“高没变”，在公理中体现为这一项消失。\textbf{倍加不改变行列式}，就是用高斯消元计算行列式的基础。
 
 \begin{example}[一眼分清三种操作]
-原矩阵 $A=\DetMat{cc}{2&1\\1&3}$ 的行列式为5。将第2行乘3，行列式变为15；交换两行，变为 $-5$；将第2行减去第1行的2倍，变为 $\DetMat{rr}{2&1\\-3&1}$，行列式仍为 $2+3=5$。三个结果分别对应拉伸、换方向和切变。
+原矩阵 $A=\DetMat{cc}{2&1\\1&3}$ 的行列式为5。将第2列乘3，行列式变为15；交换两列，变为 $-5$；将第2列减去第1列的2倍，变为 $\DetMat{rr}{2&-3\\1&1}$，行列式仍为 $2+3=5$。三个结果分别对应拉伸、换方向和切变。
 \end{example}
 
 \subsection*{体积何时塌缩：可逆性判定}
@@ -15166,15 +15469,15 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 面积为0时，两条边共线；体积为0时，三条边共面。高维中，若 $n$ 个方向线性相关，它们围出的平行体也失去完整的 $n$ 维体积。这个图景与第四章“输入信息能否恢复”的问题是同一件事：某个独立方向被压掉，就不可能唯一恢复每个输入。
 
 \begin{theorem}[行列式、线性无关与可逆性]
-对 $n$ 阶方阵 $A$，下列命题等价：$A$ 可逆；$\det(A)\ne0$；$A$ 的行向量组线性无关；$A$ 的列向量组线性无关。
+对 $n$ 阶方阵 $A$，下列命题等价：$A$ 可逆；$\det(A)\ne0$；$A$ 的列向量组线性无关；$A$ 的行向量组线性无关。
 \end{theorem}
 
 \begin{proof}
-若行向量线性相关，就能选出一行，写成其余行的线性组合。把它代入多重线性公式，每个展开项都出现两行相同，故 $\det(A)=0$。这把几何上的塌缩写成了代数上的零值。
+若列向量线性相关，就能选出一列，写成其余列的线性组合。把它代入多重线性公式，每个展开项都出现两列相同，故 $\det(A)=0$。这把几何上的塌缩写成了代数上的零值。
 
-若行向量线性无关，第二章的消元可以把 $A$ 化成 $E_n$。沿途只作交换、非零倍乘与倍加；由刚证明的三条规则，行列式只会乘上非零因子，或保持不变。终点的值为1，所以起点不可能为0。于是 $\det(A)\ne0$ 当且仅当各行线性无关。
+若列向量线性无关，对 $A^{\mathrm T}$ 作第二章的行消元，再转置回来，就是把 $A$ 化成 $E_n$ 的列消元。这里使用的是矩阵转置的运算规则，还没有假定行列式在转置下不变。沿途只作交换、非零倍乘与倍加；由刚证明的三条规则，行列式只会乘上非零因子，或保持不变。终点的值为1，所以起点不可能为0。于是 $\det(A)\ne0$ 当且仅当各列线性无关。
 
-第四章已证明行秩等于列秩；对方阵，秩为 $n$ 等价于列向量线性无关，也等价于对应映射为双射，即矩阵可逆。把这些结论连接起来，就得到全部等价关系。
+第四章已证明行秩等于列秩；对方阵，列向量线性无关等价于行向量线性无关，也等价于对应映射为双射，即矩阵可逆。把这些结论连接起来，就得到全部等价关系。
 \end{proof}
 
 几何直观现在有了严格保证：\textbf{有向体积非零，说明方向没有塌缩；方向没有塌缩，说明映射可以撤销。}对方阵而言，$\det(A)=0$ 不是“方程组必定无解”：右端项在列空间内时仍有解，只是存在自由度。第五章的目标位置与零空间，仍然需要分别检查。
@@ -15194,9 +15497,13 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \end{theorem}
 
 \begin{proof}
-固定 $B$，把 $F_B(A)=\det(AB)$ 看成关于 $A$ 的函数。$AB$ 的第 $i$ 行是 $A$ 的第 $i$ 行右乘 $B$，这个对应关系线性；所以 $F_B$ 对 $A$ 的每行线性。交换 $A$ 的两行，也交换 $AB$ 的两行，因此 $F_B$ 是交错的。而 $F_B(E_n)=\det(B)$。
+固定 $A$，把 $F_A(B)=\det(AB)$ 看成关于 $B$ 各列的函数。若 $\boldsymbol b_j$ 是 $B$ 的第 $j$ 列，则 $AB$ 的第 $j$ 列是 $A\boldsymbol b_j$；这个对应是线性的。因此 $F_A$ 对 $B$ 的每列线性；交换 $B$ 的两列，也交换 $AB$ 的两列，所以 $F_A$ 具有交替性。
 
-第6.1节的唯一性证明已说明，任意交错多重线性函数，都等于它在 $E_n$ 上的值乘以 $\det(A)$。因此 $F_B(A)=\det(B)\det(A)$。证明没有除以 $\det(B)$，所以 $B$ 不可逆时也成立。
+单位基准为 $F_A(E_n)=\det(A)$。由定理\ref{thm:six-determinant-existence}的尺度结论，
+\begin{equation}
+ F_A(B)=F_A(E_n)\det(B)=\det(A)\det(B).
+\end{equation}
+我们只使用已经定义好的列规则，没有借用行规则或转置不变性；也没有除以任何行列式，所以奇异矩阵同样包含在内。尺度结论的完整证明见第\ref{sec:six-optional-existence}节。
 \end{proof}
 
 把结论放回图形：若一步已经把体积压为0，后续线性变换不能凭空补回丢失的方向，乘积的行列式也为0。若两步都可逆，缩放倍率与方向则按乘法合成。特别地，
@@ -15219,7 +15526,7 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
  \node[anchor=west,text=DetGray] at (10.7,1.5) {$\det(AB)=\det(A)\det(B)$};
 \end{tikzpicture}}
 
-接下来还有一个不那么显然的问题：我们用各行围出的体积定义行列式，而映射把单位基送到的是各列。行与列会不会给出不同的体积？图\ref{fig:six-row-column-volume}提醒我们，两幅平行四边形可以形状不同，面积却相同；一般情形须由代数证明保证。
+接下来还有一个不那么显然的问题：我们用各列围出的体积定义行列式，按各行围出的体积是否相同？图\ref{fig:six-row-column-volume}提醒我们，两幅平行四边形可以形状不同，有向面积却相同；一般情形还要有代数保证。
 
 \DetFigure{同一矩阵 $A=\left(\begin{smallmatrix}2&1\\0&1\end{smallmatrix}\right)$ 的行与列围出不同形状的平行四边形，但有向面积都为2。转置不要求两幅图全等，只保证行列式相等。}{fig:six-row-column-volume}{%
 \begin{tikzpicture}[x=1.25cm,y=1.25cm,font=\small]
@@ -15248,17 +15555,24 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \end{theorem}
 
 \begin{proof}
-在第6.1节的排列式中，$A^{\mathrm T}$ 的元素把行列下标互换。把每个排列换成它的逆排列 $\tau=\sigma^{-1}$，再把乘积中的因子按行号重排，得到
-\begin{align}
- \det(A^{\mathrm T})
- &=\sum_{\sigma\in S_n}(-1)^{N(\sigma)}\prod_{i=1}^n a_{\sigma(i),i}\\
- &=\sum_{\tau\in S_n}(-1)^{N(\tau)}\prod_{j=1}^n a_{j,\tau(j)}
- =\det(A).
-\end{align}
-排列与逆排列有相同的逆序数：$i<j$ 而 $\sigma(i)>\sigma(j)$，恰好对应逆排列中这一对位置的反序。因此重新编号不会改变符号。
+先看三种初等矩阵 $F$。它们从 $E_n$ 作一次行操作得到；按列看，分别也是对 $E_n$ 作一次交换、倍乘或倍加。因此由列规则，三类矩阵的行列式分别为 $-1$、$k$、$1$；其转置仍属同一类型，参数 $k$ 不变，所以 $\det(F^{\mathrm T})=\det(F)$。
+
+若 $A$ 可逆，第三章的消元说明它能写成初等矩阵的乘积 $A=F_1\cdots F_s$。转置把乘积次序反过来，由刚证明的乘积法则，
+\begin{equation}
+ \det(A^{\mathrm T})=\det(F_s^{\mathrm T})\cdots\det(F_1^{\mathrm T})
+                   =\prod_{i=1}^{s}\det(F_i)=\det(A).
+\end{equation}
+这里行列式的因子是实数，所以它们可以交换次序；没有交换矩阵本身。若 $A$ 不可逆，$A^{\mathrm T}$ 也不可逆，由前面的可逆性判据，两者行列式都是0。于是所有方阵都满足结论。
 \end{proof}
 
-这个证明让图中的两种体积读法成为同一个量：矩阵作用于单位区域时，各列构成的像的通常体积为 $|\det(A)|$，与各行的定义一致。\textbf{既然行和列的地位等价，三类初等行变换对行列式的影响，就可以直接平移到列变换上。}交换两列变号，倍乘一列乘相应系数，把一列的倍数加到另一列上则不变。
+这个证明保证了两种体积读法得到同一个数。\textbf{既然行和列在行列式中等价，已经证明的列规则就能转成行规则。}若行操作把 $A$ 变成 $B$，转置后正是同种列操作把 $A^{\mathrm T}$ 变成 $B^{\mathrm T}$，所以
+\begin{align}
+ R_i\leftarrow kR_i&:\quad \det(B)=k\det(A),\\
+ R_i\leftrightarrow R_j&:\quad \det(B)=-\det(A),\\
+ R_i\leftarrow R_i+kR_j\ (i\ne j)&:\quad \det(B)=\det(A).
+ \label{eq:six-row-operation-determinants}
+\end{align}
+因此第二章的行消元也有了体积读数：交换变号，非零倍乘改变倍率，倍加保持不变。下一节用的正是这三条行规则。
 
 \begin{corollary}[三角矩阵的行列式]
 上三角矩阵或下三角矩阵 $U$ 的行列式，等于主对角线元素的乘积：
@@ -15268,7 +15582,7 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \end{equation}
 \end{corollary}
 
-几何上，三角排列让逐层的高度容易读出；对角矩阵就是各边沿坐标轴的长方体。代数上，以对角矩阵为例，多重线性直接给出对角元乘积。对上三角矩阵，在排列式的一个非零项中须有 $\sigma(i)\ge i$；所有下标之和固定为 $1+\cdots+n$，所以只能每个 $\sigma(i)=i$，只留下主对角线乘积。下三角情形由转置得到。对角元为0的情形也包含在内。
+几何上，三角排列让逐层的高度容易读出；对角矩阵就是各边沿坐标轴的长方体。代数上，把上三角矩阵的各列按标准基展开。第1列只有 $u_{11}\boldsymbol e_1$，所以先提出 $u_{11}$；第2列的 $\boldsymbol e_1$ 项会造成重复输入，贡献为0，只留下 $u_{22}\boldsymbol e_2$。依次向后，第 $j$ 列沿前 $j-1$ 支基向量的项都因重复而消失，只留下 $u_{jj}\boldsymbol e_j$。最后标准基的值为1，就得到对角元乘积。这个展开无需除法，对角元为0时仍成立；下三角情形由转置得到。
 
 \begin{example}[列公因子与列倍加]
 求 $A=\DetMat{rr}{2&6\\4&15}$ 的行列式。先从第1列提出2、第2列提出3，再用 $C_2\leftarrow C_2-2C_1$：
@@ -15280,10 +15594,10 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 \end{example}
 
 \begin{note}
-列变换可以用于\textbf{计算行列式}，却不能不加说明地用于增广矩阵并声称原方程组同解。第二章固定未知数的消元使用行变换；列操作改变系数列，也改变输入变量的记录。另外，行列式一般不满足 $\det(A+B)=\det(A)+\det(B)$：多重线性说的是每次只改变一行。例如 $\det(E_2+E_2)=4$，而 $\det(E_2)+\det(E_2)=2$。
+列变换可以用于\textbf{计算行列式}，却不能不加说明地用于增广矩阵并声称原方程组同解。第二章固定未知数的消元使用行变换；列操作改变系数列，也改变输入变量的记录。另外，行列式一般不满足 $\det(A+B)=\det(A)+\det(B)$：多重线性说的是每次只改变一列（或一行）。例如 $\det(E_2+E_2)=4$，而 $\det(E_2)+\det(E_2)=2$。
 \end{note}
 
-至此，大小、方向、可逆性与初等操作已经接在同一套规则上。下一节不再只判断体积是否为零，而要寻找两条计算路线：用消元把高度逐层读出，用代数余子式把任意一行的贡献单独读出。
+至此，大小、方向、可逆性与初等操作已经接在同一套规则上。下一节不再只判断体积是否为零，而要寻找两条计算路线：用消元把高度逐层读出，用代数余子式把任意一列的贡献单独读出。
 
 \section{行列式的计算}
 \label{sec:six-determinant-computation}
@@ -15343,7 +15657,7 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 
 回到平行六面体：先固定两条边，它们的叉乘确定底面法向与面积，再与第三条边作点积，得到体积。若改变被留下来计算的那一行，也应有一支相应的法向量。我们要找的是\textbf{垂直于其余各行的向量}，而不是垂直于这行自身的向量；后一种点积必为0，不能读出一般的体积。
 
-对三阶矩阵，以 $\boldsymbol r_1,\boldsymbol r_2,\boldsymbol r_3$ 记各行的坐标向量，三支带正确方向的垂直向量是
+对三阶矩阵，以 $\boldsymbol r_i=(a_{i1},a_{i2},a_{i3})^{\mathrm T}$ 记第 $i$ 行竖排的坐标向量。由转置不变性，$\det(\boldsymbol r_1,\boldsymbol r_2,\boldsymbol r_3)=\det(A)$，因此也能用这三支箭头读出同一个有向体积。三支带正确方向的垂直向量是
 \begin{equation}
  \boldsymbol c_1=\boldsymbol r_2\times\boldsymbol r_3,\qquad
  \boldsymbol c_2=\boldsymbol r_3\times\boldsymbol r_1,\qquad
@@ -15396,11 +15710,11 @@ $A\boldsymbol y$ 给出当前状态引起的变化率，$\boldsymbol g(t)$ 给�
 固定其余各行，将第 $i$ 行展开为 $\boldsymbol r_i=\sum_j a_{ij}\mathbf e_j$。由多重线性，
 \begin{equation}
  \det(A)=\sum_{j=1}^n a_{ij}
-       D(\boldsymbol r_1,\ldots,\mathbf e_j,\ldots,\boldsymbol r_n).
+       \det(\boldsymbol r_1,\ldots,\mathbf e_j,\ldots,\boldsymbol r_n).
 \end{equation}
-右侧每项的第 $i$ 行只有第 $j$ 个元素为1。把这一行移到第1行，把第 $j$ 列移到第1列，分别需要 $i-1$ 次、$j-1$ 次交换。新矩阵的首行是 $(1,0,\ldots,0)$；排列式中只可能沿这个1取值，剩下的部分恰好是 $M_{ij}$。因此
+右侧每项的第 $i$ 行只有第 $j$ 个元素为1。把这一行移到第1行，把第 $j$ 列移到第1列，分别需要 $i-1$ 次、$j-1$ 次交换。新矩阵的首行是 $(1,0,\ldots,0)$，用倍加消去首列这个1下方的元素，不改变右下方的子矩阵。固定第一支标准基后，余下各列的行列式读数是一个归一化的交替 $(n-1)$ 重线性型，由唯一性就是右下方子矩阵的行列式 $M_{ij}$。因此
 \begin{equation}
- D(\boldsymbol r_1,\ldots,\mathbf e_j,\ldots,\boldsymbol r_n)
+ \det(\boldsymbol r_1,\ldots,\mathbf e_j,\ldots,\boldsymbol r_n)
  =(-1)^{i-1+j-1}M_{ij}=A_{ij}.
 \end{equation}
 代回即得按行展开。对转置矩阵按行展开，并使用转置不变性，就得到按列展开。
@@ -15686,7 +16000,58 @@ $\boldsymbol c_1$ 垂直于第2行，$\boldsymbol c_2$ 垂直于第1行；第1�
    行列式：$2\cdot3-1\cdot1=5$};
 \end{tikzpicture}}
 
-面积意义由此不是一个事后附加的比喻：二维中的底乘高、三维中的混合积，以及任意维数的归一化交错多重线性函数，描述的是同一套体积规则。行列式为0时，我们看见方向塌缩；非零时，我们看见可逆作用的整体倍率；面对非线性变形，又在足够小的范围内把同一套规则交给局部矩阵使用。
+\section{【选读】行列式函数的存在性与唯一性}
+\label{sec:six-optional-existence}
+
+主线已经把有向体积的几何规则写成公理，并用它们推导计算性质。本节补上一个代数问题：看不见 $n$ 维盒子时，怎样保证这三条要求既不矛盾，又不会产生两种不同答案？以下证明为选读，不做考核要求；排列公式在这里用于核对定义，并不要求实际计算从列举所有排列开始。
+
+\DetHead{先看唯一性：把每条边拆成标准基分量}
+假设 $D$ 满足多重线性、交替性、标准基归一。若两个输入相同，交换它们既不改变输入又使输出变号，所以值为0。对 $A$ 的第 $j$ 列，按标准基写成
+\begin{equation}
+ \boldsymbol a_j=\sum_{i=1}^n a_{ij}\boldsymbol e_i.
+\end{equation}
+逐列使用可加性与数乘性，$D$ 的值就展开为
+\begin{equation}
+ \sum_{i_1,\ldots,i_n=1}^n
+   a_{i_1,1}\cdots a_{i_n,n}\,
+   D(\boldsymbol e_{i_1},\ldots,\boldsymbol e_{i_n}).
+\end{equation}
+每项从每列取一个元素。只要两个下标重复，该项为0；下标互不重复时，它们恰好是 $1,\ldots,n$ 的一种\term{permutation}。
+
+记 $\sigma=(\sigma(1),\ldots,\sigma(n))$，其中 $\sigma(j)$ 是第 $j$ 列所取元素的行号。\term{inversion-number} $N(\sigma)$ 是其中满足 $i<j$、$\sigma(i)>\sigma(j)$ 的数对个数。把一个排列通过相邻交换整理成标准次序，每交换一次，逆序数的奇偶与函数值的符号都翻转一次。因此标准基归一给出
+\begin{equation}
+ D(\boldsymbol e_{\sigma(1)},\ldots,\boldsymbol e_{\sigma(n)})
+      =(-1)^{N(\sigma)}.
+\end{equation}
+所有可能的输出已被确定，任何候选函数都只能是
+\begin{equation}
+ \det(A)=\sum_{\sigma\in S_n}(-1)^{N(\sigma)}
+                  \prod_{j=1}^n a_{\sigma(j),j}.
+ \label{eq:six-permutation-existence}
+\end{equation}
+这里 $S_n$ 是全部排列的集合。公式不是新的几何定义，而是把多重线性逐列展开后，被交替性与单位基准留下的全部项。
+
+\DetHead{再看存在性：这个有限和确实满足公理}
+反过来，用式\eqref{eq:six-permutation-existence}定义一个函数。每一项从每列恰取一个元素，所以固定其他列时，它对剩下一列满足可加性与数乘性。
+
+交换两列 $p,q$，等价于交换每项中排列的两个位置。把所有项按这个对应重新配对，乘积对应不变，而排列符号反转：一次非相邻交换也能分解成奇数次相邻交换，所以仍变号。于是新有限和是原有限和的负数，满足交替性。
+
+代入单位矩阵 $E_n$，只有恒等排列 $\sigma(j)=j$ 的乘积不为0，它的符号为正、乘积为1。所以函数也满足归一性。至此，我们已经构造出满足全部公理的函数，存在性得到证明；前一段则证明它只能有一个。
+
+若 $\beta$ 只满足交替性与多重线性，同样的标准基展开给出
+\begin{equation}
+ \beta(\boldsymbol a_1,\ldots,\boldsymbol a_n)
+   =\beta(\boldsymbol e_1,\ldots,\boldsymbol e_n)\det(A).
+\end{equation}
+这个推导没有除以单位基准的值，因而它为0时也成立。这就补齐了第6.1节陈述、第6.2节乘积法则使用的尺度结论。
+
+$n=2$ 时，两个排列留下 $a_{11}a_{22}-a_{21}a_{12}$；$n=3$ 时，六个排列留下混合积的六项。高维中的严格定义与低维中看见的面积、体积由此接在一起：先看见几何，再理解结构，最后让符号替我们完成看不见的计算。
+
+
+\section*{本章小结}
+\addcontentsline{toc}{section}{本章小结}
+
+面积意义由此不是一个事后附加的比喻：二维中的底乘高、三维中的混合积，以及任意维数的归一化交替多重线性函数，描述的是同一套体积规则。行列式为0时，我们看见方向塌缩；非零时，我们看见可逆作用的整体倍率；面对非线性变形，又在足够小的范围内把同一套规则交给局部矩阵使用。
 
 到这里，几何提出的问题已经转化为可以证明、可以计算的代数结论。下一章将进一步研究长度、夹角与正交，让我们不只量出一个区域整体缩放多少，还能更细致地理解向量之间的度量关系。
 
