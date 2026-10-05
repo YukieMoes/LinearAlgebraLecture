@@ -532,6 +532,13 @@
 \usepackage{placeins}
 \usepackage{xurl}
 \usepackage{lecture-terms}
+% 目录标题与页码均可点击；隐藏链接边框，保持原有印刷样式。
+\usepackage[unicode,hidelinks,linktoc=all,bookmarksnumbered]{hyperref}
+% PDF 书签使用纯文本，避免粗体数学向量命令在书签转换时展开。
+\pdfstringdefDisableCommands{%
+    \def\boldsymbol#1{#1}%
+    \def\bm#1{#1}%
+}
 % 英文术语引入后，给中英混排段落少量断行余量。
 \setlength{\emergencystretch}{2em}
 \begingroup
@@ -544,9 +551,11 @@
 
 \frontmatter
 \LecturePageNumbersfalse
+\hypersetup{pageanchor=false}
 \MakeTitlePage
 \MakeInsideCover
 \MakeDedicationPage
+\hypersetup{pageanchor=true}
 
 % 前言：字号、行距和中文标点仅在本组内调整。
 \begingroup
